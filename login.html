@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conex Cass | Login</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0b3b7a;
+}
+.login-box{
+  background:#fff;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  box-shadow:0 4px 12px rgba(0,0,0,.2);
+}
+.login-box h2{
+  text-align:center;
+  color:#0b3b7a;
+  margin-bottom:20px;
+}
+.login-box input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+.login-box button{
+  width:100%;
+  padding:10px;
+  background:#0b3b7a;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.login-box button:hover{background:#072c5b;}
+.small{text-align:center;font-size:12px;color:#666;margin-top:10px;}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+  <h2>Conex Cass</h2>
+  <input id="user" placeholder="Usuário">
+  <input id="pass" type="password" placeholder="Senha">
+  <button onclick="login()">Entrar</button>
+  <div class="small">Painel de Gestão</div>
+</div>
+
+<script>
+function login(){
+  const u = document.getElementById('user').value;
+  const p = document.getElementById('pass').value;
+
+  if(u.trim() === '' || p.trim() === ''){
+    alert('Preencha usuário e senha');
+    return;
+  }
+
+  localStorage.setItem(
+    'usuarioLogado',
+    JSON.stringify({ nome: u })
+  );
+
+  window.location.href = 'dashboard.html';
+}
+</script>
