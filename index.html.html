@@ -4,13 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conex Cass - Sistema Enterprise Final</title>
-
-<!-- 1. BIBLIOTECAS FIREBASE (CORRIGIDO: Agora dentro do HEAD) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap');
 :root {
@@ -215,68 +209,26 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
 </div>
 
 <script>
-// ====== CONFIGURAÇÃO FIREBASE ======
-const firebaseConfig = {
-    apiKey: "AIzaSyCwnkxOhRvXBaAxCcD6MdLWOaIrIuEngkQ",
-    authDomain: "conexcassdb.firebaseapp.com",
-    projectId: "conexcassdb",
-    storageBucket: "conexcassdb.firebasestorage.app",
-    messagingSenderId: "405570360983",
-    appId: "1:405570360983:web:d394d5171a0e279e53bbd2",
-    measurementId: "G-65KHYSMM5R"
-};
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-// ====== SISTEMA DE DADOS (HÍBRIDO) ======
-// Carrega da nuvem e salva na nuvem
-let globalData = {
-    branches: [], users: [], clients: [], transactions: [], 
-    sales: [], inventory: [], speeds: [], plans: []
-};
-
+// ====== BANCO DE DADOS LOCAL ======
 const DB = {
-    init: async () => {
-        console.log("A carregar dados da nuvem...");
-        try {
-            const collections = ['branches', 'users', 'clients', 'transactions', 'sales', 'inventory', 'speeds', 'plans'];
-            const promises = collections.map(async (col) => {
-                const snap = await db.collection('cx_data').doc(col).get();
-                if (snap.exists) {
-                    globalData[col] = snap.data().list;
-                } else {
-                    // Dados iniciais se for a primeira vez
-                    if(col === 'branches') globalData[col] = [{id:'b1', name:'Matriz (Camama)', loc:'Camama', mgr:'Cassoca', phone:'+244 945 740 125', active:true}];
-                    if(col === 'users') globalData[col] = [{id:'u1', name:'Administrador Master', user:'cassoca', pass:'0579', role:'admin', branchId:'all'}];
-                    if(col === 'inventory') globalData[col] = [{id:'i1', name:'Cabo UTP', img: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=", brand:'Generic', cat:'Redes', val:200, qty:100, unit:'Metros', branchId:'b1'}];
-                    if(col === 'speeds') globalData[col] = [{id:'s1', nome:'5 MB', preco:10000}, {id:'s2', nome:'10 MB', preco:15000}];
-                    if(col === 'plans') globalData[col] = [{id:'p1', nome:'Netflix', preco:7000}, {id:'p2', nome:'IPTV', preco:5000}];
-                    
-                    await db.collection('cx_data').doc(col).set({ list: globalData[col] });
-                }
-            });
-            await Promise.all(promises);
-            console.log("Dados sincronizados!");
-            return true;
-        } catch (error) {
-            console.error("Erro ao carregar:", error);
-            alert("Erro de conexão. Verifica a internet.");
-            return false;
-        }
-    },
-
-    get: (k) => globalData[k] || null,
-
-    set: async (k, v) => {
-        globalData[k] = v; 
-        try {
-            await db.collection('cx_data').doc(k).set({ list: v });
-        } catch (e) {
-            console.error("Erro ao salvar na nuvem:", e);
-        }
+    get: (k) => JSON.parse(localStorage.getItem(`cx_${k}`)) || null,
+    set: (k, v) => localStorage.setItem(`cx_${k}`, JSON.stringify(v)),
+    init: () => {
+        if(!DB.get('branches')) DB.set('branches', [{id:'b1', name:'Matriz (Camama)', loc:'Camama', mgr:'Cassoca', phone:'+244 945 740 125', active:true}]);
+        if(!DB.get('users')) DB.set('users', [{id:'u1', name:'Administrador Master', user:'cassoca', pass:'0579', role:'admin', branchId:'all'}]);
+        if(!DB.get('clients')) DB.set('clients', []);
+        if(!DB.get('transactions')) DB.set('transactions', []);
+        if(!DB.get('sales')) DB.set('sales', []); 
+        const placeholder = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+        if(!DB.get('inventory')) DB.set('inventory', [
+            {id:'i1', name:'Cabo UTP', img: placeholder, brand:'Generic', cat:'Redes', val:200, qty:100, unit:'Metros', branchId:'b1'}, 
+            {id:'i2', name:'Box Android', img: placeholder, brand:'MXQ Pro', cat:'Video', val:15000, qty:5, unit:'Unidade', branchId:'b1'}
+        ]);
+        if(!DB.get('speeds')) DB.set('speeds', [{id:'s1', nome:'5 MB', preco:10000}, {id:'s2', nome:'10 MB', preco:15000}]);
+        if(!DB.get('plans')) DB.set('plans', [{id:'p1', nome:'Netflix', preco:7000}, {id:'p2', nome:'IPTV', preco:5000}]);
     }
 };
+DB.init();
 
 let currentUser = null; let currentBranch = 'all'; let tempClientPlans = []; 
 let tempSaleItems = []; 
@@ -720,19 +672,6 @@ function openModalTransaction(tp){const t=tp==='income'?'Receita':'Despesa';cons
 function exportDB(){const d={branches:DB.get('branches'),users:DB.get('users'),clients:DB.get('clients'),transactions:DB.get('transactions'),inventory:DB.get('inventory'),speeds:DB.get('speeds'),plans:DB.get('plans'),sales:DB.get('sales')};const b=new Blob([JSON.stringify(d)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='backup_conex.json';a.click();}
 function importDB(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);Object.keys(d).forEach(k=>DB.set(k,d[k]));alert('Sucesso!');location.reload();}catch(e){alert('Erro')}};r.readAsText(f);}
 
-// ====== INICIALIZAÇÃO CORRIGIDA ======
-async function init(){ 
-    const loaded = await DB.init();
-    const s = sessionStorage.getItem('cx_session'); 
-    if(s && loaded){ 
-        currentUser = JSON.parse(s); 
-        run(); 
-    } else { 
-        showLogin(); 
-    } 
-}
-
-// Arrancar o sistema
 init();
 </script>
 </body>
