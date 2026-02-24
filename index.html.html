@@ -1,12 +1,16 @@
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conex Cass - Sistema Enterprise Final</title>
+
+<!-- 1. BIBLIOTECAS FIREBASE (CORRIGIDO: Agora dentro do HEAD) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@400;500;600;700&display=swap');
 :root {
@@ -273,7 +277,6 @@ const DB = {
         }
     }
 };
-DB.init();
 
 let currentUser = null; let currentBranch = 'all'; let tempClientPlans = []; 
 let tempSaleItems = []; 
@@ -717,6 +720,7 @@ function openModalTransaction(tp){const t=tp==='income'?'Receita':'Despesa';cons
 function exportDB(){const d={branches:DB.get('branches'),users:DB.get('users'),clients:DB.get('clients'),transactions:DB.get('transactions'),inventory:DB.get('inventory'),speeds:DB.get('speeds'),plans:DB.get('plans'),sales:DB.get('sales')};const b=new Blob([JSON.stringify(d)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='backup_conex.json';a.click();}
 function importDB(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{try{const d=JSON.parse(ev.target.result);Object.keys(d).forEach(k=>DB.set(k,d[k]));alert('Sucesso!');location.reload();}catch(e){alert('Erro')}};r.readAsText(f);}
 
+// ====== INICIALIZAÇÃO CORRIGIDA ======
 async function init(){ 
     const loaded = await DB.init();
     const s = sessionStorage.getItem('cx_session'); 
@@ -727,6 +731,9 @@ async function init(){
         showLogin(); 
     } 
 }
+
+// Arrancar o sistema
+init();
 </script>
 </body>
 </html>
