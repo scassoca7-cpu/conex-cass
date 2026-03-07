@@ -39,15 +39,14 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
 .sidebar nav a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: var(--text-muted); text-decoration: none; font-weight: 600; border-left: 3px solid transparent; transition: 0.2s; }
 .sidebar nav a:hover, .sidebar nav a.active { background: rgba(0,180,216,0.1); color: #fff; border-left-color: var(--primary); }
 
-/* CSS DE IMPRESSÃO E PDF */
 @media print {
   body * { visibility: hidden; }
   .print-area, .print-area * { visibility: visible; }
   .print-area { position: absolute; left: 0; top: 0; width: 100%; background: #fff !important; color: #000 !important; padding: 0 !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
   .no-print { display: none !important; }
-  img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
-.contract-box { font-family: 'Times New Roman', serif; padding: 20px; color: #000; background: #fff; }
+
+.contract-box { font-family: 'Times New Roman', serif; font-size: 12pt; padding: 20px; color: #000; background: #fff; line-height: 1.5; }
 .invoice-box { font-family: 'Arial', sans-serif; padding: 20px; color: #000; background: #fff; }
 .carimbo-visto { width: 120px; height: auto; opacity: 0.9; margin-top: 10px; }
 
@@ -59,14 +58,16 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
 .product-card p { font-size: 0.75rem; color: var(--success); font-weight: bold; }
 .product-card small { display: block; font-size: 0.65rem; color: var(--text-muted); margin-top: 4px; }
 .product-card.out-of-stock { opacity: 0.5; pointer-events: none; }
+.product-card.service-card { border-color: var(--warning); background: rgba(255, 193, 0, 0.05); }
 .thumb-preview { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; margin-right: 10px; border: 1px solid rgba(255,255,255,0.1); }
 .sale-item-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-bottom:1px solid #eee; }
 .sale-item-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 4px; margin-right: 10px; }
 
-/* ESTILOS EXTRAS */
 .text-danger { color: var(--danger); }
 .warning-box { background: #fff3cd; color: #856404; padding: 15px; border: 1px solid #ffeeba; border-radius: 4px; margin: 20px 0; text-align: center; font-weight: bold; }
 .info-row { background: rgba(0, 180, 216, 0.1); padding: 8px; border-radius: 4px; margin-bottom: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; }
+.service-check { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 4px; cursor: pointer; }
+.service-check input { width: auto; }
 </style>
 </head>
 <body>
@@ -104,7 +105,14 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
                 <div class="card" style="border-left:3px solid var(--warning);"><div style="font-size:0.8rem;color:var(--text-muted);">Vendas Materiais</div><div style="font-size:1.4rem;font-family:'Orbitron';" id="kpiSales">0 AKZ</div></div>
                 <div class="card" style="border-left:3px solid var(--danger);"><div style="font-size:0.8rem;color:var(--text-muted);">Despesas</div><div style="font-size:1.4rem;font-family:'Orbitron';" id="kpiExpenses">0 AKZ</div></div>
             </div>
-            <div class="card"><h3>⚠️ Alertas</h3><div id="dashboardAlerts" style="max-height:300px; overflow-y:auto;"></div></div>
+            
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3>⚠️ Alertas & Vencimentos</h3>
+                    <button class="btn btn-warning" onclick="openBulkNotifyModal()" style="font-size:0.7rem; padding:4px 8px;">📢 Notificar Vencimentos</button>
+                </div>
+                <div id="dashboardAlerts" style="max-height:400px; overflow-y:auto;"></div>
+            </div>
         </section>
 
         <section id="page-branches" class="page">
@@ -148,7 +156,7 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
                     <div style="display:flex;gap:10px;margin-top:15px;"><input id="newSpeedName" placeholder="Ex: 5MB" style="flex:1"><input id="newSpeedPrice" placeholder="Preço" style="width:100px"><button class="btn btn-primary" onclick="addSpeed()">➕</button></div>
                 </div>
                 <div class="card">
-                    <h3>📺 Streaming</h3>
+                    <h3>📺 Streaming / Serviços</h3>
                     <table><thead><tr><th>Nome</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tablePlans"></tbody></table>
                     <div style="display:flex;gap:10px;margin-top:15px;"><input id="newPlanName" placeholder="Ex: Netflix" style="flex:1"><input id="newPlanPrice" placeholder="Preço" style="width:100px"><button class="btn btn-primary" onclick="addPlan()">➕</button></div>
                 </div>
@@ -183,7 +191,7 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
             <h2>Configurações</h2>
             <div class="card">
                 <h3>Backup & Restauração</h3>
-                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px">Use "Exportar" para salvar seus dados e "Importar" para restaurar. Recomenda-se fazer backup semanal.</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px">Use "Exportar" para salvar seus dados.</p>
                 <button class="btn btn-primary" onclick="exportDB()">⬇️ Exportar Dados</button>
                 <button class="btn btn-outline" onclick="document.getElementById('importFile').click()" style="margin-left:10px;">⬆️ Importar</button>
                 <input type="file" id="importFile" style="display:none" accept=".json" onchange="importDB(event)">
@@ -225,7 +233,12 @@ const DB = {
             {id:'i2', name:'Box Android', img: placeholder, brand:'MXQ Pro', cat:'Video', val:15000, qty:5, unit:'Unidade', branchId:'b1'}
         ]);
         if(!DB.get('speeds')) DB.set('speeds', [{id:'s1', nome:'5 MB', preco:10000}, {id:'s2', nome:'10 MB', preco:15000}]);
-        if(!DB.get('plans')) DB.set('plans', [{id:'p1', nome:'Netflix', preco:7000}, {id:'p2', nome:'IPTV', preco:5000}]);
+        if(!DB.get('plans')) DB.set('plans', [
+            {id:'p1', nome:'Netflix', preco:7000}, 
+            {id:'p2', nome:'IPTV', preco:5000}, 
+            {id:'p3', nome:'Angotela', preco:3000}, 
+            {id:'p4', nome:'Unitv', preco:3500}
+        ]);
     }
 };
 DB.init();
@@ -248,7 +261,14 @@ function closeModal(){ document.getElementById('modalGeneric').classList.remove(
 function val(id){ return document.getElementById(id).value; }
 function fmt(n){ return new Intl.NumberFormat('pt-AO').format(n); }
 
-// ====== DASHBOARD (COM ALERTAS) ======
+// ====== HELPERS DE DATA ======
+function addMonths(date, months) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+}
+
+// ====== DASHBOARD ======
 function loadDashboard(){ 
     const c=filter(DB.get('clients')); 
     const t=filter(DB.get('transactions')); 
@@ -264,9 +284,6 @@ function loadDashboard(){
     const alerts=document.getElementById('dashboardAlerts'); 
     alerts.innerHTML=''; 
     
-    const pend=c.filter(x=>x.status==='NaoPago').length; 
-    if(pend>0) alerts.innerHTML+=`<div style="padding:8px;background:rgba(255,0,110,0.1);border-left:2px solid var(--danger);font-size:0.8rem;">❌ ${pend} pagamentos pendentes (Manual)</div>`; 
-    
     const lowStock=filter(DB.get('inventory')).filter(i=>i.qty<3); 
     if(lowStock.length>0) alerts.innerHTML+=`<div style="padding:8px;background:rgba(255,193,0,0.1);border-left:2px solid var(--warning);font-size:0.8rem;">📦 Estoque baixo: ${lowStock.map(l=>l.name).join(', ')}</div>`; 
     
@@ -275,7 +292,7 @@ function loadDashboard(){
     
     const expiringClients = c.filter(client => {
         if(!client.validade) return false; 
-        const valDate = new Date(client.validade);
+        const valDate = new Date(client.validade + 'T00:00:00');
         const diffTime = valDate - hoje;
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
         return diffDays <= 3;
@@ -286,30 +303,155 @@ function loadDashboard(){
             let phone = client.contact.replace(/\D/g, ''); 
             if(phone.length === 9 && phone.startsWith('9')) phone = '244' + phone;
             
-            const msgText = `Olá *${client.name}*, vim avisar que a sua subscrição na Conex Cass termina em *${client.validade}*. Para evitar corte, por favor regularize o pagamento.`;
+            const msgText = `Olá *${client.name}*, seu plano termina em *${client.validade}*. Regularize para evitar corte.`;
             const waLink = `https://wa.me/${phone}?text=${encodeURIComponent(msgText)}`;
             
-            const valDate = new Date(client.validade);
+            const valDate = new Date(client.validade + 'T00:00:00');
             const isExpired = valDate < hoje;
             
-            return `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.05);">
-                <div>
-                    <span style="font-weight:bold; color:${isExpired ? 'var(--danger)' : 'var(--text-main)'}">${client.name}</span>
-                    <small style="display:block; color:var(--text-muted); font-size:0.7rem">Vence: ${client.validade}</small>
+            return `<div style="padding:10px; border-bottom:1px solid rgba(255,255,255,0.1);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                    <div>
+                        <span style="font-weight:bold; color:${isExpired ? 'var(--danger)' : 'var(--text-main)'}">${client.name}</span>
+                        <span style="font-size:0.8rem; color:var(--text-muted); margin-left:10px;">(Vence: ${client.validade})</span>
+                    </div>
+                    <span class="badge ${isExpired ? 'bg-danger' : 'bg-warning'}">${isExpired ? 'Vencido' : 'Vence Hoje/Amanhã'}</span>
                 </div>
-                <a href="${waLink}" target="_blank" class="btn btn-success" style="padding:4px 8px; font-size:0.7rem; text-decoration:none;">
-                    WhatsApp
-                </a>
+                <div style="display:flex; gap:5px; justify-content:flex-end;">
+                    <button class="btn btn-success" style="padding:4px 8px; font-size:0.7rem;" onclick="quickRenew('${client.id}')">💰 Renovar</button>
+                    <a href="${waLink}" target="_blank" class="btn btn-primary" style="padding:4px 8px; font-size:0.7rem; text-decoration:none;">WhatsApp</a>
+                </div>
             </div>`;
         }).join('');
         
-        alerts.innerHTML += `<div style="padding:10px; background:rgba(0,180,216,0.1); border-left:2px solid var(--primary); font-size:0.8rem; margin-top:10px;">
-            <strong>📅 Expirando/Vencidos (${expiringClients.length}):</strong>
-            <div style="margin-top:5px; max-height:150px; overflow-y:auto;">${listHtml}</div>
+        alerts.innerHTML += `<div style="background:rgba(0,0,0,0.2); border-radius:4px; margin-top:10px;">
+            <div style="padding:8px; background:rgba(0,180,216,0.1); font-weight:bold;">📅 Expirando/Vencidos (${expiringClients.length})</div>
+            <div>${listHtml}</div>
         </div>`;
     }
 
-    if(!alerts.innerHTML) alerts.innerHTML='<div style="text-align:center;color:var(--success);">✅ Tudo OK</div>'; 
+    if(!alerts.innerHTML) alerts.innerHTML='<div style="text-align:center;color:var(--success);padding:20px;">✅ Tudo OK</div>'; 
+}
+
+// Renovação Rápida
+function quickRenew(id){
+    const c = DB.get('clients').find(x=>x.id===id);
+    if(!c) return;
+    
+    modal(`💰 Renovar: ${c.name}`, `
+        <p>Mensalidade Base: <strong>${fmt(c.mens)} AKZ</strong></p>
+        <div class="form-row">
+            <label>Meses a Renovar</label>
+            <select id="qMonths" onchange="calcTotalRenew(${c.mens})">
+                <option value="1">1 Mês</option>
+                <option value="2">2 Meses</option>
+                <option value="3">3 Meses</option>
+                <option value="6">6 Meses</option>
+                <option value="12">1 Ano</option>
+            </select>
+        </div>
+        <div class="form-row">
+            <label>Total a Pagar</label>
+            <input type="text" id="totalRenew" value="${fmt(c.mens)} AKZ" readonly style="font-weight:bold; color:var(--success); font-size:1.2rem;">
+        </div>
+        <div class="form-row">
+            <label>Método</label>
+            <select id="payMetRenew"><option>Transferência</option><option>Dinheiro</option><option>TPA</option></select>
+        </div>
+    `, ()=>{
+        processQuickRenew(id);
+    }, 'Confirmar Renovação', 'btn-success');
+}
+
+function calcTotalRenew(mens){
+    const m = parseInt(document.getElementById('qMonths').value);
+    document.getElementById('totalRenew').value = fmt(mens * m) + ' AKZ';
+}
+
+function processQuickRenew(id){
+    const c = DB.get('clients').find(x=>x.id===id);
+    const months = parseInt(val('qMonths'));
+    const metodo = val('payMetRenew');
+    const totalPay = c.mens * months;
+
+    // Lógica de data corrigida
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    let startDate = today;
+    // Se o cliente ainda tem dias válidos, começamos a contar a partir da validade atual
+    if(c.validade) {
+        const currentVal = new Date(c.validade + 'T00:00:00');
+        if(currentVal >= today) {
+            startDate = currentVal;
+        }
+    }
+    
+    const newDateObj = addMonths(startDate, months);
+    const newDate = newDateObj.toISOString().split('T')[0];
+    
+    c.validade = newDate;
+    c.status = 'Pago';
+    DB.set('clients', DB.get('clients'));
+
+    const tr = {
+        id:'t'+Date.now(),
+        branchId:c.branchId,
+        type:'income',
+        val:totalPay,
+        cat:'Mensalidade',
+        desc:`Renovação ${months}m - ${c.name}`,
+        date:new Date().toLocaleDateString('pt-AO')
+    };
+    DB.get('transactions').push(tr);
+    DB.set('transactions', DB.get('transactions'));
+
+    closeModal();
+    loadDashboard();
+    generateInvoiceRenew(c, totalPay, months, newDate, metodo);
+}
+
+function generateInvoiceRenew(c, val, months, newDate, met){
+    const b=DB.get('branches').find(x=>x.id===c.branchId);
+    const dt = new Date().toLocaleDateString('pt-AO');
+    
+    document.getElementById('docBody').innerHTML=`
+    <div class="invoice-box">
+        ${getDocHeader(b,'FATURA DE RENOVAÇÃO',Date.now())}
+        <table style="width:100%;font-size:10pt;margin-bottom:20px">
+            <tr><td><strong>Cliente:</strong> ${c.name}</td><td><strong>Data:</strong> ${dt}</td></tr>
+            <tr><td><strong>Nova Validade:</strong> ${newDate}</td><td><strong>Período:</strong> ${months} Mês(es)</td></tr>
+        </table>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt">
+            <thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Descrição</th><th style="padding:8px;text-align:right">Valor</th></tr></thead>
+            <tbody>
+                <tr><td style="padding:8px">Renovação de Plano (${c.pkg}) x ${months} Mês(es)</td><td style="padding:8px;text-align:right">${fmt(val)} AKZ</td></tr>
+            </tbody>
+        </table>
+        <div style="text-align:right;margin-bottom:30px"><h3>TOTAL: ${fmt(val)} AKZ</h3></div>
+        <div style="font-size:9pt; color:#666">Pago via: ${met}</div>
+        ${getDocFooter(true)}
+    </div>`;
+    document.getElementById('docTitle').innerText="Fatura de Renovação";
+    document.getElementById('modalDoc').classList.add('show');
+}
+
+function openBulkNotifyModal() {
+    const hoje = new Date(); hoje.setHours(0,0,0,0);
+    const c = DB.get('clients');
+    const list = c.filter(client => {
+        if(!client.validade || client.status === 'Pago') return false;
+        const diff = Math.ceil((new Date(client.validade) - hoje) / (1000 * 60 * 60 * 24));
+        return diff <= 3;
+    });
+
+    if(list.length === 0) { alert("Sem clientes para notificar."); return; }
+    const h = list.map(client => {
+        let phone = client.contact.replace(/\D/g, '');
+        if(phone.length === 9 && phone.startsWith('9')) phone = '244' + phone;
+        return `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333;"><span>${client.name}</span><a href="https://wa.me/${phone}?text=${encodeURIComponent('Olá '+client.name+', seu plano vence em '+client.validade)}" target="_blank" class="btn btn-success">Enviar</a></div>`;
+    }).join('');
+    modal('Notificações', h, null, 'Fechar', 'btn-outline');
 }
 
 // ====== FILIAIS ======
@@ -329,59 +471,174 @@ function delPlan(id){ DB.set('plans', DB.get('plans').filter(p=>p.id!==id)); loa
 // ====== ESTOQUE ======
 function loadStock(forceGlobal = false){ const data = forceGlobal ? DB.get('inventory') : filter(DB.get('inventory')); renderStockTable(data); }
 function searchStock(){ const q = document.getElementById('searchStock').value.toLowerCase(); if(!q) { loadStock(); return; } const data = DB.get('inventory').filter(i => i.name.toLowerCase().includes(q) || (i.brand && i.brand.toLowerCase().includes(q))); renderStockTable(data); }
-function renderStockTable(data){ const branches = DB.get('branches'); document.getElementById('tableStock').innerHTML=data.map(i => { const branchName = branches.find(b => b.id === i.branchId)?.name || 'N/D'; const isLocal = i.branchId === currentBranch || currentBranch === 'all'; return `<tr><td><img src="${i.img || 'https://via.placeholder.com/60'}" class="thumb-preview"></td><td>${i.name}</td><td>${i.brand || '-'}</td><td>${fmt(i.val)} AKZ</td><td>${i.qty} ${i.unit === 'Metros' ? 'm' : 'un'}</td><td><span class="badge ${isLocal ? 'bg-info' : 'bg-warning'}">${branchName}</span></td><td><button class="btn btn-outline" onclick="adjStock('${i.id}',-1)">-</button> <button class="btn btn-success" onclick="adjStock('${i.id}',1)">+</button> <button class="btn btn-warning" onclick="openModalTransfer('${i.id}')" title="Transferir">➡️</button> <button class="btn btn-danger" onclick="delItem('${i.id}')" style="margin-left:5px">🗑️</button></td></tr>`; }).join(''); }
+function renderStockTable(data){ const branches = DB.get('branches'); document.getElementById('tableStock').innerHTML=data.map(i => { const branchName = branches.find(b => b.id === i.branchId)?.name || 'N/D'; return `<tr><td><img src="${i.img || 'https://via.placeholder.com/60'}" class="thumb-preview"></td><td>${i.name}</td><td>${i.brand || '-'}</td><td>${fmt(i.val)} AKZ</td><td>${i.qty} ${i.unit === 'Metros' ? 'm' : 'un'}</td><td><span class="badge bg-info">${branchName}</span></td><td><button class="btn btn-outline" onclick="adjStock('${i.id}',-1)">-</button> <button class="btn btn-success" onclick="adjStock('${i.id}',1)">+</button> <button class="btn btn-danger" onclick="delItem('${i.id}')" style="margin-left:5px">🗑️</button></td></tr>`; }).join(''); }
 
 function openModalItem(id=''){ const item=id?DB.get('inventory').find(x=>x.id===id):{name:'',brand:'',cat:'',val:0,qty:0,unit:'Unidade',img:''}; modal(id?'Editar':'Novo Produto',`<div class="form-row"><div style="flex:1"><div class="form-row"><label>Nome do Produto</label><input id="iName" value="${item.name}"></div><div class="form-row"><label>Marca</label><input id="iBrand" value="${item.brand || ''}"><label>Categoria</label><select id="iCat"><option ${item.cat==='Redes'?'selected':''}>Redes</option><option ${item.cat==='Video'?'selected':''}>Video</option><option ${item.cat==='Acessórios'?'selected':''}>Acessórios</option></select></div><div class="form-row"><label>Preço</label><input type="number" id="iVal" value="${item.val}"><label>Unidade</label><select id="iUnit"><option value="Unidade" ${item.unit==='Unidade'?'selected':''}>Unidade</option><option value="Metros" ${item.unit==='Metros'?'selected':''}>Metros</option></select></div><div class="form-row"><label>Quantidade</label><input type="number" id="iQty" value="${item.qty}"></div></div><div style="width:150px; text-align:center;"><label>Foto</label><img id="previewImg" src="${item.img || 'https://via.placeholder.com/150'}" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:2px dashed rgba(255,255,255,0.2)"><input type="file" id="iFile" accept="image/*" style="display:none" onchange="previewImage(this)"><button class="btn btn-outline" style="margin-top:10px; width:100%" onclick="document.getElementById('iFile').click()">Carregar</button></div></div>`,()=>{ if(!val('iName')){alert('Nome obrigatório');return} const imgSrc = document.getElementById('previewImg').src; let bid=id?item.branchId:(currentUser.role==='admin'?(currentBranch==='all'?DB.get('branches')[0].id:currentBranch):currentUser.branchId); const data={id:id||'i'+Date.now(),name:val('iName'),img:imgSrc,brand:val('iBrand'),cat:val('iCat'),unit:val('iUnit'),val:parseFloat(val('iVal')),qty:parseInt(val('iQty')),branchId:bid}; const list=DB.get('inventory'); const idx=list.findIndex(x=>x.id===id); if(idx>=0)list[idx]=data; else list.push(data); DB.set('inventory',list);closeModal();loadStock(); }); }
 function previewImage(input){ if(input.files && input.files[0]){ const reader = new FileReader(); reader.onload = (e) => { document.getElementById('previewImg').src = e.target.result; }; reader.readAsDataURL(input.files[0]); } }
 function adjStock(id,delta){ const list=DB.get('inventory'); const i=list.find(x=>x.id===id); if(i){i.qty=Math.max(0,i.qty+delta); DB.set('inventory',list); loadStock(); } }
 function delItem(id){ if(confirm('Remover produto?')){ DB.set('inventory', DB.get('inventory').filter(i=>i.id!==id)); loadStock(); }}
 
-function openModalTransfer(id){ 
-    const allItems = DB.get('inventory'); 
-    const item = allItems.find(i => i.id === id); 
-    if(!item) return;
-    const branches = DB.get('branches').filter(b => b.id !== item.branchId);
-    modal(`➡️ Transferir: ${item.name}`, `
-        <p>Stock atual: <strong>${item.qty} ${item.unit}</strong> em ${DB.get('branches').find(b=>b.id===item.branchId)?.name}</p>
-        <div class="form-row">
-            <label>Enviar para:</label>
-            <select id="transDest">${branches.map(b=>`<option value="${b.id}">${b.name}</option>`).join('')}</select>
-        </div>
-        <div class="form-row">
-            <label>Quantidade a Transferir</label>
-            <input type="number" id="transQty" value="1" min="1">
-        </div>
-    `, ()=>{
-        const qtyInput = document.getElementById('transQty').value;
-        const qty = parseInt(qtyInput, 10);
-        if (isNaN(qty) || qty <= 0) { alert('Digite uma quantidade válida.'); return; }
-        if (qty > item.qty) { alert(`Stock insuficiente. Disponível: ${item.qty}.`); return; }
-        const destId = val('transDest');
-        item.qty -= qty;
-        const existingDest = allItems.find(i => i.name === item.name && i.branchId === destId);
-        if(existingDest){ existingDest.qty += qty; }
-        else { const newItem = JSON.parse(JSON.stringify(item)); newItem.id = 'i'+Date.now(); newItem.branchId = destId; newItem.qty = qty; allItems.push(newItem); }
-        DB.set('inventory', allItems); closeModal(); loadStock(); alert('Sucesso!');
-    }, 'Transferir', 'btn-warning');
-}
-
-// ====== VENDAS ======
+// ====== VENDAS (PDV) ======
 function loadSales(){ const sales=filter(DB.get('sales')); document.getElementById('tableSales').innerHTML=sales.map(s=>`<tr><td>${s.date}</td><td>${s.clientName}</td><td>${s.items.map(i=>`${i.name} (${i.qty})`).join(', ')}</td><td><strong>${fmt(s.total)} AKZ</strong></td><td><button class="btn btn-primary" onclick="generateSaleInvoice(null, '${s.id}')">📄 Fatura</button></td></tr>`).join(''); }
 
-function openModalSale(){ tempSaleItems=[]; const products=filter(DB.get('inventory')); const clients=filter(DB.get('clients')); modal('🛒 Nova Venda',`<div class="form-row"><label>Cliente</label><select id="saleClient" onchange="var f=document.getElementById('saleAvulsoFields'); f.style.display = this.value === 'avulso' ? 'block' : 'none';"><option value="0">Consumidor Final</option><option value="avulso">Cliente Avulso</option>${clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div><div id="saleAvulsoFields" class="form-row" style="display:none; background:rgba(0,0,0,0.2); padding:10px; border-radius:4px;"><input id="saleNameAvulso" placeholder="Nome do Cliente"><input id="saleNifAvulso" placeholder="NIF"></div><hr style="border-color:rgba(255,255,255,0.1); margin:20px 0;"><div class="form-row" style="margin-bottom:10px;"><input type="text" id="searchProdSale" placeholder="🔍 Pesquisar produto..." onkeyup="renderProductGrid(this.value)"></div><div id="productGrid" class="product-grid"></div><div style="margin-top:20px; border-top:2px solid var(--primary); padding-top:15px;"><h4>Carrinho</h4><div id="saleCartList" style="min-height:60px; background:rgba(0,0,0,0.2); padding:10px; border-radius:4px; margin-bottom:10px;"><p style="color:var(--text-muted); text-align:center">Vazio</p></div><div style="text-align:right; font-size:1.2rem;">Total: <strong id="saleTotal" style="color:var(--success)">0 AKZ</strong></div></div>`, ()=>{ if(tempSaleItems.length===0){alert('Adicione itens');return} processSale(); }, 'Finalizar', 'btn-success'); renderProductGrid(''); }
-function renderProductGrid(q){ const p=filter(DB.get('inventory')).filter(i=>i.name.toLowerCase().includes(q.toLowerCase())); document.getElementById('productGrid').innerHTML=p.map(i=>`<div class="product-card ${i.qty<1?'out-of-stock':''}" onclick="${i.qty<1?'':`addToCart('${i.id}')`}"><img src="${i.img||'https://via.placeholder.com/80'}"><h4>${i.name}</h4><p>${fmt(i.val)} AKZ</p><small>Stock: ${i.qty}</small></div>`).join(''); }
-function addToCart(pid){ const p=DB.get('inventory').find(x=>x.id===pid); const inCart=tempSaleItems.find(x=>x.id===pid); if(inCart){ if(inCart.qty>=p.qty){alert('Stock insuficiente');return} inCart.qty++; inCart.sub=inCart.val*inCart.qty; } else { tempSaleItems.push({id:p.id,name:p.name,val:p.val,qty:1,unit:p.unit,img:p.img,sub:p.val}); } updateSaleCartUI(); }
-function updateSaleCartUI(){ const l=document.getElementById('saleCartList'); if(tempSaleItems.length===0){l.innerHTML='<p style="color:var(--text-muted);text-align:center">Vazio</p>';document.getElementById('saleTotal').innerText='0 AKZ';return} let h='';let t=0; tempSaleItems.forEach((it,i)=>{t+=it.sub;h+=`<div class="sale-item-row"><div style="display:flex;align-items:center;"><img src="${it.img}"><div><span style="font-weight:600">${it.name}</span><br><small style="color:#666">${it.val} x ${it.qty}</small></div></div><div style="text-align:right;"><strong>${fmt(it.sub)} AKZ</strong><br><button class="btn btn-danger" style="padding:0 5px;font-size:0.7rem;margin-top:5px" onclick="removeSaleItem(${i})">X</button></div></div>`;}); l.innerHTML=h;document.getElementById('saleTotal').innerText=fmt(t)+' AKZ'; }
-function removeSaleItem(i){ tempSaleItems.splice(i,1); updateSaleCartUI(); }
-function processSale(){ const sel=val('saleClient');let n="Consumidor Final";if(sel==='avulso'){n=val('saleNameAvulso')||"Consumidor Final";const nif=val('saleNifAvulso');if(nif)n+=` (NIF:${nif})`;}else if(sel!=='0'){const c=DB.get('clients').find(x=>x.id===sel);if(c)n=c.name;} const t=tempSaleItems.reduce((a,b)=>a+b.sub,0); const s={id:'sale'+Date.now(),branchId:currentBranch==='all'?DB.get('branches')[0].id:currentBranch,date:new Date().toLocaleDateString('pt-AO'),clientName:n,items:[...tempSaleItems],total:t}; DB.get('sales').push(s); tempSaleItems.forEach(it=>{const p=DB.get('inventory').find(x=>x.id===it.id);if(p)p.qty-=it.qty;}); DB.set('inventory',DB.get('inventory')); const tr={id:'t'+Date.now(),branchId:s.branchId,type:'income',val:t,cat:'Venda de Material',desc:`Venda a ${n}`,date:s.date}; DB.get('transactions').push(tr); DB.set('sales',DB.get('sales'));DB.set('transactions',DB.get('transactions'));closeModal();loadSales();loadStock();loadDashboard(); generateSaleInvoice(s); }
-function generateSaleInvoice(so, sid){ const s=so?so:DB.get('sales').find(x=>x.id===sid);if(!s)return; const b=DB.get('branches').find(x=>x.id===s.branchId); const h=s.items.map(it=>`<tr><td>${it.name}</td><td>${it.qty} ${it.unit==='Metros'?'m':'un'}</td><td>${fmt(it.val)} AKZ</td><td>${fmt(it.sub)} AKZ</td></tr>`).join(''); document.getElementById('docBody').innerHTML=`<div class="invoice-box">${getDocHeader(b,'FATURA DE VENDA',s.id.replace('sale',''))}<table style="width:100%;font-size:9pt;margin-bottom:20px"><tr><td><strong>Cliente:</strong>${s.clientName}</td><td><strong>Data:</strong>${s.date}</td></tr></table><table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:9pt"><thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Produto</th><th style="padding:8px;text-align:center">Qtd</th><th style="padding:8px;text-align:right">Preço</th><th style="padding:8px;text-align:right">Sub-Total</th></tr></thead><tbody>${h}</tbody></table><div style="text-align:right;margin-bottom:30px"><h3>TOTAL: ${fmt(s.total)} AKZ</h3></div>${getDocFooter()}</div>`; document.getElementById('docTitle').innerText="Fatura"; document.getElementById('modalDoc').classList.add('show'); }
-
-// ====== CLIENTES ======
-function loadClients(l=null){ const d=l||filter(DB.get('clients')); document.getElementById('tableClients').innerHTML=d.map(c=>{
-    const isExpired = c.validade ? (new Date(c.validade) < new Date()) : true;
-    const validadeClass = isExpired ? 'text-danger' : '';
+function openModalSale(){ 
+    tempSaleItems=[]; 
+    const products=filter(DB.get('inventory')); 
+    const clients=filter(DB.get('clients')); 
+    const speeds = DB.get('speeds');
+    const plans = DB.get('plans');
     
-    return `<tr><td>${c.name}<br><small style="color:var(--text-muted)">${c.email||''}</small></td><td>${c.contact}</td><td>${c.pkg}</td><td><span class="${validadeClass}" style="font-weight:bold">${c.validade || 'N/D'}</span></td><td><span class="badge ${c.status==='Pago'?'bg-success':'bg-danger'}">${c.status}</span></td><td><button class="btn btn-success" style="padding:2px 6px;" onclick="receivePayment('${c.id}')">💰</button> <button class="btn btn-warning" style="padding:2px 6px;" onclick="generateCobranca('${c.id}')" title="Fatura Cobrança">⚠️</button> <button class="btn btn-primary" style="padding:2px 6px;" onclick="generateInvoice('${c.id}')">📄</button> <button class="btn btn-outline" style="padding:2px 6px;" onclick="openModalContract('${c.id}')" title="Contrato">📝</button> <button class="btn btn-outline" style="padding:2px 6px;" onclick="openModalClient('${c.id}')">✏️</button> <button class="btn btn-danger" style="padding:2px 6px;" onclick="delClient('${c.id}')">🗑️</button></td></tr>`;
+    modal('🛒 Nova Venda',`
+    <div class="form-row"><label>Cliente</label><select id="saleClient"><option value="0">Consumidor Final</option>${clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+    
+    <div style="display:flex; gap:10px; margin:20px 0;">
+        <button class="btn btn-primary" onclick="toggleSaleTab('products')" id="tabProd">Produtos</button>
+        <button class="btn btn-outline" onclick="toggleSaleTab('services')" id="tabServ">Serviços/Streaming</button>
+    </div>
+
+    <div id="saleProductsArea">
+        <input type="text" id="searchProdSale" placeholder="🔍 Pesquisar produto..." onkeyup="renderProductGrid(this.value)" style="margin-bottom:10px;">
+        <div id="productGrid" class="product-grid"></div>
+    </div>
+    
+    <div id="saleServicesArea" style="display:none;">
+        <div class="form-row">
+            <label>Internet</label>
+            <select id="saleSpeed"><option value="">Selecione</option>${speeds.map(s=>`<option value="${s.preco}" data-name="${s.nome}">${s.nome} - ${fmt(s.preco)} Akz</option>`).join('')}</select>
+        </div>
+        <div style="margin-bottom:15px;">
+            <label>Streaming/Serviços (Selecione)</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                ${plans.map(p=>`
+                    <label class="service-check">
+                        <input type="checkbox" value="${p.preco}" data-name="${p.nome}" class="stream-check" onchange="updateServiceTotal()"> ${p.nome} (${fmt(p.preco)} Akz)
+                    </label>
+                `).join('')}
+            </div>
+        </div>
+        <div class="form-row">
+            <label>Duração (Meses)</label>
+            <input type="number" id="saleDuration" value="1" min="1" onchange="updateServiceTotal()">
+        </div>
+        <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:4px; margin-bottom:10px;">
+            <p>Total do Serviço: <strong id="serviceTotalPreview" style="color:var(--warning)">0 AKZ</strong></p>
+        </div>
+        <button class="btn btn-warning" style="width:100%;" onclick="addServiceToCart()">➕ Adicionar Serviço ao Carrinho</button>
+    </div>
+
+    <div style="margin-top:20px; border-top:2px solid var(--primary); padding-top:15px;">
+        <h4>Carrinho</h4>
+        <div id="saleCartList" style="min-height:60px; background:rgba(0,0,0,0.2); padding:10px; border-radius:4px; margin-bottom:10px;"><p style="color:var(--text-muted); text-align:center">Vazio</p></div>
+        <div style="text-align:right; font-size:1.2rem;">Total: <strong id="saleTotal" style="color:var(--success)">0 AKZ</strong></div>
+    </div>`, ()=>{ if(tempSaleItems.length===0){alert('Adicione itens');return} processSale(); }, 'Finalizar', 'btn-success'); 
+    
+    renderProductGrid(''); 
+}
+
+function updateServiceTotal(){
+    const speedVal = parseFloat(document.getElementById('saleSpeed').value) || 0;
+    const duration = parseInt(document.getElementById('saleDuration').value) || 1;
+    let streamsTotal = 0;
+    document.querySelectorAll('.stream-check:checked').forEach(el => {
+        streamsTotal += parseFloat(el.value);
+    });
+    
+    const total = (speedVal + streamsTotal) * duration;
+    document.getElementById('serviceTotalPreview').innerText = fmt(total) + ' AKZ';
+}
+
+function toggleSaleTab(type){
+    if(type === 'products'){
+        document.getElementById('saleProductsArea').style.display = 'block';
+        document.getElementById('saleServicesArea').style.display = 'none';
+        document.getElementById('tabProd').className = 'btn btn-primary';
+        document.getElementById('tabServ').className = 'btn btn-outline';
+    } else {
+        document.getElementById('saleProductsArea').style.display = 'none';
+        document.getElementById('saleServicesArea').style.display = 'block';
+        document.getElementById('tabProd').className = 'btn btn-outline';
+        document.getElementById('tabServ').className = 'btn btn-primary';
+        updateServiceTotal();
+    }
+}
+
+function addServiceToCart(){
+    const speedSel = document.getElementById('saleSpeed');
+    const duration = parseInt(document.getElementById('saleDuration').value) || 1;
+    
+    let items = [];
+    let total = 0;
+    let speedVal = speedSel.value ? parseFloat(speedSel.value) : 0;
+    
+    if(speedVal > 0) {
+        items.push(speedSel.options[speedSel.selectedIndex].dataset.name);
+    }
+    
+    let streamItems = [];
+    document.querySelectorAll('.stream-check:checked').forEach(el => {
+        streamItems.push(el.dataset.name);
+        total += parseFloat(el.value);
+    });
+    
+    if(items.length === 0 && streamItems.length === 0){ alert('Selecione pelo menos um serviço'); return; }
+    
+    total += speedVal;
+    let fullDesc = items.concat(streamItems).join(' + ');
+    
+    const totalItem = total * duration;
+    fullDesc += ` (${duration} Mês)`;
+
+    tempSaleItems.push({id:'srv'+Date.now(), name:fullDesc, val:total, qty:duration, unit:'Mês', sub:totalItem, type:'service'});
+    updateSaleCartUI();
+    
+    speedSel.value = "";
+    document.querySelectorAll('.stream-check').forEach(el => el.checked = false);
+    document.getElementById('saleDuration').value = 1;
+    updateServiceTotal();
+}
+
+function renderProductGrid(q){ 
+    const p=filter(DB.get('inventory')).filter(i=>i.name.toLowerCase().includes(q.toLowerCase())); 
+    document.getElementById('productGrid').innerHTML=p.map(i=>`<div class="product-card ${i.qty<1?'out-of-stock':''}" onclick="${i.qty<1?'':`addToCart('${i.id}')`}"><img src="${i.img||'https://via.placeholder.com/80'}"><h4>${i.name}</h4><p>${fmt(i.val)} AKZ</p><small>Stock: ${i.qty}</small></div>`).join(''); 
+}
+
+function addToCart(pid){ 
+    const p=DB.get('inventory').find(x=>x.id===pid); 
+    const inCart=tempSaleItems.find(x=>x.id===pid); 
+    if(inCart){ if(inCart.qty>=p.qty){alert('Stock insuficiente');return} inCart.qty++; inCart.sub=inCart.val*inCart.qty; } else { tempSaleItems.push({id:p.id,name:p.name,val:p.val,qty:1,unit:p.unit,img:p.img,sub:p.val,type:'product'}); } 
+    updateSaleCartUI(); 
+}
+
+function updateSaleCartUI(){ 
+    const l=document.getElementById('saleCartList'); 
+    if(tempSaleItems.length===0){l.innerHTML='<p style="color:var(--text-muted);text-align:center">Vazio</p>';document.getElementById('saleTotal').innerText='0 AKZ';return} 
+    let h='';let t=0; 
+    tempSaleItems.forEach((it,i)=>{t+=it.sub;h+=`<div class="sale-item-row"><div style="display:flex;align-items:center;"><div><span style="font-weight:600">${it.name}</span><br><small style="color:#666">${fmt(it.val)} x ${it.qty}</small></div></div><div style="text-align:right;"><strong>${fmt(it.sub)} AKZ</strong><br><button class="btn btn-danger" style="padding:0 5px;font-size:0.7rem;margin-top:5px" onclick="removeSaleItem(${i})">X</button></div></div>`;}); 
+    l.innerHTML=h;document.getElementById('saleTotal').innerText=fmt(t)+' AKZ'; 
+}
+
+function removeSaleItem(i){ tempSaleItems.splice(i,1); updateSaleCartUI(); }
+function processSale(){ 
+    const sel=val('saleClient');let n="Consumidor Final"; if(sel!=='0'){const c=DB.get('clients').find(x=>x.id===sel);if(c)n=c.name;} 
+    const t=tempSaleItems.reduce((a,b)=>a+b.sub,0); 
+    const s={id:'sale'+Date.now(),branchId:currentBranch==='all'?DB.get('branches')[0].id:currentBranch,date:new Date().toLocaleDateString('pt-AO'),clientName:n,items:[...tempSaleItems],total:t}; 
+    DB.get('sales').push(s); 
+    
+    tempSaleItems.forEach(it=>{ if(it.type === 'product'){ const p=DB.get('inventory').find(x=>x.id===it.id);if(p)p.qty-=it.qty; } }); 
+    DB.set('inventory',DB.get('inventory')); 
+    
+    const tr={id:'t'+Date.now(),branchId:s.branchId,type:'income',val:t,cat:'Venda',desc:`Venda a ${n}`,date:s.date}; 
+    DB.get('transactions').push(tr); 
+    DB.set('sales',DB.get('sales'));DB.set('transactions',DB.get('transactions'));closeModal();loadSales();loadStock();loadDashboard(); generateSaleInvoice(s); 
+}
+
+function generateSaleInvoice(so, sid){ const s=so?so:DB.get('sales').find(x=>x.id===sid);if(!s)return; const b=DB.get('branches').find(x=>x.id===s.branchId); const h=s.items.map(it=>`<tr><td>${it.name}</td><td>${it.qty}</td><td>${fmt(it.val)} AKZ</td><td>${fmt(it.sub)} AKZ</td></tr>`).join(''); document.getElementById('docBody').innerHTML=`<div class="invoice-box">${getDocHeader(b,'FATURA',s.id.replace('sale',''))}<table style="width:100%;font-size:9pt;margin-bottom:20px"><tr><td><strong>Cliente:</strong>${s.clientName}</td><td><strong>Data:</strong>${s.date}</td></tr></table><table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:9pt"><thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Item</th><th style="padding:8px">Qtd</th><th style="padding:8px;text-align:right">Preço</th><th style="padding:8px;text-align:right">Total</th></tr></thead><tbody>${h}</tbody></table><div style="text-align:right;margin-bottom:30px"><h3>TOTAL: ${fmt(s.total)} AKZ</h3></div>${getDocFooter()}</div>`; document.getElementById('docTitle').innerText="Fatura"; document.getElementById('modalDoc').classList.add('show'); }
+
+// ====== CLIENTES COM VALIDADE AUTOMÁTICA ======
+function loadClients(l=null){ const d=l||filter(DB.get('clients')); document.getElementById('tableClients').innerHTML=d.map(c=>{
+    const isExpired = c.validade ? (new Date(c.validade + 'T00:00:00') < new Date()) : true;
+    const validadeClass = isExpired ? 'text-danger' : '';
+    return `<tr><td>${c.name}<br><small style="color:var(--text-muted)">${c.email||''}</small></td><td>${c.contact}</td><td>${c.pkg}</td><td><span class="${validadeClass}" style="font-weight:bold">${c.validade || 'N/D'}</span></td><td><span class="badge ${c.status==='Pago'?'bg-success':'bg-danger'}">${c.status}</span></td><td><button class="btn btn-success" style="padding:2px 6px;" onclick="receivePayment('${c.id}')">💰</button> <button class="btn btn-primary" style="padding:2px 6px;" onclick="generateInvoice('${c.id}')">📄</button> <button class="btn btn-outline" style="padding:2px 6px;" onclick="openModalContract('${c.id}')">📝</button> <button class="btn btn-outline" style="padding:2px 6px;" onclick="openModalClient('${c.id}')">✏️</button> <button class="btn btn-danger" style="padding:2px 6px;" onclick="delClient('${c.id}')">🗑️</button></td></tr>`;
 }).join(''); }
 function searchClients(){ const q=document.getElementById('searchClient').value.toLowerCase(); loadClients(filter(DB.get('clients')).filter(c=>c.name.toLowerCase().includes(q)||c.contact.includes(q))); }
 function delClient(id){ if(confirm('Apagar cliente?')){ DB.set('clients', DB.get('clients').filter(c=>c.id!==id)); loadClients(); } }
@@ -402,36 +659,43 @@ function openModalClient(id=''){
     <div class="form-row"><label>Morada</label><input id="cMorada" value="${c.morada||''}"></div>
     
     <div class="form-row">
-        <label>Taxa Contrato</label><input type="number" id="cContrato" value="${c.contrato||50000}">
+        <label>Taxa Adesão</label><input type="number" id="cContrato" value="${c.contrato||50000}">
         <label>Pago?</label>
         <select id="cContratoPago"><option value="0" ${!c.contratoPago?'selected':''}>Não</option><option value="1" ${c.contratoPago?'selected':''}>Sim</option></select>
     </div>
     
-    <!-- CAMPO VALIDADE -->
-    <div class="form-row">
-        <label>Validade do Plano</label><input type="date" id="cValidade" value="${c.validade || ''}">
-    </div>
-
     <div class="form-row">
         <label>Internet</label><select id="cPkg" onchange="calcM()">${so}</select>
-        <label>Instalação</label><input type="date" id="cDate" value="${c.data||''}">
+        <label>Tipo Ligação</label>
+        <select id="cConn"><option ${c.conn==='Fibra'?'selected':''}>Fibra</option><option ${c.conn==='Rádio'?'selected':''}>Rádio</option><option ${c.conn==='Cabo'?'selected':''}>Cabo</option></select>
     </div>
-    
+
     <div class="form-row" style="grid-template-columns:1fr">
-        <label>Streaming</label>
+        <label>Streaming Adicional</label>
         <div id="planTags" style="display:flex;flex-wrap:wrap;gap:5px">
             ${ps.map(p=>`<span class="badge ${tempClientPlans.find(x=>x.n===p.nome)?'bg-success':'bg-info'}" onclick="toggleP(this,'${p.nome}',${p.preco})">${p.nome} - ${fmt(p.preco)}kz</span>`).join('')}
         </div>
     </div>
-    
+
     <div class="form-row">
-        <label>Equip.</label>
-        <select id="cEquip"><option value="">Nenhum</option>${it.map(i=>`<option value="${i.name}" ${c.equip===i.name?'selected':''}>${i.name}</option>`).join('')}</select>
-        <label>Ligação</label>
-        <select id="cConn"><option ${c.conn==='Fibra'?'selected':''}>Fibra</option><option ${c.conn==='Rádio'?'selected':''}>Rádio</option><option ${c.conn==='Cabo'?'selected':''}>Cabo</option></select>
+        <label>Data Instalação</label><input type="date" id="cDate" value="${c.data||''}" onchange="calcValidadeAuto()">
+        <label>Duração (Meses)</label>
+        <select id="cDuration" onchange="calcValidadeAuto()">
+            <option value="1">1 Mês</option>
+            <option value="3">3 Meses</option>
+            <option value="6">6 Meses</option>
+            <option value="12">1 Ano</option>
+        </select>
     </div>
     
     <div class="form-row">
+        <label>Validade Calculada</label>
+        <input type="date" id="cValidade" value="${c.validade || ''}">
+    </div>
+    
+    <div class="form-row">
+        <label>Equipamento</label>
+        <select id="cEquip"><option value="">Nenhum</option>${it.map(i=>`<option value="${i.name}" ${c.equip===i.name?'selected':''}>${i.name}</option>`).join('')}</select>
         <label>Status</label>
         <select id="cStatus"><option ${c.status==='Pago'?'selected':''}>Pago</option><option ${c.status==='NaoPago'?'selected':''}>Pendente</option></select>
     </div>
@@ -440,43 +704,42 @@ function openModalClient(id=''){
         <p>Mensalidade: <strong id="cMens" style="color:var(--success);font-size:1.1rem">${fmt(c.mens||0)} AKZ</strong></p>
     </div>`,()=>{
         if(!val('cName')){alert('Nome obrigatório');return}
-        let bid;
-        if(id) bid=c.branchId; 
-        else if(currentUser.role==='admin'&&currentBranch==='all') bid=val('cBranch');
-        else bid=currentUser.role==='admin'?currentBranch:currentUser.branchId;
-        
+        let bid; if(id) bid=c.branchId; else if(currentUser.role==='admin'&&currentBranch==='all') bid=val('cBranch'); else bid=currentUser.role==='admin'?currentBranch:currentUser.branchId;
         const pp=val('cPkg').split('|');
         const d={
             id:id||'c'+Date.now(),
             branchId:bid,
-            name:val('cName'),
-            contact:val('cContact'),
-            morada:val('cMorada'),
-            bilhete:val('cBilhete'),
-            email:val('cEmail'),
-            pkg:pp[0],
-            velPre:parseInt(pp[1]),
-            plans:tempClientPlans,
-            mens:calcM(),
-            equip:val('cEquip'),
-            conn:val('cConn'),
-            data:val('cDate'),
-            validade:val('cValidade'), 
-            status:val('cStatus'),
-            contrato:parseFloat(val('cContrato')),
-            contratoPago:val('cContratoPago')==='1'
+            name:val('cName'),contact:val('cContact'),morada:val('cMorada'),bilhete:val('cBilhete'),email:val('cEmail'),
+            pkg:pp[0],velPre:parseInt(pp[1]),plans:tempClientPlans,mens:calcM(),
+            equip:val('cEquip'),conn:val('cConn'),data:val('cDate'),validade:val('cValidade'),status:val('cStatus'),
+            contrato:parseFloat(val('cContrato')),contratoPago:val('cContratoPago')==='1'
         };
-        
-        const l=DB.get('clients');
-        const ix=l.findIndex(x=>x.id===id);
-        if(ix>=0) l[ix]=d; else l.push(d);
-        DB.set('clients',l);
-        closeModal();
-        loadClients();
-    },'Salvar');
+        const l=DB.get('clients');const ix=l.findIndex(x=>x.id===id);if(ix>=0) l[ix]=d; else l.push(d);DB.set('clients',l);closeModal();loadClients();
+    },'Salvar'); 
     
-    setTimeout(calcM,50); 
+    setTimeout(()=>{ calcM(); calcValidadeAuto(); }, 50); 
 }
+
+function calcValidadeAuto(){
+    const dateInput = document.getElementById('cDate');
+    const durationInput = document.getElementById('cDuration');
+    const validadeInput = document.getElementById('cValidade');
+    
+    let dateStr = dateInput.value;
+    const duration = parseInt(durationInput.value);
+    
+    if(!dateStr) {
+        dateStr = new Date().toISOString().split('T')[0];
+        dateInput.value = dateStr;
+    }
+    
+    if(dateStr && duration){
+        const d = new Date(dateStr + 'T00:00:00');
+        const newD = addMonths(d, duration);
+        validadeInput.value = newD.toISOString().split('T')[0];
+    }
+}
+
 function toggleP(el,n,v){const s=tempClientPlans.find(p=>p.n===n);if(s){tempClientPlans=tempClientPlans.filter(p=>p.n!==n);el.classList.remove('bg-success');el.classList.add('bg-info');}else{tempClientPlans.push({n,v});el.classList.remove('bg-info');el.classList.add('bg-success');}calcM();}
 function calcM(){const p=val('cPkg')||'0|0';const pt=p.split('|');const b=parseInt(pt[1]);const ps=tempClientPlans.reduce((a,p)=>a+p.v,0);const t=b+ps;const el=document.getElementById('cMens');if(el)el.innerText=fmt(t)+' AKZ';return t;}
 
@@ -484,47 +747,49 @@ function calcM(){const p=val('cPkg')||'0|0';const pt=p.split('|');const b=parseI
 function getDocHeader(b, t, n){ return `<div style="text-align:center;margin-bottom:20px"><img src="logotipo_conex_cass_novo.png" style="width:90px;height:auto"><br><h2 style="font-size:16pt;margin:5px 0;color:#000">${b?b.name:'CONEX CASS'}</h2><p style="font-size:9pt;color:#666">NIF: 5002630770 | Tel: ${b&&b.phone?b.phone:'+244 945 740 125'}</p></div><h3 style="text-align:center;background:#f0f0f0;padding:5px;font-size:12pt">${t} ${n?'Nº '+n:''}</h3>`; }
 function getDocFooter(showStamp = true){ return `<div style="margin-top:50px;text-align:right">${showStamp ? '<img src="carimbo_conextv.png" class="carimbo-visto">' : ''}</div>`; }
 
-// Receber Pagamento
+// ====== RECEBER PAGAMENTO (CORRIGIDO) ======
 function receivePayment(id){
     const c=DB.get('clients').find(x=>x.id===id);
-    const hoje = new Date();
-    const novaValidade = new Date(hoje.setMonth(hoje.getMonth() + 1)).toISOString().split('T')[0];
     
-    modal('💰 Receber',`
-    <p>Cliente: <strong>${c.name}</strong></p>
-    <p>Valor: <strong style="color:var(--primary)">${fmt(c.mens)} AKZ</strong></p>
-    <div class="form-row"><label>Valor Pago</label><input type="number" id="payVal" value="${c.mens}"></div>
-    <div class="form-row">
-        <label>Método</label>
-        <select id="payMet"><option>Transferência</option><option>Dinheiro</option><option>TPA</option></select>
-    </div>
-    <div class="form-row">
-        <label>Nova Validade (1 Mês)</label>
-        <input type="date" id="payValidade" value="${novaValidade}">
-    </div>
-    `,()=>{
-        const v=parseFloat(val('payVal'));
-        const newDate = val('payValidade');
-        
+    // LÓGICA DE DATA INTELIGENTE
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    let startDate = today;
+
+    // Se o cliente tem validade e ela é futura, começamos a contar a partir dela
+    if(c.validade) {
+        const currentVal = new Date(c.validade + 'T00:00:00');
+        if(currentVal >= today) {
+            startDate = currentVal;
+        }
+    }
+
+    // Calcula 1 mês a mais
+    const novaValidadeObj = addMonths(startDate, 1);
+    const novaValidade = novaValidadeObj.toISOString().split('T')[0];
+    
+    modal('💰 Receber',`<p>Cliente: <strong>${c.name}</strong></p><p>Valor: <strong style="color:var(--primary)">${fmt(c.mens)} AKZ</strong></p><div class="form-row"><label>Valor Pago</label><input type="number" id="payVal" value="${c.mens}"></div><div class="form-row"><label>Método</label><select id="payMet"><option>Transferência</option><option>Dinheiro</option><option>TPA</option></select></div><div class="form-row"><label>Nova Validade</label><input type="date" id="payValidade" value="${novaValidade}"></div>`,()=>{
+        const v=parseFloat(val('payVal')); const newDate = val('payValidade'); const metodo = val('payMet');
         if(!v||v<=0){alert('Valor inválido');return}
         
-        c.status='Pago';
+        // Atualiza cliente
+        c.status='Pago'; 
         c.validade = newDate; 
-        
         DB.set('clients',DB.get('clients'));
         
+        // Lança transação
         const t={id:'t'+Date.now(),branchId:c.branchId,type:'income',val:v,cat:'Mensalidade',desc:`Pgto. ${c.name}`,date:new Date().toLocaleDateString('pt-AO')};
-        DB.get('transactions').push(t);
-        DB.set('transactions',DB.get('transactions'));
+        DB.get('transactions').push(t); DB.set('transactions',DB.get('transactions'));
         
-        genRec(c,v,val('payMet'));
-        closeModal();
-        loadClients();
-        loadDashboard();
+        genRec(c,v,metodo); closeModal(); loadClients(); loadDashboard();
+        
+        // WhatsApp
+        let phone = c.contact.replace(/\D/g, ''); if(phone.length === 9 && phone.startsWith('9')) phone = '244' + phone;
+        const msgText = `Olá *${c.name}*, pagamento confirmado. Plano renovado até *${newDate}*. Obrigado!`;
+        if(confirm("Pagamento Salvo! Enviar WhatsApp?")) window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msgText)}`, '_blank');
     },'Confirmar','btn-success');
 }
 
-// Recibo
 function genRec(c,v,m){
     const d=new Date().toLocaleDateString('pt-AO');
     const b=DB.get('branches').find(x=>x.id===c.branchId);
@@ -532,93 +797,37 @@ function genRec(c,v,m){
     <div class="contract-box" style="text-align:center">
         ${getDocHeader(b,'RECIBO',Date.now())}
         <hr style="border:0;border-top:1px dashed #ccc;margin:20px 0">
-        <p style="font-size:10pt">Recebemos de <strong>${c.name}</strong></p>
+        <p style="font-size:12pt">Recebemos de <strong>${c.name}</strong></p>
         <h1 style="font-size:18pt;color:#000;margin:10px 0"><strong>${fmt(v)} AKZ</strong></h1>
-        <p style="font-size:9pt">Ref: ${c.pkg}</p>
+        <p style="font-size:10pt">Ref: ${c.pkg}</p>
         <hr style="border:0;border-top:1px dashed #ccc;margin:20px 0">
-        <div class="info-row" style="font-size:9pt">
-            <span>Data: ${d}</span> 
-            <span>Método: ${m}</span>
-            <span>Próx. Vencimento: <strong>${c.validade || 'N/D'}</strong></span>
-        </div>
+        <div class="info-row" style="font-size:10pt"><span>Data: ${d}</span> <span>Método: ${m}</span> <span>Próx. Venc: <strong>${c.validade || 'N/D'}</strong></span></div>
         ${getDocFooter(true)}
     </div>`;
-    document.getElementById('docTitle').innerText="Recibo";
-    document.getElementById('modalDoc').classList.add('show');
+    document.getElementById('docTitle').innerText="Recibo"; document.getElementById('modalDoc').classList.add('show');
 }
 
-// Fatura Normal
 function generateInvoice(id){
     const c=DB.get('clients').find(x=>x.id===id);
     const b=DB.get('branches').find(x=>x.id===c.branchId);
-    let vc=0;
-    if(!c.contratoPago) vc=c.contrato||0;
-    
+    let vc=0; if(!c.contratoPago) vc=c.contrato||0;
     const ph=c.plans&&c.plans.length>0?c.plans.map(p=>`<tr><td>Streaming: ${p.n}</td><td>${fmt(p.v)} AKZ</td></tr>`).join(''):'';
     const td=new Date().toLocaleDateString('pt-AO');
     const tf=c.mens+vc;
-    const lc=vc>0?`<tr><td style="background:#eee;padding:8px"><strong>TAXA CONTRATO</strong></td><td style="background:#eee;padding:8px"><strong>${fmt(vc)} AKZ</strong></td></tr>`:'';
+    const lc=vc>0?`<tr><td style="background:#eee;padding:8px"><strong>TAXA ADESÃO</strong></td><td style="background:#eee;padding:8px"><strong>${fmt(vc)} AKZ</strong></td></tr>`:'';
     
     document.getElementById('docBody').innerHTML=`
     <div class="invoice-box">
-        ${getDocHeader(b,'FATURA DE SERVIÇO',Date.now())}
-        <table style="width:100%;font-size:9pt;margin-bottom:20px">
-            <tr><td><strong>Cliente:</strong>${c.name}</td><td><strong>Data:</strong>${td}</td></tr>
-            <tr><td><strong>BI:</strong>${c.bilhete||'-'}</td><td><strong>Validade Atual:</strong>${c.validade || 'N/D'}</td></tr>
-        </table>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:9pt">
-            <thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Descrição</th><th style="padding:8px;text-align:right">Valor</th></tr></thead>
-            <tbody>
-                ${lc}
-                <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Internet (${c.pkg})</td><td style="padding:8px;text-align:right">${fmt(c.velPre||0)} AKZ</td></tr>
-                ${ph}
-            </tbody>
-        </table>
+        ${getDocHeader(b,'FATURA',Date.now())}
+        <table style="width:100%;font-size:10pt;margin-bottom:20px"><tr><td><strong>Cliente:</strong>${c.name}</td><td><strong>Data:</strong>${td}</td></tr><tr><td><strong>BI:</strong>${c.bilhete||'-'}</td><td><strong>Validade:</strong>${c.validade || 'N/D'}</td></tr></table>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt"><thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Descrição</th><th style="padding:8px;text-align:right">Valor</th></tr></thead><tbody>${lc}<tr style="border-bottom:1px solid #eee"><td style="padding:8px">Internet (${c.pkg})</td><td style="padding:8px;text-align:right">${fmt(c.velPre||0)} AKZ</td></tr>${ph}</tbody></table>
         <div style="text-align:right;margin-bottom:30px"><h3>TOTAL: ${fmt(tf)} AKZ</h3></div>
         ${getDocFooter(true)}
     </div>`;
-    document.getElementById('docTitle').innerText="Fatura";
-    document.getElementById('modalDoc').classList.add('show');
+    document.getElementById('docTitle').innerText="Fatura"; document.getElementById('modalDoc').classList.add('show');
 }
 
-// Fatura de Cobrança
-function generateCobranca(id){
-    const c=DB.get('clients').find(x=>x.id===id);
-    const b=DB.get('branches').find(x=>x.id===c.branchId);
-    const td=new Date().toLocaleDateString('pt-AO');
-    
-    document.getElementById('docBody').innerHTML=`
-    <div class="invoice-box">
-        ${getDocHeader(b,'AVISO DE COBRANÇA',Date.now())}
-        
-        <table style="width:100%;font-size:9pt;margin-bottom:20px">
-            <tr><td><strong>Cliente:</strong>${c.name}</td><td><strong>Data Emissão:</strong>${td}</td></tr>
-            <tr><td><strong>Serviço:</strong>${c.pkg}</td><td><strong>Estado:</strong><span style="color:red;font-weight:bold">Pendente</span></td></tr>
-        </table>
-
-        <div class="warning-box">
-            ⚠️ AVISO DE RENOVAÇÃO <br>
-            A sua subscrição terminará antecipadamente caso o pagamento não seja efetuado.<br>
-            Data Fim do Plano: <strong style="font-size:1.2em">${c.validade || 'N/D'}</strong>
-        </div>
-
-        <table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:9pt">
-            <thead><tr style="background:#eee;color:#000"><th style="padding:8px;text-align:left">Descrição</th><th style="padding:8px;text-align:right">Valor</th></tr></thead>
-            <tbody>
-                <tr style="border-bottom:1px solid #eee"><td style="padding:8px">Mensalidade (${c.pkg})</td><td style="padding:8px;text-align:right">${fmt(c.mens||0)} AKZ</td></tr>
-                ${c.plans && c.plans.length > 0 ? c.plans.map(p=>`<tr><td style="padding:8px">${p.n}</td><td style="padding:8px;text-align:right">${fmt(p.v)} AKZ</td></tr>`).join('') : ''}
-            </tbody>
-        </table>
-        
-        <div style="text-align:right;margin-bottom:30px"><h3>TOTAL A PAGAR: ${fmt(c.mens)} AKZ</h3></div>
-        
-        ${getDocFooter(false)}
-    </div>`;
-    document.getElementById('docTitle').innerText="Aviso de Cobrança";
-    document.getElementById('modalDoc').classList.add('show');
-}
-
-// CONTRATO
+// ====== CONTRATO ======
 function openModalContract(id){
     const c=DB.get('clients').find(x=>x.id===id);
     modal('📝 Contrato',`<p>Cliente: <strong>${c.name}</strong></p><div class="form-row"><label>Manutenção</label><input type="number" id="cfgM" value="0"></div><div class="form-row"><label>Danificação</label><input type="number" id="cfgD" value="30000"></div>`,()=>{genCont(id,parseFloat(val('cfgM')),parseFloat(val('cfgD')))},'Gerar','btn-primary');
@@ -629,29 +838,32 @@ function genCont(id, tm, td){
     const b=DB.get('branches').find(x=>x.id===c.branchId);
     const dt=new Date().toLocaleDateString('pt-AO');
     
-    // Linha extra para mostrar a validade no contrato, se existir
-    const valRow = c.validade ? `<tr><td style="padding:6px;border:1px solid #eee"><strong>Válido Até</strong></td><td style="padding:6px;border:1px solid #eee">${c.validade}</td></tr>` : '';
-
     document.getElementById('docBody').innerHTML=`
     <div class="contract-box">
-        ${getDocHeader(b,'CONTRATO',Date.now())}
-        <p style="margin-bottom:15px;text-align:justify;font-size:10pt">Entre a <strong>Prestadora:</strong> ${b?b.name:'CONEX CASS'}, e o <strong>Cliente:</strong> ${c.name}.</p>
-        <h4 style="margin-top:20px;border-bottom:1px solid #eee;font-size:10pt">CONDIÇÕES</h4>
-        <table style="width:100%;border-collapse:collapse;margin:15px 0;font-size:9pt">
+        ${getDocHeader(b,'CONTRATO DE PRESTAÇÃO DE SERVIÇOS',Date.now())}
+        
+        <p style="text-align:justify; margin-bottom:15px;">
+            Entre a <strong>Prestadora de Serviços:</strong> ${b?b.name:'CONEX CASS'}, e o <strong>Cliente:</strong> ${c.name}.
+        </p>
+        
+        <table style="width:100%;border-collapse:collapse;margin:15px 0;font-size:12pt">
             <tr style="background:#f9f9f9"><td style="padding:6px;border:1px solid #eee"><strong>Adesão</strong></td><td style="padding:6px;border:1px solid #eee">${fmt(c.contrato||0)} AKZ</td></tr>
             <tr><td style="padding:6px;border:1px solid #eee"><strong>Velocidade</strong></td><td style="padding:6px;border:1px solid #eee">${c.pkg}</td></tr>
-            ${valRow}
+            <tr><td style="padding:6px;border:1px solid #eee"><strong>Validade</strong></td><td style="padding:6px;border:1px solid #eee">${c.validade || 'N/D'}</td></tr>
             <tr style="background:#f9f9f9"><td style="padding:6px;border:1px solid #eee"><strong>Mensalidade</strong></td><td style="padding:6px;border:1px solid #eee"><strong>${fmt(c.mens)} AKZ</strong></td></tr>
         </table>
-        <ol style="font-size:9pt;line-height:1.4;padding-left:15px">
-            <li>Objeto: Acesso Internet.</li>
-            <li>Manutenção: ${fmt(tm)} AKZ.</li>
-            <li>Danificação: ${fmt(td)} AKZ.</li>
-            <li>Atraso: <strong style="color:red">CORTE</strong>.</li>
-        </ol>
-        <div style="margin-top:40px;display:flex;justify-content:space-between">
-            <div style="width:45%;text-align:center"><p>Luanda, ${dt}</p><br><br><div style="border-bottom:1px solid #000;height:30px;width:80%;margin:auto"></div><p><strong>CLIENTE</strong></p></div>
-            <div style="width:45%;text-align:center"><br><br>${getDocFooter()}</div>
+        <ul style="font-size:12pt; line-height:1.5; padding-left:20px; list-style:none;">
+            <li>• Objeto: Acesso Internet.</li>
+            <li>• Manutenção: ${fmt(tm)} AKZ.</li>
+            <li>• Danificação: ${fmt(td)} AKZ.</li>
+            <li>• Atraso: <strong style="color:red">CORTE</strong>.</li>
+        </ul>
+        
+        <div style="margin-top:50px; text-align:center">
+            <p>Luanda, ${dt}</p>
+            <br><br><br>
+            <div style="border-bottom:1px solid #000;height:30px;width:60%;margin:auto"></div>
+            <p style="margin-top:5px"><strong>CLIENTE</strong></p>
         </div>
     </div>`;
     document.getElementById('docTitle').innerText="Contrato";
@@ -661,7 +873,7 @@ function genCont(id, tm, td){
 function closeModalDoc(){document.getElementById('modalDoc').classList.remove('show');}
 
 // ====== PDF & PRINT ======
-function baixarPDF(){try{const e=document.getElementById('docBody');const o={margin:10,filename:'doc.pdf',image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',portrait:'p'}};html2pdf().set(o).from(e).save();}catch(e){alert('Erro no download. Use o botão IMPRIMIR.');}}
+function baixarPDF(){try{const e=document.getElementById('docBody');const o={margin:10,filename:'doc.pdf',image:{type:'jpeg',quality:0.95},html2canvas:{scale:2,useCORS:true},jsPDF:{unit:'mm',format:'a4',portrait:'p'}};html2pdf().set(o).from(e).save();}catch(e){alert('Erro no download.');}}
 function imprimirDoc(){ window.print(); }
 
 // ====== FINANCEIRO ======
