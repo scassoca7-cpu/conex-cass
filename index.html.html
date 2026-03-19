@@ -49,6 +49,7 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
 .thermal-receipt { font-family: 'Courier New', monospace; width: 280px; background: #fff; color: #000; padding: 10px; margin: 0 auto; font-size: 11px; text-align: center; border: 1px dashed #ccc; }
 .contract-box { font-family: 'Times New Roman', serif; font-size: 12pt; padding: 20px; color: #000; background: #fff; line-height: 1.5; }
 .invoice-box { font-family: 'Arial', sans-serif; padding: 20px; color: #000; background: #fff; }
+.carimbo-visto { width: 120px; height: auto; opacity: 0.9; margin-top: 10px; }
 
 .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px; margin-top: 15px; max-height: 400px; overflow-y: auto; }
 .product-card { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; }
@@ -228,8 +229,6 @@ table { width: 100%; border-collapse: collapse; } th, td { padding: 10px 12px; t
 
 <!-- MODALS -->
 <div id="modalGeneric" class="modal"><div class="modal-box"><div class="modal-header"><h2 id="modalTitle">Título</h2></div><div class="modal-body" id="modalBody"></div><div class="modal-footer" id="modalFooter"></div></div></div>
-
-<!-- MODAL DE DOCUMENTOS -->
 <div id="modalDoc" class="modal">
     <div class="modal-box" style="max-width:800px;">
         <div class="modal-header no-print"><h2 id="docTitle">Documento</h2></div>
@@ -267,6 +266,21 @@ DB.init();
 
 let currentUser = null; let currentBranch = 'all'; let tempClientPlans = []; let tempSaleItems = []; let currentDocData = null; let chartFinanceInstance = null;
 
+// ====== HELPERS DE DATA ======
+function getTodayStr(){
+    const d = new Date();
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+function parseDate(str){
+    if(!str) return null;
+    const p = str.split('/');
+    if(p.length !== 3) return null;
+    return new Date(p[2], p[1]-1, p[0]);
+}
+
 // ====== CORE ======
 function init(){ const s = sessionStorage.getItem('cx_session'); if(s){ currentUser = JSON.parse(s); run(); } else showLogin(); }
 function showLogin(){ document.body.innerHTML = `<div style="display:flex;height:100vh;align-items:center;justify-content:center;background:#000;"><div class="card" style="width:350px;text-align:center;"><img src="logotipo_conex_cass_novo.png" style="width:80px;border-radius:50%;margin-bottom:15px;" onerror="this.src='https://via.placeholder.com/80'"><input type="text" id="lUser" placeholder="Usuário" style="margin-bottom:10px;"><input type="password" id="lPass" placeholder="Senha" style="margin-bottom:10px;" onkeydown="if(event.key==='Enter')login()"><button class="btn btn-primary" style="width:100%;" onclick="login()">ENTRAR</button></div></div>`; }
@@ -282,7 +296,7 @@ function closeModal(){ document.getElementById('modalGeneric').classList.remove(
 function val(id){ return document.getElementById(id).value; }
 function fmt(n){ return new Intl.NumberFormat('pt-AO').format(n); }
 function addMonths(date, months) { const d = new Date(date); d.setMonth(d.getMonth() + months); return d; }
-function addLog(action) { const logs = DB.get('logs'); logs.unshift({ date: new Date().toLocaleString('pt-AO'), user: currentUser ? currentUser.name : 'Sistema', action }); if(logs.length > 50) logs.pop(); DB.set('logs', logs); }
+function addLog(action) { const logs = DB.get('logs'); logs.unshift({ date: getTodayStr() + ' ' + new Date().toLocaleTimeString('pt-AO'), user: currentUser ? currentUser.name : 'Sistema', action }); if(logs.length > 50) logs.pop(); DB.set('logs', logs); }
 
 // ====== SETTINGS ======
 function loadSettings(){ const s = DB.get('settings'); if(s){ document.getElementById('cfgCompanyName').value = s.name || ''; document.getElementById('cfgCompanyNif').value = s.nif || ''; document.getElementById('cfgCompanyPhone').value = s.phone || ''; } loadLogs(); }
@@ -302,7 +316,7 @@ function loadDashboard(){
     for(let i = 5; i >= 0; i--) {
         const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
         months.push(d.toLocaleDateString('pt-AO', {month: 'short'}));
-        const mTrans = t.filter(tr => { const p = tr.date.split('/'); if(p.length!==3) return false; const tDate = new Date(p[2], p[1]-1, p[0]); return tDate.getFullYear() === d.getFullYear() && tDate.getMonth() === d.getMonth(); });
+        const mTrans = t.filter(tr => parseDate(tr.date) && parseDate(tr.date).getMonth() === d.getMonth() && parseDate(tr.date).getFullYear() === d.getFullYear());
         incomeData.push(mTrans.filter(x=>x.type==='income').reduce((a,b)=>a+b.val,0));
         expenseData.push(mTrans.filter(x=>x.type==='expense').reduce((a,b)=>a+b.val,0));
     }
@@ -330,12 +344,43 @@ function loadDashboard(){
 
 // ====== RELATÓRIOS ======
 function loadReportData(){
-    const monthInput = document.getElementById('reportMonth'); if(!monthInput.value) { const now = new Date(); monthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; }
-    const [year, month] = monthInput.value.split('-').map(Number); const trans = filter(DB.get('transactions'));
-    const filtered = trans.filter(t => { const p = t.date.split('/'); if(p.length!==3) return false; const d = new Date(p[2], p[1]-1, p[0]); return d.getFullYear() === year && (d.getMonth()+1) === month; });
-    const income = filtered.filter(t=>t.type==='income').reduce((a,b)=>a+b.val,0); const expense = filtered.filter(t=>t.type==='expense').reduce((a,b)=>a+b.val,0); const profit = income - expense;
-    const cfg = DB.get('settings'); const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-    document.getElementById('reportContent').innerHTML = `<div class="invoice-box"><div style="text-align:center; margin-bottom:20px;"><h2>${cfg.name}</h2><h3>${monthNames[month-1]} ${year}</h3></div><div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-bottom:20px; text-align:center;"><div style="background:#e8f5e9; padding:15px; border-radius:8px;"><h4 style="margin:0; color:green;">ENTRADAS</h4><h2 style="margin:5px 0; color:green;">${fmt(income)} AKZ</h2></div><div style="background:#ffebee; padding:15px; border-radius:8px;"><h4 style="margin:0; color:red;">SAÍDAS</h4><h2 style="margin:5px 0; color:red;">${fmt(expense)} AKZ</h2></div><div style="background:#e3f2fd; padding:15px; border-radius:8px;"><h4 style="margin:0; color:#0277bd;">LUCRO</h4><h2 style="margin:5px 0; color:${profit >= 0 ? '#0277bd' : 'red'};">${fmt(profit)} AKZ</h2></div></div><table style="width:100%; font-size:10pt;"><thead><tr style="background:#eee;"><th style="padding:5px;">Data</th><th>Desc</th><th style="text-align:right;">Valor</th></tr></thead><tbody>${filtered.map(t=>`<tr><td>${t.date}</td><td>${t.desc}</td><td style="text-align:right; color:${t.type==='income'?'green':'red'};">${t.type==='income'?'+':'-'}${fmt(t.val)}</td></tr>`).join('')}</tbody></table></div>`;
+    const monthInput = document.getElementById('reportMonth'); 
+    if(!monthInput.value) { const now = new Date(); monthInput.value = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`; }
+    const [year, month] = monthInput.value.split('-').map(Number); 
+    const trans = filter(DB.get('transactions'));
+    
+    const filtered = trans.filter(t => {
+        const d = parseDate(t.date);
+        if(!d) return false;
+        return d.getFullYear() === year && (d.getMonth()+1) === month;
+    });
+    
+    const income = filtered.filter(t=>t.type==='income').reduce((a,b)=>a+b.val,0); 
+    const expense = filtered.filter(t=>t.type==='expense').reduce((a,b)=>a+b.val,0); 
+    const profit = income - expense;
+    const mensalidades = filtered.filter(t=>t.cat==='Mensalidade').reduce((a,b)=>a+b.val,0);
+    const instalacao = filtered.filter(t=>t.cat==='Instalação' || t.cat==='Instalação (Prestação)').reduce((a,b)=>a+b.val,0);
+    
+    const cfg = DB.get('settings'); 
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    
+    document.getElementById('reportContent').innerHTML = `
+    <div class="invoice-box">
+        <div style="text-align:center; margin-bottom:20px;">
+            <h2>${cfg.name}</h2>
+            <h3>Relatório - ${monthNames[month-1]} ${year}</h3>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:15px; margin-bottom:20px; text-align:center;">
+            <div style="background:#e8f5e9; padding:15px; border-radius:8px;"><h4 style="margin:0; color:green;">RECEITAS</h4><h2 style="margin:5px 0; color:green;">${fmt(income)} AKZ</h2></div>
+            <div style="background:#ffebee; padding:15px; border-radius:8px;"><h4 style="margin:0; color:red;">DESPESAS</h4><h2 style="margin:5px 0; color:red;">${fmt(expense)} AKZ</h2></div>
+            <div style="background:#e3f2fd; padding:15px; border-radius:8px;"><h4 style="margin:0; color:#0277bd;">LUCRO</h4><h2 style="margin:5px 0; color:${profit >= 0 ? '#0277bd' : 'red'};">${fmt(profit)} AKZ</h2></div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px; text-align:center; font-size:10pt;">
+            <div style="background:#f5f5f5; padding:10px; border-radius:4px;"><strong>Mensalidades Recebidas:</strong><br>${fmt(mensalidades)} AKZ</div>
+            <div style="background:#f5f5f5; padding:10px; border-radius:4px;"><strong>Taxas Instalação:</strong><br>${fmt(instalacao)} AKZ</div>
+        </div>
+        <table style="width:100%; font-size:10pt;"><thead><tr style="background:#eee;"><th style="padding:5px;">Data</th><th>Desc</th><th style="text-align:right;">Valor</th></tr></thead><tbody>${filtered.map(t=>`<tr><td>${t.date}</td><td>${t.desc}</td><td style="text-align:right; color:${t.type==='income'?'green':'red'};">${t.type==='income'?'+':'-'}${fmt(t.val)}</td></tr>`).join('')}</tbody></table>
+    </div>`;
 }
 function printReport(){ window.print(); }
 
@@ -369,19 +414,60 @@ function receivePayment(id) {
         if(v >= totalEsperado) { c.status = 'Pago'; c.divida = 0; c.validade = newDate; addLog(`Pgto Total: ${c.name}`); } 
         else if (v > 0) { c.status = 'Parcial'; c.divida = totalEsperado - v; addLog(`Pgto Parcial: ${c.name}`); } else { alert('Inválido'); return; }
         DB.set('clients', DB.get('clients'));
-        const tr = { id:'t'+Date.now(), branchId:c.branchId, type:'income', val:v, cat:'Mensalidade', desc:`Pgto. ${c.name}`, date:new Date().toLocaleDateString('pt-AO') };
+        const tr = { id:'t'+Date.now(), branchId:c.branchId, type:'income', val:v, cat:'Mensalidade', desc:`Pgto. ${c.name}`, date: getTodayStr() };
         DB.get('transactions').push(tr); DB.set('transactions', DB.get('transactions'));
         genRec(c, v, metodo); closeModal(); loadClients(); loadDashboard();
     }, 'Confirmar', 'btn-success');
 }
 
 // ====== DOCUMENTOS ======
-function getDocHeader(b, t, n){ const cfg = DB.get('settings'); return `<div style="text-align:center;margin-bottom:20px"><h2 style="font-size:16pt;margin:5px 0;color:#000">${b ? b.name : (cfg.name || 'CONEX CASS')}</h2><p style="font-size:9pt;color:#666">NIF: ${cfg.nif} | Tel: ${cfg.phone}</p></div><h3 style="text-align:center;background:#f0f0f0;padding:5px;font-size:12pt">${t} ${n?'Nº '+n:''}</h3>`; }
+function getDocHeader(b, t, n){ 
+    const cfg = DB.get('settings'); 
+    return `
+    <div style="text-align:center;margin-bottom:20px">
+        <img src="logotipo_conex_cass_novo.png" style="width:90px;height:auto" onerror="this.style.display='none'">
+        <br>
+        <h2 style="font-size:16pt;margin:5px 0;color:#000">${b ? b.name : (cfg.name || 'CONEX CASS')}</h2>
+        <p style="font-size:9pt;color:#666">NIF: ${cfg.nif} | Tel: ${cfg.phone}</p>
+    </div>
+    <h3 style="text-align:center;background:#f0f0f0;padding:5px;font-size:12pt">${t} ${n?'Nº '+n:''}</h3>`; 
+}
+
+function getDocFooter(showStamp = true){ 
+    return `<div style="margin-top:50px;text-align:right">
+        ${showStamp ? '<img src="carimbo_conextv.png" class="carimbo-visto" onerror="this.style.display=\'none\'">' : ''}
+    </div>`; 
+}
 
 function genRec(c,v,m){ 
-    const d=new Date().toLocaleDateString('pt-AO'); const b=DB.get('branches').find(x=>x.id===c.branchId); 
+    const d = getTodayStr(); 
+    const b = DB.get('branches').find(x=>x.id===c.branchId); 
     currentDocData = { type: 'receipt', client: c, total: v, method: m, date: d };
-    document.getElementById('docBody').innerHTML=`<div class="invoice-box" style="text-align:center">${getDocHeader(b,'RECIBO')}<h1>${fmt(v)} AKZ</h1><p>Recebemos de <strong>${c.name}</strong></p><p>Ref: ${c.pkg}</p><p style="margin-top:20px">${d} - ${m}</p></div>`; 
+    
+    let prestacaoHtml = '';
+    if(c.divida > 0) {
+        prestacaoHtml = `
+        <div style="margin-top:15px; border-top:2px dashed #ccc; padding-top:10px;">
+            <p style="color:red; font-weight:bold;">⚠️ PAGAMENTO PARCIAL (PRESTAÇÃO)</p>
+            <table style="width:100%; font-size:10pt; margin-top:5px;">
+                <tr><td><strong>Valor Pago:</strong></td><td style="text-align:right;">${fmt(v)} AKZ</td></tr>
+                <tr style="color:red;"><td><strong>Saldo Devedor:</strong></td><td style="text-align:right;">${fmt(c.divida)} AKZ</td></tr>
+                <tr><td><strong>Validade P/ Pagamento:</strong></td><td style="text-align:right;">${c.validade || 'N/D'}</td></tr>
+            </table>
+            <p style="font-size:9pt; color:#666; margin-top:5px">* O serviço está sujeito a suspensão caso a dívida não seja liquidada na data indicada.</p>
+        </div>`;
+    }
+
+    document.getElementById('docBody').innerHTML=`
+    <div class="invoice-box" style="text-align:center">
+        ${getDocHeader(b,'RECIBO')}
+        <h1>${fmt(v)} AKZ</h1>
+        <p>Recebemos de <strong>${c.name}</strong></p>
+        <p>Ref: ${c.pkg}</p>
+        <p style="margin-top:20px">${d} - ${m}</p>
+        ${prestacaoHtml}
+        ${getDocFooter(false)}
+    </div>`; 
     document.getElementById('modalDoc').classList.add('show'); 
 }
 
@@ -389,10 +475,10 @@ function generateInvoice(id){
     const c=DB.get('clients').find(x=>x.id===id); const b=DB.get('branches').find(x=>x.id===c.branchId); 
     let vc=0; if(!c.contratoPago) vc=c.contrato||0;
     const ph=c.plans&&c.plans.length>0?c.plans.map(p=>`<tr><td>Streaming: ${p.n}</td><td>${fmt(p.v)} AKZ</td></tr>`).join(''):''; 
-    const td=new Date().toLocaleDateString('pt-AO'); const tf=c.mens+vc; 
+    const td=getTodayStr(); const tf=c.mens+vc; 
     const lc=vc>0?`<tr><td style="background:#eee;padding:8px"><strong>TAXA ADESÃO</strong></td><td style="background:#eee;padding:8px"><strong>${fmt(vc)} AKZ</strong></td></tr>`:''; 
     currentDocData = { type: 'invoice', client: c, total: tf, items: c.plans }; 
-    document.getElementById('docBody').innerHTML=`<div class="invoice-box">${getDocHeader(b,'FATURA',Date.now())}<table style="width:100%;font-size:10pt;margin-bottom:20px"><tr><td><strong>Cliente:</strong>${c.name}</td><td><strong>Data:</strong>${td}</td></tr><tr><td><strong>BI:</strong>${c.bilhete||'-'}</td><td><strong>Validade:</strong>${c.validade || 'N/D'}</td></tr></table><table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt"><thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Descrição</th><th style="padding:8px;text-align:right">Valor</th></tr></thead><tbody>${lc}<tr style="border-bottom:1px solid #eee"><td style="padding:8px">Internet (${c.pkg})</td><td style="padding:8px;text-align:right">${fmt(c.velPre||0)} AKZ</td></tr>${ph}</tbody></table><div style="text-align:right;margin-bottom:30px"><h3>TOTAL: ${fmt(tf)} AKZ</h3></div></div>`; 
+    document.getElementById('docBody').innerHTML=`<div class="invoice-box">${getDocHeader(b,'FATURA',Date.now())}<table style="width:100%;font-size:10pt;margin-bottom:20px"><tr><td><strong>Cliente:</strong>${c.name}</td><td><strong>Data:</strong>${td}</td></tr><tr><td><strong>BI:</strong>${c.bilhete||'-'}</td><td><strong>Validade:</strong>${c.validade || 'N/D'}</td></tr></table><table style="width:100%;border-collapse:collapse;margin-bottom:20px;font-size:10pt"><thead><tr style="background:#000;color:#fff"><th style="padding:8px;text-align:left">Descrição</th><th style="padding:8px;text-align:right">Valor</th></tr></thead><tbody>${lc}<tr style="border-bottom:1px solid #eee"><td style="padding:8px">Internet (${c.pkg})</td><td style="padding:8px;text-align:right">${fmt(c.velPre||0)} AKZ</td></tr>${ph}</tbody></table><div style="text-align:right;margin-bottom:30px"><h3>TOTAL: ${fmt(tf)} AKZ</h3></div>${getDocFooter(true)}</div>`; 
     document.getElementById('docTitle').innerText="Fatura"; document.getElementById('modalDoc').classList.add('show'); 
 }
 
@@ -402,15 +488,17 @@ function openModalContract(id){
 }
 
 function genCont(id, tm, td){ 
-    const c=DB.get('clients').find(x=>x.id===id); const b=DB.get('branches').find(x=>x.id===c.branchId); const dt=new Date().toLocaleDateString('pt-AO'); 
+    const c=DB.get('clients').find(x=>x.id===id); const b=DB.get('branches').find(x=>x.id===c.branchId); const dt=getTodayStr(); 
     currentDocData = { type: 'contract', client: c }; 
-    document.getElementById('docBody').innerHTML=`<div class="contract-box">
+    document.getElementById('docBody').innerHTML=`
+    <div class="contract-box">
         ${getDocHeader(b,'CONTRATO DE PRESTAÇÃO DE SERVIÇOS')}
+        
         <p style="text-align:justify; margin-bottom:15px;">
-            Entre a <strong>Prestadora de Serviços:</strong> ${b?b.name:'CONEX CASS'}, inscrita no NIF ${DB.get('settings').nif}, e o <strong>Cliente:</strong> abaixo identificado, foi celebrado o presente contrato de prestação de serviços de acesso à Internet.
+            Entre a <strong>Prestadora de Serviços:</strong> ${b?b.name:'CONEX CASS'}, e o <strong>Cliente:</strong> abaixo identificado.
         </p>
         
-        <h4 style="background:#eee; padding:5px; margin-bottom:10px;">DADOS DO CLIENTE</h4>
+        <h4 style="background:#eee; padding:5px; margin-bottom:10px; border:1px solid #ddd;">DADOS DO CLIENTE</h4>
         <table style="width:100%; margin-bottom:15px; font-size:11pt;">
             <tr><td width="30%"><strong>Nome:</strong></td><td>${c.name}</td></tr>
             <tr><td><strong>BI/Passaporte:</strong></td><td>${c.bilhete || 'Não Informado'}</td></tr>
@@ -418,7 +506,7 @@ function genCont(id, tm, td){
             <tr><td><strong>Contacto:</strong></td><td>${c.contact}</td></tr>
         </table>
 
-        <h4 style="background:#eee; padding:5px; margin-bottom:10px;">DADOS DO SERVIÇO</h4>
+        <h4 style="background:#eee; padding:5px; margin-bottom:10px; border:1px solid #ddd;">DADOS DO SERVIÇO</h4>
         <table style="width:100%; border-collapse:collapse; margin-bottom:15px; font-size:11pt;">
             <tr style="background:#f9f9f9"><td style="padding:6px;border:1px solid #ddd"><strong>Velocidade</strong></td><td style="padding:6px;border:1px solid #ddd">${c.pkg}</td></tr>
             <tr><td style="padding:6px;border:1px solid #ddd"><strong>Tipo de Ligação</strong></td><td style="padding:6px;border:1px solid #ddd">${c.conn || 'Não definido'}</td></tr>
@@ -427,10 +515,10 @@ function genCont(id, tm, td){
             <tr style="background:#f9f9f9"><td style="padding:6px;border:1px solid #ddd"><strong>Mensalidade</strong></td><td style="padding:6px;border:1px solid #ddd"><strong>${fmt(c.mens)} AKZ</strong></td></tr>
         </table>
 
-        <h4 style="background:#eee; padding:5px; margin-bottom:10px;">CLÁUSULAS</h4>
+        <h4 style="background:#eee; padding:5px; margin-bottom:10px; border:1px solid #ddd;">CLÁUSULAS</h4>
         <ul style="font-size:11pt; line-height:1.6; padding-left:20px; list-style:decimal;">
             <li>O cliente compromete-se a efetuar o pagamento mensal até ao dia 5 de cada mês.</li>
-            <li>A falta de pagamento por mais de 7 dias implicará a suspensão dos serviços.</li>
+            <li>A <strong>falta de pagamento da mensalidade</strong> implica <strong style="color:red; font-size:12pt;">CORTE IMEDIATO</strong> dos serviços.</li>
             <li>Em caso de necessidade de manutenção, será cobrada uma taxa de ${fmt(tm)} AKZ.</li>
             <li>Em caso de danificação de equipamentos, o cliente pagará uma taxa de ${fmt(td)} AKZ.</li>
             <li>Este contrato é válido por tempo indeterminado, podendo ser rescindido mediante aviso prévio de 15 dias.</li>
@@ -450,15 +538,16 @@ function genCont(id, tm, td){
                 </div>
             </div>
         </div>
+        ${getDocFooter(true)}
     </div>`; 
     document.getElementById('docTitle').innerText="Contrato"; document.getElementById('modalDoc').classList.add('show'); 
 }
 
 function closeModalDoc(){document.getElementById('modalDoc').classList.remove('show');}
-function imprimirTermico() { if (!currentDocData) return; const cfg = DB.get('settings'); let html = `<div class="thermal-receipt"><div style="text-align:center;"><h2>${cfg.name || 'CONEX CASS'}</h2><p>${cfg.phone || ''}</p></div><p style="text-align:left;"><b>Cliente:</b> ${currentDocData.client.name}</p><p style="text-align:left;"><b>Data:</b> ${new Date().toLocaleDateString('pt-AO')}</p><p>----------------------------</p><h1>${fmt(currentDocData.total || 0)} AKZ</h1><p>----------------------------</p><p style="text-align:center; font-size:8pt;">Obrigado!</p></div>`; document.getElementById('docBody').innerHTML = html; setTimeout(() => { window.print(); }, 250); }
+function imprimirTermico() { if (!currentDocData) return; const cfg = DB.get('settings'); let html = `<div class="thermal-receipt"><div style="text-align:center;"><h2>${cfg.name || 'CONEX CASS'}</h2><p>${cfg.phone || ''}</p></div><p style="text-align:left;"><b>Cliente:</b> ${currentDocData.client.name}</p><p style="text-align:left;"><b>Data:</b> ${getTodayStr()}</p><p>----------------------------</p><h1>${fmt(currentDocData.total || 0)} AKZ</h1><p>----------------------------</p><p style="text-align:center; font-size:8pt;">Obrigado!</p></div>`; document.getElementById('docBody').innerHTML = html; setTimeout(() => { window.print(); }, 250); }
 function imprimirDoc(){ window.print(); }
 
-// ====== CADASTRO DE CLIENTE (COMPLETO) ======
+// ====== CADASTRO DE CLIENTE ======
 function openModalClient(id=''){ 
     const c=id?DB.get('clients').find(x=>x.id===id):{name:'',contact:'',pkg:'',status:'Pago',equip:'',conn:'',morada:'',plans:[],bilhete:'',email:'',data:'',velPre:0,mens:0,contrato:50000,contratoPago:false, validade:'', divida:0}; 
     tempClientPlans=c.plans||[]; 
@@ -467,7 +556,7 @@ function openModalClient(id=''){
     
     modal('Cliente',`${bs}
     <div class="card" style="background:rgba(0,0,0,0.2); padding:10px; margin-bottom:15px;">
-        <label style="margin-bottom:5px; display:flex; align-items:center; gap:10px;">📄 Carregar PDF do BI (Auto)
+        <label style="margin-bottom:5px; display:flex; align-items:center; gap:10px;">📄 Carregar PDF do BI
             <input type="file" accept="application/pdf" onchange="handlePdfUpload(this)" style="width:auto; padding:2px;">
         </label>
         <div id="pdfStatus" style="font-size:0.8rem; color:var(--text-muted);"></div>
@@ -548,10 +637,10 @@ function loadSales(){ document.getElementById('tableSales').innerHTML=filter(DB.
 function openModalSale(){ tempSaleItems=[]; const products=filter(DB.get('inventory')); const clients=filter(DB.get('clients')); modal('Venda',`<select id="saleClient"><option value="0">Consumidor</option>${clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select><hr><div id="productGrid" class="product-grid"></div><hr><h4>Total: <span id="saleTotal">0 AKZ</span></h4>`,()=>processSale(),'Finalizar'); document.getElementById('productGrid').innerHTML=products.map(i=>`<div class="product-card" onclick="addToCart('${i.id}')"><h4>${i.name}</h4><p>${fmt(i.val)}</p></div>`).join(''); }
 function addToCart(pid){ const p=DB.get('inventory').find(x=>x.id===pid); tempSaleItems.push({id:p.id,name:p.name,val:p.val,qty:1,sub:p.val}); updateSaleCartUI(); }
 function updateSaleCartUI(){ const t=tempSaleItems.reduce((a,b)=>a+b.sub,0); document.getElementById('saleTotal').innerText=fmt(t)+' AKZ'; }
-function processSale(){ const n = val('saleClient')==='0' ? 'Consumidor' : DB.get('clients').find(x=>x.id===val('saleClient')).name; const t = tempSaleItems.reduce((a,b)=>a+b.sub,0); const s = {id:'sale'+Date.now(),branchId:currentBranch==='all'?DB.get('branches')[0].id:currentBranch,date:new Date().toLocaleDateString('pt-AO'),clientName:n,items:[...tempSaleItems],total:t}; DB.get('sales').push(s); tempSaleItems.forEach(it=>{ const p=DB.get('inventory').find(x=>x.id===it.id); if(p)p.qty-=it.qty; }); DB.set('inventory',DB.get('inventory')); const tr={id:'t'+Date.now(),branchId:s.branchId,type:'income',val:t,cat:'Venda',desc:`Venda a ${n}`,date:s.date}; DB.get('transactions').push(tr); DB.set('sales',DB.get('sales'));DB.set('transactions',DB.get('transactions')); closeModal();loadSales();loadStock(); generateSaleInvoice(s); }
-function generateSaleInvoice(s){ if(!s)return; const b=DB.get('branches').find(x=>x.id===s.branchId); currentDocData = { type: 'sale', sale: s, client: {name: s.clientName}, total: s.total }; document.getElementById('docBody').innerHTML=`<div class="invoice-box">${getDocHeader(b,'FATURA')}<p>Cliente: ${s.clientName} | Data: ${s.date}</p><table style="width:100%;margin:20px 0">${s.items.map(i=>`<tr><td>${i.name}</td><td>${fmt(i.sub)} AKZ</td></tr>`).join('')}</table><h2 style="text-align:right">TOTAL: ${fmt(s.total)} AKZ</h2></div>`; document.getElementById('modalDoc').classList.add('show'); }
-function loadFinance(){ let data = filter(DB.get('transactions')); const start = document.getElementById('finStartDate').value; const end = document.getElementById('finEndDate').value; if(start||end){ data=data.filter(t=>{ const p=t.date.split('/'); if(p.length!==3)return false; const d=new Date(p[2],p[1]-1,p[0]); return d>=(start?new Date(start):new Date('1970-01-01')) && d<=(end?new Date(end):new Date('2100-01-01')); }); } document.getElementById('tableTransactions').innerHTML=data.map(t=>`<tr><td>${t.date}</td><td><span class="badge ${t.type==='income'?'bg-success':'bg-danger'}">${t.type}</span></td><td>${t.cat}</td><td>${t.desc}</td><td style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.type==='income'?'+':'-'}${fmt(t.val)}</td></tr>`).join(''); }
-function openModalTransaction(tp){ modal(tp==='income'?'Receita':'Despesa',`<input type="number" id="tVal" placeholder="Valor"><input id="tDesc" placeholder="Descrição"><select id="tCat">${tp==='income'?'<option>Mensalidade</option>':'<option>Salários</option><option>Energia</option>'}</select>`,()=>{ const v=parseFloat(val('tVal')); if(!v)return; const tr={id:'t'+Date.now(),branchId:currentBranch==='all'?DB.get('branches')[0].id:currentBranch,type:tp,val:v,cat:val('tCat'),desc:val('tDesc'),date:new Date().toLocaleDateString('pt-AO')}; DB.get('transactions').push(tr); DB.set('transactions',DB.get('transactions')); closeModal();loadFinance();loadDashboard(); },'Lançar', tp==='income'?'btn-success':'btn-danger'); }
+function processSale(){ const n = val('saleClient')==='0' ? 'Consumidor' : DB.get('clients').find(x=>x.id===val('saleClient')).name; const t = tempSaleItems.reduce((a,b)=>a+b.sub,0); const s = {id:'sale'+Date.now(),branchId:currentBranch==='all'?DB.get('branches')[0].id:currentBranch,date:getTodayStr(),clientName:n,items:[...tempSaleItems],total:t}; DB.get('sales').push(s); tempSaleItems.forEach(it=>{ const p=DB.get('inventory').find(x=>x.id===it.id); if(p)p.qty-=it.qty; }); DB.set('inventory',DB.get('inventory')); const tr={id:'t'+Date.now(),branchId:s.branchId,type:'income',val:t,cat:'Venda',desc:`Venda a ${n}`,date:getTodayStr()}; DB.get('transactions').push(tr); DB.set('sales',DB.get('sales'));DB.set('transactions',DB.get('transactions')); closeModal();loadSales();loadStock(); generateSaleInvoice(s); }
+function generateSaleInvoice(s){ if(!s)return; const b=DB.get('branches').find(x=>x.id===s.branchId); currentDocData = { type: 'sale', sale: s, client: {name: s.clientName}, total: s.total }; document.getElementById('docBody').innerHTML=`<div class="invoice-box">${getDocHeader(b,'FATURA')}<p>Cliente: ${s.clientName} | Data: ${s.date}</p><table style="width:100%;margin:20px 0">${s.items.map(i=>`<tr><td>${i.name}</td><td>${fmt(i.sub)} AKZ</td></tr>`).join('')}</table><h2 style="text-align:right">TOTAL: ${fmt(s.total)} AKZ</h2>${getDocFooter(false)}</div>`; document.getElementById('modalDoc').classList.add('show'); }
+function loadFinance(){ let data = filter(DB.get('transactions')); const start = document.getElementById('finStartDate').value; const end = document.getElementById('finEndDate').value; if(start||end){ data=data.filter(t=>{ const d = parseDate(t.date); if(!d) return false; return d >= new Date(start) && d <= new Date(end); }); } document.getElementById('tableTransactions').innerHTML=data.map(t=>`<tr><td>${t.date}</td><td><span class="badge ${t.type==='income'?'bg-success':'bg-danger'}">${t.type}</span></td><td>${t.cat}</td><td>${t.desc}</td><td style="color:${t.type==='income'?'var(--success)':'var(--danger)'}">${t.type==='income'?'+':'-'}${fmt(t.val)}</td></tr>`).join(''); }
+function openModalTransaction(tp){ modal(tp==='income'?'Receita':'Despesa',`<input type="number" id="tVal" placeholder="Valor"><input id="tDesc" placeholder="Descrição"><select id="tCat">${tp==='income'?'<option>Mensalidade</option><option>Instalação</option>':'<option>Salários</option><option>Energia</option>'}</select>`,()=>{ const v=parseFloat(val('tVal')); if(!v)return; const tr={id:'t'+Date.now(),branchId:currentBranch==='all'?DB.get('branches')[0].id:currentBranch,type:tp,val:v,cat:val('tCat'),desc:val('tDesc'),date:getTodayStr()}; DB.get('transactions').push(tr); DB.set('transactions',DB.get('transactions')); closeModal();loadFinance();loadDashboard(); },'Lançar', tp==='income'?'btn-success':'btn-danger'); }
 function exportDB(){const d={branches:DB.get('branches'),users:DB.get('users'),clients:DB.get('clients'),transactions:DB.get('transactions'),inventory:DB.get('inventory'),speeds:DB.get('speeds'),plans:DB.get('plans'),sales:DB.get('sales'),logs:DB.get('logs'),settings:DB.get('settings')};const b=new Blob([JSON.stringify(d)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='backup_conex.json';a.click();}
 function importDB(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=(ev)=>{ try{ const d=JSON.parse(ev.target.result); Object.keys(d).forEach(k=>DB.set(k,d[k])); alert('Sucesso!'); location.reload(); }catch(e){alert('Erro')}};r.readAsText(f);}
 
