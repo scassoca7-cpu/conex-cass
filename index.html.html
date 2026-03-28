@@ -33,8 +33,8 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
 .plan-badge{font-size:.65rem;padding:2px 6px;border-radius:3px;font-weight:bold;}
 .plan-activate-box{background:linear-gradient(135deg,rgba(0,180,216,.12),rgba(0,255,136,.08));border:1px solid var(--primary);border-radius:8px;padding:15px;margin-top:10px;}
 .plan-activate-box h4{color:var(--success);margin-bottom:10px;font-size:.9rem;}
-
-/* MODAL - sem sticky, overflow normal */
+.sidebar-logo{width:70px;height:70px;border-radius:50%;border:2px solid var(--primary);margin:0 auto 10px;overflow:hidden;background:#fff;padding:5px;}
+.sidebar-logo img{width:100%;height:100%;object-fit:contain;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:none;overflow-y:auto;padding:20px 15px;}
 .modal-overlay.show{display:block;}
 .modal-box{background:#0a192f;border:var(--border-light);border-radius:8px;width:100%;max-width:1000px;margin:0 auto;}
@@ -42,14 +42,11 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
 .modal-header{padding:15px 20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;background:#0a192f;border-radius:8px 8px 0 0;}
 .modal-body{padding:20px;overflow:visible;}
 .modal-footer{padding:15px 20px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;background:#0a192f;border-radius:0 0 8px 8px;}
-
-/* DROPDOWN CUSTOMIZADO - position:fixed escapa de qualquer overflow */
 .cs-wrap{position:relative;width:100%;}
 .cs-trigger{width:100%;padding:10px 12px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:#fff;font-size:.9rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:.2s;user-select:none;}
 .cs-trigger:hover{border-color:rgba(0,180,216,.5);}
 .cs-trigger .cs-arrow{font-size:.6rem;color:var(--text-muted);transition:transform .2s;}
-.cs-trigger.open{border-color:var(--primary);}
-.cs-trigger.open .cs-arrow{transform:rotate(180deg);}
+.cs-trigger.open{border-color:var(--primary);}.cs-trigger.open .cs-arrow{transform:rotate(180deg);}
 .cs-trigger.placeholder{color:var(--text-muted);}
 .cs-dd{position:fixed;z-index:999999;display:none;background:#0d2137;border:1px solid rgba(0,180,216,.4);border-radius:6px;max-height:260px;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.6);min-width:200px;padding:4px 0;}
 .cs-dd-group{padding:6px 12px 4px;font-size:.7rem;color:var(--primary);text-transform:uppercase;font-weight:700;letter-spacing:.5px;background:rgba(0,180,216,.05);}
@@ -58,10 +55,7 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
 .cs-dd-opt.selected{background:rgba(0,180,216,.15);color:var(--success);font-weight:600;}
 .cs-dd-opt.disabled{opacity:.35;pointer-events:none;}
 .cs-original{display:none!important;}
-
 .sidebar-header{padding:20px;text-align:center;border-bottom:var(--border-light);}
-.sidebar-logo{width:60px;height:60px;border-radius:50%;border:2px solid var(--primary);margin:0 auto 10px;overflow:hidden;background:#fff;}
-.sidebar-logo img{width:100%;height:100%;object-fit:cover;}
 .sidebar-header h1{font-family:'Orbitron';font-size:1rem;color:#fff;}
 .sidebar nav{flex:1;overflow-y:auto;padding:10px 0;}
 .sidebar nav a{display:flex;align-items:center;gap:10px;padding:12px 20px;color:var(--text-muted);text-decoration:none;font-weight:600;border-left:3px solid transparent;transition:.2s;cursor:pointer;}
@@ -72,9 +66,13 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
 </head>
 <body>
 
+<!-- Pré-carregar imagens -->
+<img id="imgLogo" src="https://z-cdn-media.chatglm.cn/files/514d9689-ab21-4064-826f-1aa292cad192.png?auth_key=1874721613-3bcbbecf27f14f25961f961ab421db23-0-a2ff1cb41756bb27c666799966a9de0b" style="display:none;" crossorigin="anonymous">
+<img id="imgStamp" src="https://z-cdn-media.chatglm.cn/files/6d064e2c-1efe-471e-9fec-518b428e99fc.png?auth_key=1874721613-52c3047109374f67bd7b835e05a09542-0-f5e11c366247df146483221ced90e5df" style="display:none;" crossorigin="anonymous">
+
 <nav class="sidebar" id="mainSidebar">
     <div class="sidebar-header">
-        <div class="sidebar-logo"><img src="logotipo_conex_cass_novo.png" onerror="this.src='https://via.placeholder.com/60'"></div>
+        <div class="sidebar-logo"><img src="https://z-cdn-media.chatglm.cn/files/514d9689-ab21-4064-826f-1aa292cad192.png?auth_key=1874721613-3bcbbecf27f14f25961f961ab421db23-0-a2ff1cb41756bb27c666799966a9de0b" alt="Logo"></div>
         <h1>CONEX CASS</h1>
         <p style="font-size:.7rem;color:var(--primary);">ERP Pro Max</p>
     </div>
@@ -90,15 +88,11 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
     <header class="header">
         <div style="display:flex;align-items:center;gap:10px;">
             <button class="btn btn-outline" id="menuToggle" onclick="document.getElementById('mainSidebar').classList.toggle('open')">☰</button>
-            <h1 style="display:flex;align-items:center;gap:10px;font-family:'Orbitron';font-size:1rem;">
-                <span id="pageTitle">Dashboard</span>
-                <span id="headerBranchTag" class="badge bg-info" style="font-size:.6rem;margin-left:10px;">Matriz</span>
-            </h1>
+            <h1 style="display:flex;align-items:center;gap:10px;font-family:'Orbitron';font-size:1rem;"><span id="pageTitle">Dashboard</span><span id="headerBranchTag" class="badge bg-info" style="font-size:.6rem;margin-left:10px;">Matriz</span></h1>
         </div>
         <span id="currentUserName" style="font-size:.9rem;color:var(--text-muted);">Admin</span>
     </header>
     <div class="content">
-
         <section id="page-dashboard" class="page active">
             <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px;">
                 <div class="card" style="border-left:3px solid var(--primary);"><div style="font-size:.8rem;color:var(--text-muted);">Faturado (Mês)</div><div style="font-size:1.4rem;font-family:'Orbitron';" id="kpiBilled">0 AKZ</div></div>
@@ -106,119 +100,36 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
                 <div class="card" style="border-left:3px solid var(--danger);"><div style="font-size:.8rem;color:var(--text-muted);">Contas a Pagar</div><div style="font-size:1.4rem;font-family:'Orbitron';" id="kpiPayables">0 AKZ</div></div>
                 <div class="card" style="border-left:3px solid var(--warning);"><div style="font-size:.8rem;color:var(--text-muted);">Contas a Receber</div><div style="font-size:1.4rem;font-family:'Orbitron';" id="kpiReceivables">0 AKZ</div></div>
             </div>
-            <div class="card">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><h3>⚠️ Cobrança Urgente</h3><button class="btn btn-danger btn-sm" onclick="notifyAllOverdue()">📧 Notificar</button></div>
-                <div id="dashboardAlerts" style="max-height:300px;overflow-y:auto;"></div>
-            </div>
+            <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><h3>⚠️ Cobrança Urgente</h3><button class="btn btn-danger btn-sm" onclick="notifyAllOverdue()">📧 Notificar</button></div><div id="dashboardAlerts" style="max-height:300px;overflow-y:auto;"></div></div>
         </section>
-
-        <section id="page-commercial" class="page">
-            <div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>🛒 Gestão Comercial</h2><div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-info" onclick="openModalDocGen()">📄 Novo Documento</button><button class="btn btn-primary" onclick="openModalClient()">➕ Novo Cliente</button></div></div>
-            <div class="card"><h3>Últimos Documentos Emitidos</h3><table><thead><tr><th>Data</th><th>Documento</th><th>Cliente</th><th>Tipo</th><th>Total</th><th>Estado</th><th>Ações</th></tr></thead><tbody id="tableCommercialDocs"></tbody></table></div>
-        </section>
-
-        <section id="page-clients" class="page">
-            <div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>👥 Clientes</h2><div style="display:flex;gap:10px;flex-wrap:wrap;"><input type="text" id="searchClient" placeholder="Pesquisar..." onkeyup="searchClients()" style="width:200px;"><button class="btn btn-primary" onclick="openModalClient()">➕ Novo</button></div></div>
-            <div class="card"><table><thead><tr><th>Nome</th><th>NIF</th><th>Contacto</th><th>Plano</th><th>Validade</th><th>Estado</th><th>Ações</th></tr></thead><tbody id="tableClients"></tbody></table></div>
-        </section>
-
-        <section id="page-suppliers" class="page">
-            <div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>🏭 Fornecedores & Contas a Pagar</h2><button class="btn btn-danger" onclick="openModalSupplier()">➕ Fornecedor</button></div>
-            <div class="grid" style="grid-template-columns:1fr 1fr;gap:20px;"><div class="card"><h3>Fornecedores</h3><table><thead><tr><th>Nome</th><th>NIF</th><th>Dívida</th><th>Ações</th></tr></thead><tbody id="tableSuppliers"></tbody></table></div><div class="card"><h3>Despesas Registadas</h3><div id="supplierBillsList" style="max-height:300px;overflow-y:auto;"></div></div></div>
-        </section>
-
-        <section id="page-stock" class="page">
-            <div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>📦 Produtos & Estoque</h2><button class="btn btn-primary" onclick="openModalItem()">➕ Produto</button></div>
-            <div class="card"><table><thead><tr><th>Ref</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Stock</th><th>Ações</th></tr></thead><tbody id="tableStock"></tbody></table></div>
-        </section>
-
-        <section id="page-plans" class="page">
-            <h2>📡 Planos de Internet</h2>
-            <p style="color:var(--text-muted);margin-bottom:20px;">Gerencie os planos semanais, quinzenais e mensais</p>
-            <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:20px;">
-                <div class="card plan-section"><h3>📅 Semanal (7 dias) <span class="plan-badge bg-info">7D</span></h3><table><thead><tr><th>Velocidade</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tableWeekly"></tbody></table></div>
-                <div class="card plan-section"><h3>🗓️ Quinzenal (15 dias) <span class="plan-badge bg-warning">15D</span></h3><table><thead><tr><th>Velocidade</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tableBiweekly"></tbody></table></div>
-                <div class="card plan-section"><h3>📆 Mensal (30 dias) <span class="plan-badge bg-success">30D</span></h3><table><thead><tr><th>Velocidade</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tableMonthly"></tbody></table></div>
-            </div>
-            <div class="card" style="margin-top:20px;"><h3>➕ Adicionar Novo Plano</h3>
-                <div class="form-row">
-                    <div><label>Período</label><select id="newSpeedPeriod"><option value="Semanal">Semanal (7 dias)</option><option value="Quinzenal">Quinzenal (15 dias)</option><option value="Mensal">Mensal (30 dias)</option></select></div>
-                    <div><label>Velocidade</label><input id="newSpeedName" placeholder="Ex: 5 MB"></div>
-                    <div><label>Preço (Kz)</label><input type="number" id="newSpeedPrice" placeholder="Ex: 4900"></div>
-                    <div><label>&nbsp;</label><button class="btn btn-primary" onclick="addSpeed()">➕ Adicionar</button></div>
-                </div>
-            </div>
-            <div class="card" style="margin-top:20px;"><h3>📺 Serviços de Streaming</h3>
-                <div class="form-row"><input id="newPlanName" placeholder="Nome do Serviço"><input type="number" id="newPlanPrice" placeholder="Preço"><button class="btn btn-primary" onclick="addPlan()">➕ Adicionar</button></div>
-                <table><thead><tr><th>Serviço</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tablePlans"></tbody></table>
-            </div>
-        </section>
-
-        <section id="page-branches" class="page">
-            <div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>🏢 Filiais</h2><button class="btn btn-primary" onclick="openModalBranch()">➕ Nova Filial</button></div>
-            <div class="card"><table><thead><tr><th>Nome</th><th>Localização</th><th>Gerente</th><th>Telefone</th><th>Ações</th></tr></thead><tbody id="tableBranches"></tbody></table></div>
-        </section>
-
-        <section id="page-reports" class="page">
-            <h2>📊 Relatórios & Fiscalidade</h2>
-            <div class="grid" style="grid-template-columns:1fr 1fr;gap:20px;">
-                <div class="card"><h3>Relatório Mensal</h3><div class="form-row"><input type="month" id="reportMonth" onchange="loadReportData()"><button class="btn btn-warning" onclick="exportFiscalCSV()">📥 Exportar CSV</button></div><div id="reportContent" style="margin-top:15px;"></div></div>
-                <div class="card"><h3>Resumo Fiscal</h3><p>Total IVA Débito: <strong id="rptTaxDebit" style="color:var(--danger)">0.00</strong></p><p>Total IVA Crédito: <strong id="rptTaxCredit" style="color:var(--success)">0.00</strong></p><hr style="border-color:rgba(255,255,255,.1)"><h4>IVA a Pagar: <span id="rptTaxTotal" style="color:var(--warning)">0.00</span></h4></div>
-            </div>
-        </section>
-
-        <section id="page-config" class="page">
-            <h2>⚙️ Configurações</h2>
-            <div class="card"><h3>Empresa & Fiscal</h3><div class="form-row"><div><label>Nome Empresa</label><input id="cfgCompanyName" placeholder="Nome Empresa"></div><div><label>NIF</label><input id="cfgCompanyNif" placeholder="NIF"></div><div><label>Telefone</label><input id="cfgCompanyPhone" placeholder="Telefone"></div></div><div class="form-row"><div><label>% IVA</label><input type="number" id="cfgTaxRate" placeholder="14"></div><div><label>Moeda</label><select id="cfgCurrency"><option value="AKZ">Kwanza (AKZ)</option><option value="USD">Dólar (USD)</option><option value="EUR">Euro (EUR)</option></select></div></div><button class="btn btn-primary" onclick="saveSettings()">💾 Salvar Configurações</button></div>
-            <div class="card"><h3>💾 Backup & Restauro</h3><div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="exportDB()">📤 Exportar Dados</button><button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar Dados</button><input type="file" id="importFile" style="display:none" onchange="importDB(event)" accept=".json"></div></div>
-        </section>
-
-        <section id="page-users" class="page">
-            <div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;"><h2>👤 Utilizadores</h2><button class="btn btn-primary" onclick="openModalUser()">➕ Novo</button></div>
-            <div class="card"><table><thead><tr><th>Nome</th><th>User</th><th>Função</th><th>Comissão (%)</th><th>Ações</th></tr></thead><tbody id="tableUsers"></tbody></table></div>
-        </section>
+        <section id="page-commercial" class="page"><div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>🛒 Gestão Comercial</h2><div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-info" onclick="openModalDocGen()">📄 Novo Documento</button><button class="btn btn-primary" onclick="openModalClient()">➕ Novo Cliente</button></div></div><div class="card"><h3>Últimos Documentos Emitidos</h3><table><thead><tr><th>Data</th><th>Documento</th><th>Cliente</th><th>Tipo</th><th>Total</th><th>Estado</th><th>Ações</th></tr></thead><tbody id="tableCommercialDocs"></tbody></table></div></section>
+        <section id="page-clients" class="page"><div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>👥 Clientes</h2><div style="display:flex;gap:10px;flex-wrap:wrap;"><input type="text" id="searchClient" placeholder="Pesquisar..." onkeyup="searchClients()" style="width:200px;"><button class="btn btn-primary" onclick="openModalClient()">➕ Novo</button></div></div><div class="card"><table><thead><tr><th>Nome</th><th>NIF</th><th>Contacto</th><th>Plano</th><th>Validade</th><th>Estado</th><th>Ações</th></tr></thead><tbody id="tableClients"></tbody></table></div></section>
+        <section id="page-suppliers" class="page"><div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>🏭 Fornecedores & Contas a Pagar</h2><button class="btn btn-danger" onclick="openModalSupplier()">➕ Fornecedor</button></div><div class="grid" style="grid-template-columns:1fr 1fr;gap:20px;"><div class="card"><h3>Fornecedores</h3><table><thead><tr><th>Nome</th><th>NIF</th><th>Dívida</th><th>Ações</th></tr></thead><tbody id="tableSuppliers"></tbody></table></div><div class="card"><h3>Despesas Registadas</h3><div id="supplierBillsList" style="max-height:300px;overflow-y:auto;"></div></div></div></section>
+        <section id="page-stock" class="page"><div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>📦 Produtos & Estoque</h2><button class="btn btn-primary" onclick="openModalItem()">➕ Produto</button></div><div class="card"><table><thead><tr><th>Ref</th><th>Produto</th><th>Categoria</th><th>Preço</th><th>Stock</th><th>Ações</th></tr></thead><tbody id="tableStock"></tbody></table></div></section>
+        <section id="page-plans" class="page"><h2>📡 Planos de Internet</h2><p style="color:var(--text-muted);margin-bottom:20px;">Gerencie os planos semanais, quinzenais e mensais</p><div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:20px;"><div class="card plan-section"><h3>📅 Semanal (7 dias) <span class="plan-badge bg-info">7D</span></h3><table><thead><tr><th>Velocidade</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tableWeekly"></tbody></table></div><div class="card plan-section"><h3>🗓️ Quinzenal (15 dias) <span class="plan-badge bg-warning">15D</span></h3><table><thead><tr><th>Velocidade</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tableBiweekly"></tbody></table></div><div class="card plan-section"><h3>📆 Mensal (30 dias) <span class="plan-badge bg-success">30D</span></h3><table><thead><tr><th>Velocidade</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tableMonthly"></tbody></table></div></div><div class="card" style="margin-top:20px;"><h3>➕ Adicionar Novo Plano</h3><div class="form-row"><div><label>Período</label><select id="newSpeedPeriod"><option value="Semanal">Semanal (7 dias)</option><option value="Quinzenal">Quinzenal (15 dias)</option><option value="Mensal">Mensal (30 dias)</option></select></div><div><label>Velocidade</label><input id="newSpeedName" placeholder="Ex: 5 MB"></div><div><label>Preço (Kz)</label><input type="number" id="newSpeedPrice" placeholder="Ex: 4900"></div><div><label>&nbsp;</label><button class="btn btn-primary" onclick="addSpeed()">➕ Adicionar</button></div></div></div><div class="card" style="margin-top:20px;"><h3>📺 Serviços de Streaming</h3><div class="form-row"><input id="newPlanName" placeholder="Nome do Serviço"><input type="number" id="newPlanPrice" placeholder="Preço"><button class="btn btn-primary" onclick="addPlan()">➕ Adicionar</button></div><table><thead><tr><th>Serviço</th><th>Preço</th><th>Ações</th></tr></thead><tbody id="tablePlans"></tbody></table></div></section>
+        <section id="page-branches" class="page"><div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px;"><h2>🏢 Filiais</h2><button class="btn btn-primary" onclick="openModalBranch()">➕ Nova Filial</button></div><div class="card"><table><thead><tr><th>Nome</th><th>Localização</th><th>Gerente</th><th>Telefone</th><th>Ações</th></tr></thead><tbody id="tableBranches"></tbody></table></div></section>
+        <section id="page-reports" class="page"><h2>📊 Relatórios & Fiscalidade</h2><div class="grid" style="grid-template-columns:1fr 1fr;gap:20px;"><div class="card"><h3>Relatório Mensal</h3><div class="form-row"><input type="month" id="reportMonth" onchange="loadReportData()"><button class="btn btn-warning" onclick="exportFiscalCSV()">📥 Exportar CSV</button></div><div id="reportContent" style="margin-top:15px;"></div></div><div class="card"><h3>Resumo Fiscal</h3><p>Total IVA Débito: <strong id="rptTaxDebit" style="color:var(--danger)">0.00</strong></p><p>Total IVA Crédito: <strong id="rptTaxCredit" style="color:var(--success)">0.00</strong></p><hr style="border-color:rgba(255,255,255,.1)"><h4>IVA a Pagar: <span id="rptTaxTotal" style="color:var(--warning)">0.00</span></h4></div></div></section>
+        <section id="page-config" class="page"><h2>⚙️ Configurações</h2><div class="card"><h3>Empresa & Fiscal</h3><div class="form-row"><div><label>Nome Empresa</label><input id="cfgCompanyName" placeholder="Nome Empresa"></div><div><label>NIF</label><input id="cfgCompanyNif" placeholder="NIF"></div><div><label>Telefone</label><input id="cfgCompanyPhone" placeholder="Telefone"></div></div><div class="form-row"><div><label>% IVA</label><input type="number" id="cfgTaxRate" placeholder="14"></div><div><label>Moeda</label><select id="cfgCurrency"><option value="AKZ">Kwanza (AKZ)</option><option value="USD">Dólar (USD)</option><option value="EUR">Euro (EUR)</option></select></div></div><button class="btn btn-primary" onclick="saveSettings()">💾 Salvar Configurações</button></div><div class="card"><h3>💾 Backup & Restauro</h3><div style="display:flex;gap:10px;flex-wrap:wrap;"><button class="btn btn-primary" onclick="exportDB()">📤 Exportar Dados</button><button class="btn btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar Dados</button><input type="file" id="importFile" style="display:none" onchange="importDB(event)" accept=".json"></div></div></section>
+        <section id="page-users" class="page"><div style="display:flex;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;"><h2>👤 Utilizadores</h2><button class="btn btn-primary" onclick="openModalUser()">➕ Novo</button></div><div class="card"><table><thead><tr><th>Nome</th><th>User</th><th>Função</th><th>Comissão (%)</th><th>Ações</th></tr></thead><tbody id="tableUsers"></tbody></table></div></section>
     </div>
 </main>
 
-<!-- MODAL GENÉRICO -->
 <div id="modalGeneric" class="modal-overlay"><div class="modal-box"><div class="modal-header"><h2 id="modalTitle"></h2><span class="btn btn-outline" onclick="closeModal()">✕</span></div><div class="modal-body" id="modalBody"></div><div class="modal-footer" id="modalFooter"></div></div></div>
-<!-- MODAL DOCUMENTO -->
 <div id="modalDoc" class="modal-overlay"><div class="modal-box modal-box-sm"><div class="modal-header"><h2 id="docTitle">Documento</h2><span class="btn btn-outline" onclick="closeModalDoc()">✕</span></div><div class="modal-body" id="docBody"></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModalDoc()">Fechar</button><button class="btn btn-warning" onclick="imprimirDoc()">🖨️ Imprimir</button></div></div></div>
 
 <script>
-/* ================================================================
-   DATABASE
-   ================================================================ */
-var DB = {
-    get: function(k) { try { return JSON.parse(localStorage.getItem('cx_'+k)); } catch(e) { return null; } },
-    set: function(k,v) { localStorage.setItem('cx_'+k, JSON.stringify(v)); },
-    init: function() {
-        if (!DB.get('branches')) DB.set('branches', [{id:'b1',name:'Matriz',loc:'Camama',mgr:'Cassoca',phone:'+244 945 740 125',active:true}]);
-        if (!DB.get('users')) DB.set('users', [{id:'u1',name:'Administrador',user:'cassoca',pass:'0579',role:'admin',branchId:'all',commission:0}]);
-        if (!DB.get('clients')) DB.set('clients', []);
-        if (!DB.get('suppliers')) DB.set('suppliers', []);
-        if (!DB.get('transactions')) DB.set('transactions', []);
-        if (!DB.get('documents')) DB.set('documents', []);
-        if (!DB.get('inventory')) DB.set('inventory', [{id:'i1',name:'Router TP-Link',cat:'Equipamento',val:5000,qty:10,branchId:'b1'}]);
-        if (!DB.get('speeds')) DB.set('speeds', [
-            {id:'s1',nome:'5 MB',preco:4900,period:'Semanal',days:7},{id:'s2',nome:'10 MB',preco:8400,period:'Semanal',days:7},{id:'s3',nome:'15 MB',preco:11900,period:'Semanal',days:7},{id:'s4',nome:'20 MB',preco:15400,period:'Semanal',days:7},{id:'s5',nome:'25 MB',preco:18900,period:'Semanal',days:7},
-            {id:'s6',nome:'5 MB',preco:10500,period:'Quinzenal',days:15},{id:'s7',nome:'10 MB',preco:18000,period:'Quinzenal',days:15},{id:'s8',nome:'15 MB',preco:25500,period:'Quinzenal',days:15},{id:'s9',nome:'20 MB',preco:33000,period:'Quinzenal',days:15},{id:'s10',nome:'25 MB',preco:40500,period:'Quinzenal',days:15},
-            {id:'s11',nome:'5 MB',preco:10000,period:'Mensal',days:30},{id:'s12',nome:'10 MB',preco:15000,period:'Mensal',days:30},{id:'s13',nome:'15 MB',preco:20000,period:'Mensal',days:30},{id:'s14',nome:'20 MB',preco:25000,period:'Mensal',days:30},{id:'s15',nome:'25 MB',preco:30000,period:'Mensal',days:30}
-        ]);
-        if (!DB.get('plans')) DB.set('plans', [{id:'p1',nome:'UNITV',preco:7000},{id:'p2',nome:'Angotela',preco:5000},{id:'p3',nome:'IPTV SMART',preco:5000},{id:'p4',nome:'NETFLIX',preco:7000}]);
-        if (!DB.get('settings')) DB.set('settings', {name:'CONEX CASS',nif:'5002630770',phone:'+244 945 740 125',lastInv:0,lastRec:0,taxRate:14,currency:'AKZ'});
-    }
-};
+/* ====== URLs das imagens ====== */
+var LOGO_URL = 'https://z-cdn-media.chatglm.cn/files/514d9689-ab21-4064-826f-1aa292cad192.png?auth_key=1874721613-3bcbbecf27f14f25961f961ab421db23-0-a2ff1cb41756bb27c666799966a9de0b';
+var STAMP_URL = 'https://z-cdn-media.chatglm.cn/files/6d064e2c-1efe-471e-9fec-518b428e99fc.png?auth_key=1874721613-52c3047109374f67bd7b835e05a09542-0-f5e11c366247df146483221ced90e5df';
+
+/* ====== DATABASE ====== */
+var DB={get:function(k){try{return JSON.parse(localStorage.getItem('cx_'+k));}catch(e){return null;}},set:function(k,v){localStorage.setItem('cx_'+k,JSON.stringify(v));},init:function(){if(!DB.get('branches'))DB.set('branches',[{id:'b1',name:'Matriz',loc:'Camama',mgr:'Cassoca',phone:'+244 945 740 125',active:true}]);if(!DB.get('users'))DB.set('users',[{id:'u1',name:'Administrador',user:'cassoca',pass:'0579',role:'admin',branchId:'all',commission:0}]);if(!DB.get('clients'))DB.set('clients',[]);if(!DB.get('suppliers'))DB.set('suppliers',[]);if(!DB.get('transactions'))DB.set('transactions',[]);if(!DB.get('documents'))DB.set('documents',[]);if(!DB.get('inventory'))DB.set('inventory',[{id:'i1',name:'Router TP-Link',cat:'Equipamento',val:5000,qty:10,branchId:'b1'}]);if(!DB.get('speeds'))DB.set('speeds',[{id:'s1',nome:'5 MB',preco:4900,period:'Semanal',days:7},{id:'s2',nome:'10 MB',preco:8400,period:'Semanal',days:7},{id:'s3',nome:'15 MB',preco:11900,period:'Semanal',days:7},{id:'s4',nome:'20 MB',preco:15400,period:'Semanal',days:7},{id:'s5',nome:'25 MB',preco:18900,period:'Semanal',days:7},{id:'s6',nome:'5 MB',preco:10500,period:'Quinzenal',days:15},{id:'s7',nome:'10 MB',preco:18000,period:'Quinzenal',days:15},{id:'s8',nome:'15 MB',preco:25500,period:'Quinzenal',days:15},{id:'s9',nome:'20 MB',preco:33000,period:'Quinzenal',days:15},{id:'s10',nome:'25 MB',preco:40500,period:'Quinzenal',days:15},{id:'s11',nome:'5 MB',preco:10000,period:'Mensal',days:30},{id:'s12',nome:'10 MB',preco:15000,period:'Mensal',days:30},{id:'s13',nome:'15 MB',preco:20000,period:'Mensal',days:30},{id:'s14',nome:'20 MB',preco:25000,period:'Mensal',days:30},{id:'s15',nome:'25 MB',preco:30000,period:'Mensal',days:30}]);if(!DB.get('plans'))DB.set('plans',[{id:'p1',nome:'UNITV',preco:7000},{id:'p2',nome:'Angotela',preco:5000},{id:'p3',nome:'IPTV SMART',preco:5000},{id:'p4',nome:'NETFLIX',preco:7000}]);if(!DB.get('settings'))DB.set('settings',{name:'CONEX CASS',nif:'5002630770',phone:'+244 945 740 125',lastInv:0,lastRec:0,taxRate:14,currency:'AKZ'});}};
 DB.init();
+var currentUser=null,currentBranch='all';
 
-var currentUser = null;
-var currentBranch = 'all';
-
-/* ================================================================
-   HELPERS
-   ================================================================ */
-function getTodayStr() { var d=new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
-function parseDate(s) { if(!s)return null; if(s.indexOf('/')>-1){var p=s.split('/');if(p.length===3)return new Date(p[2],p[1]-1,p[0]);} if(s.indexOf('-')>-1){var p=s.split('-');if(p.length===3)return new Date(p[0],p[1]-1,p[2]);} return new Date(s); }
+/* ====== HELPERS ====== */
+function getTodayStr(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
+function parseDate(s){if(!s)return null;if(s.indexOf('/')>-1){var p=s.split('/');if(p.length===3)return new Date(p[2],p[1]-1,p[0]);}if(s.indexOf('-')>-1){var p=s.split('-');if(p.length===3)return new Date(p[0],p[1]-1,p[2]);}return new Date(s);}
 function addDays(d,n){var r=new Date(d);r.setDate(r.getDate()+n);return r;}
 function formatDateISO(d){return d.toISOString().split('T')[0];}
 function formatDatePT(s){if(!s)return'-';var p=s.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
@@ -230,428 +141,121 @@ function getSpeedLabel(sid){var s=getSpeedById(sid);if(!s)return'-';var p=s.peri
 function val(id){var el=document.getElementById(id);return el?el.value:'';}
 function filterArr(arr){if(!arr)return[];if(currentUser.role==='admin'&&currentBranch==='all')return arr;var bid=currentUser.role==='admin'?currentBranch:currentUser.branchId;return arr.filter(function(x){return!x.branchId||x.branchId===bid;});}
 
-/* ================================================================
-   CUSTOM SELECT - Dropdowns position:fixed (escapam de qualquer overflow)
-   ================================================================ */
-var _activeCSDD = null;
+/* ====== CUSTOM SELECT ====== */
+var _activeCSDD=null;
+function closeAllCSDropdowns(){if(_activeCSDD){_activeCSDD.style.display='none';_activeCSDD=null;}document.querySelectorAll('.cs-trigger.open').forEach(function(t){t.classList.remove('open');});}
+document.addEventListener('click',function(e){if(!e.target.closest('.cs-wrap'))closeAllCSDropdowns();});
+function initCustomSelects(container){var root=container||document;root.querySelectorAll('select[data-cs]').forEach(function(sel){if(sel._csDone)return;sel._csDone=true;sel.classList.add('cs-original');var wrap=document.createElement('div');wrap.className='cs-wrap';sel.parentNode.insertBefore(wrap,sel);wrap.appendChild(sel);var trigger=document.createElement('div');trigger.className='cs-trigger';var selOpt=sel.options[sel.selectedIndex];trigger.innerHTML='<span>'+(selOpt&&selOpt.value?selOpt.text:sel.getAttribute('data-placeholder')||'Selecionar...')+'</span><span class="cs-arrow">▼</span>';if(!selOpt||!selOpt.value)trigger.classList.add('placeholder');wrap.insertBefore(trigger,sel);var dd=document.createElement('div');dd.className='cs-dd';document.body.appendChild(dd);function buildDD(){dd.innerHTML='';Array.from(sel.children).forEach(function(child){if(child.tagName==='OPTGROUP'){var grp=document.createElement('div');grp.className='cs-dd-group';grp.textContent=child.label;dd.appendChild(grp);Array.from(child.children).forEach(function(opt){addOpt(dd,opt);});}else if(child.tagName==='OPTION'){addOpt(dd,child);}});}function addOpt(parent,opt){var item=document.createElement('div');item.className='cs-dd-opt';if(opt.disabled)item.classList.add('disabled');if(opt.selected)item.classList.add('selected');item.textContent=opt.text;item.setAttribute('data-val',opt.value);item.addEventListener('click',function(e){e.stopPropagation();sel.value=opt.value;trigger.querySelector('span').textContent=opt.text;trigger.classList.remove('placeholder');dd.querySelectorAll('.cs-dd-opt').forEach(function(o){o.classList.remove('selected');});item.classList.add('selected');closeAllCSDropdowns();sel.dispatchEvent(new Event('change',{bubbles:true}));});parent.appendChild(item);}buildDD();trigger.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();if(dd.style.display==='block'){closeAllCSDropdowns();return;}closeAllCSDropdowns();var rect=trigger.getBoundingClientRect();dd.style.minWidth=rect.width+'px';dd.style.left=rect.left+'px';dd.style.top=(rect.bottom+4)+'px';dd.style.display='block';trigger.classList.add('open');_activeCSDD=dd;requestAnimationFrame(function(){var dr=dd.getBoundingClientRect();if(dr.bottom>window.innerHeight-10)dd.style.top=(rect.top-dr.height-4)+'px';if(dr.right>window.innerWidth-10)dd.style.left=(window.innerWidth-dr.width-10)+'px';});});sel._csUpdate=function(){var o=sel.options[sel.selectedIndex];if(o&&o.value){trigger.querySelector('span').textContent=o.text;trigger.classList.remove('placeholder');}else{trigger.querySelector('span').textContent=sel.getAttribute('data-placeholder')||'Selecionar...';trigger.classList.add('placeholder');}dd.querySelectorAll('.cs-dd-opt').forEach(function(item){item.classList.toggle('selected',item.getAttribute('data-val')===sel.value);});};});}
 
-function closeAllCSDropdowns() {
-    if (_activeCSDD) { _activeCSDD.style.display = 'none'; _activeCSDD = null; }
-    document.querySelectorAll('.cs-trigger.open').forEach(function(t){ t.classList.remove('open'); });
-}
-
-document.addEventListener('click', function(e) {
-    if (!e.target.closest('.cs-wrap')) closeAllCSDropdowns();
-});
-
-function initCustomSelects(container) {
-    var root = container || document;
-    root.querySelectorAll('select[data-cs]').forEach(function(sel) {
-        if (sel._csDone) return;
-        sel._csDone = true;
-
-        // Esconder select original
-        sel.classList.add('cs-original');
-
-        // Wrapper
-        var wrap = document.createElement('div');
-        wrap.className = 'cs-wrap';
-        sel.parentNode.insertBefore(wrap, sel);
-        wrap.appendChild(sel);
-
-        // Trigger
-        var trigger = document.createElement('div');
-        trigger.className = 'cs-trigger';
-        var selOpt = sel.options[sel.selectedIndex];
-        trigger.innerHTML = '<span>' + (selOpt && selOpt.value ? selOpt.text : sel.getAttribute('data-placeholder') || 'Selecionar...') + '</span><span class="cs-arrow">▼</span>';
-        if (!selOpt || !selOpt.value) trigger.classList.add('placeholder');
-        wrap.insertBefore(trigger, sel);
-
-        // Dropdown (position:fixed - NÃO é filho do modal)
-        var dd = document.createElement('div');
-        dd.className = 'cs-dd';
-        document.body.appendChild(dd);
-
-        // Construir opções (suporta optgroups)
-        function buildDD() {
-            dd.innerHTML = '';
-            Array.from(sel.children).forEach(function(child) {
-                if (child.tagName === 'OPTGROUP') {
-                    var grp = document.createElement('div');
-                    grp.className = 'cs-dd-group';
-                    grp.textContent = child.label;
-                    dd.appendChild(grp);
-                    Array.from(child.children).forEach(function(opt) { addOpt(dd, opt); });
-                } else if (child.tagName === 'OPTION') {
-                    addOpt(dd, child);
-                }
-            });
-        }
-
-        function addOpt(parent, opt) {
-            var item = document.createElement('div');
-            item.className = 'cs-dd-opt';
-            if (opt.disabled) item.classList.add('disabled');
-            if (opt.selected) item.classList.add('selected');
-            item.textContent = opt.text;
-            item.setAttribute('data-val', opt.value);
-            item.addEventListener('click', function(e) {
-                e.stopPropagation();
-                sel.value = opt.value;
-                trigger.querySelector('span').textContent = opt.text;
-                trigger.classList.remove('placeholder');
-                dd.querySelectorAll('.cs-dd-opt').forEach(function(o){ o.classList.remove('selected'); });
-                item.classList.add('selected');
-                closeAllCSDropdowns();
-                sel.dispatchEvent(new Event('change', {bubbles: true}));
-            });
-            parent.appendChild(item);
-        }
-
-        buildDD();
-
-        // Abrir/fechar
-        trigger.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            if (dd.style.display === 'block') { closeAllCSDropdowns(); return; }
-            closeAllCSDropdowns();
-            var rect = trigger.getBoundingClientRect();
-            dd.style.minWidth = rect.width + 'px';
-            dd.style.left = rect.left + 'px';
-            dd.style.top = (rect.bottom + 4) + 'px';
-            dd.style.display = 'block';
-            trigger.classList.add('open');
-            _activeCSDD = dd;
-            // Ajustar se sai da tela
-            requestAnimationFrame(function() {
-                var dr = dd.getBoundingClientRect();
-                if (dr.bottom > window.innerHeight - 10) {
-                    dd.style.top = (rect.top - dr.height - 4) + 'px';
-                }
-                if (dr.right > window.innerWidth - 10) {
-                    dd.style.left = (window.innerWidth - dr.width - 10) + 'px';
-                }
-            });
-        });
-
-        // Método para atualizar display programaticamente
-        sel._csUpdate = function() {
-            var o = sel.options[sel.selectedIndex];
-            if (o && o.value) {
-                trigger.querySelector('span').textContent = o.text;
-                trigger.classList.remove('placeholder');
-            } else {
-                trigger.querySelector('span').textContent = sel.getAttribute('data-placeholder') || 'Selecionar...';
-                trigger.classList.add('placeholder');
-            }
-            dd.querySelectorAll('.cs-dd-opt').forEach(function(item) {
-                item.classList.toggle('selected', item.getAttribute('data-val') === sel.value);
-            });
-        };
-    });
-}
-
-/* ================================================================
-   CORE - Login / Logout / Navegação
-   ================================================================ */
-function init() { var s=sessionStorage.getItem('cx_session'); if(s){currentUser=JSON.parse(s);run();}else showLogin(); }
-
-function showLogin() {
-    document.body.innerHTML = '<div style="display:flex;height:100vh;align-items:center;justify-content:center;background:#000;"><div class="card" style="width:350px;text-align:center;padding:30px;"><img src="logotipo_conex_cass_novo.png" style="width:80px;border-radius:50%;margin-bottom:15px;" onerror="this.src=\'https://via.placeholder.com/80\'"><h2 style="font-family:Orbitron;margin-bottom:20px;color:var(--primary);">CONEX CASS</h2><input type="text" id="lUser" placeholder="Usuário" style="margin-bottom:10px;"><input type="password" id="lPass" placeholder="Senha" style="margin-bottom:15px;" onkeydown="if(event.key===\'Enter\')login()"><button class="btn btn-primary" style="width:100%;padding:12px;" onclick="login()">ENTRAR</button></div></div>';
-}
-function login() { var u=document.getElementById('lUser').value,p=document.getElementById('lPass').value;var user=DB.get('users').find(function(x){return x.user===u&&x.pass===p;}); if(user){currentUser=user;sessionStorage.setItem('cx_session',JSON.stringify(user));location.reload();}else alert('Credenciais inválidas!'); }
-function doLogout() { sessionStorage.removeItem('cx_session'); location.reload(); }
-
-function run() {
-    if(currentUser.role!=='admin') currentBranch=currentUser.branchId;
-    else currentBranch=localStorage.getItem('cx_activeBranch')||'all';
-    loadSidebar();
-    document.getElementById('currentUserName').innerText=currentUser.name;
-    navigate('dashboard');
-}
-
-function loadSidebar() {
-    var nav=document.getElementById('menuNav');
-    var items=[{id:'dashboard',icon:'📊',txt:'Dashboard'},{id:'commercial',icon:'💼',txt:'Comercial'},{id:'clients',icon:'👥',txt:'Clientes'},{id:'suppliers',icon:'🏭',txt:'Fornecedores'},{id:'stock',icon:'📦',txt:'Produtos'},{id:'reports',icon:'📈',txt:'Relatórios'}];
-    if(currentUser.role==='admin'){items.unshift({id:'branches',icon:'🏢',txt:'Filiais'});items.splice(2,0,{id:'users',icon:'👤',txt:'Users'});items.splice(4,0,{id:'plans',icon:'📡',txt:'Planos'});items.push({id:'config',icon:'⚙️',txt:'Config'});}
-    nav.innerHTML=items.map(function(i){return '<a onclick="navigate(\''+i.id+'\')">'+i.icon+' '+i.txt+'</a>';}).join('');
-    var bs=document.getElementById('activeBranchSelect');
-    if(currentUser.role==='admin'){bs.innerHTML='<option value="all">Todas</option>'+DB.get('branches').map(function(b){return '<option value="'+b.id+'">'+b.name+'</option>';}).join('');bs.disabled=false;}
-    else{var bn=(DB.get('branches').find(function(x){return x.id===currentUser.branchId;})||{}).name||'-';bs.innerHTML='<option>'+bn+'</option>';bs.disabled=true;}
-    bs.value=currentBranch;
-}
+/* ====== CORE ====== */
+function init(){var s=sessionStorage.getItem('cx_session');if(s){currentUser=JSON.parse(s);run();}else showLogin();}
+function showLogin(){document.body.innerHTML='<div style="display:flex;height:100vh;align-items:center;justify-content:center;background:var(--bg-dark);"><div class="card" style="width:380px;text-align:center;padding:35px;background:var(--bg-panel);border:var(--border-light);"><img src="'+LOGO_URL+'" style="width:90px;height:90px;border-radius:50%;border:2px solid var(--primary);margin-bottom:15px;padding:5px;background:#fff;object-fit:contain;"><h2 style="font-family:Orbitron;margin-bottom:5px;color:var(--primary);font-size:1.1rem;">CONEX CASS</h2><p style="font-size:.8rem;color:var(--text-muted);margin-bottom:20px;">Sistema de Gestão ERP</p><input type="text" id="lUser" placeholder="Usuário" style="margin-bottom:10px;"><input type="password" id="lPass" placeholder="Senha" style="margin-bottom:15px;" onkeydown="if(event.key===\'Enter\')login()"><button class="btn btn-primary" style="width:100%;padding:12px;" onclick="login()">ENTRAR</button></div></div>';}
+function login(){var u=document.getElementById('lUser').value,p=document.getElementById('lPass').value;var user=DB.get('users').find(function(x){return x.user===u&&x.pass===p;});if(user){currentUser=user;sessionStorage.setItem('cx_session',JSON.stringify(user));location.reload();}else alert('Credenciais inválidas!');}
+function doLogout(){sessionStorage.removeItem('cx_session');location.reload();}
+function run(){if(currentUser.role!=='admin')currentBranch=currentUser.branchId;else currentBranch=localStorage.getItem('cx_activeBranch')||'all';loadSidebar();document.getElementById('currentUserName').innerText=currentUser.name;navigate('dashboard');}
+function loadSidebar(){var nav=document.getElementById('menuNav');var items=[{id:'dashboard',icon:'📊',txt:'Dashboard'},{id:'commercial',icon:'💼',txt:'Comercial'},{id:'clients',icon:'👥',txt:'Clientes'},{id:'suppliers',icon:'🏭',txt:'Fornecedores'},{id:'stock',icon:'📦',txt:'Produtos'},{id:'reports',icon:'📈',txt:'Relatórios'}];if(currentUser.role==='admin'){items.unshift({id:'branches',icon:'🏢',txt:'Filiais'});items.splice(2,0,{id:'users',icon:'👤',txt:'Users'});items.splice(4,0,{id:'plans',icon:'📡',txt:'Planos'});items.push({id:'config',icon:'⚙️',txt:'Config'});}nav.innerHTML=items.map(function(i){return '<a onclick="navigate(\''+i.id+'\')">'+i.icon+' '+i.txt+'</a>';}).join('');var bs=document.getElementById('activeBranchSelect');if(currentUser.role==='admin'){bs.innerHTML='<option value="all">Todas</option>'+DB.get('branches').map(function(b){return '<option value="'+b.id+'">'+b.name+'</option>';}).join('');bs.disabled=false;}else{var bn=(DB.get('branches').find(function(x){return x.id===currentUser.branchId;})||{}).name||'-';bs.innerHTML='<option>'+bn+'</option>';bs.disabled=true;}bs.value=currentBranch;}
 function setActiveBranch(){currentBranch=document.getElementById('activeBranchSelect').value;localStorage.setItem('cx_activeBranch',currentBranch);navigate('dashboard');}
+function navigate(id){document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});var pg=document.getElementById('page-'+id);if(pg)pg.classList.add('active');var actions={dashboard:loadDashboard,commercial:loadCommercial,suppliers:loadSuppliers,clients:loadClients,stock:loadStock,plans:loadPlans,reports:loadReportData,config:loadSettings,users:loadUsers,branches:loadBranches};if(actions[id])actions[id]();document.getElementById('mainSidebar').classList.remove('open');}
 
-function navigate(id) {
-    document.querySelectorAll('.page').forEach(function(p){p.classList.remove('active');});
-    var pg=document.getElementById('page-'+id);if(pg)pg.classList.add('active');
-    var actions={dashboard:loadDashboard,commercial:loadCommercial,suppliers:loadSuppliers,clients:loadClients,stock:loadStock,plans:loadPlans,reports:loadReportData,config:loadSettings,users:loadUsers,branches:loadBranches};
-    if(actions[id])actions[id]();
-    document.getElementById('mainSidebar').classList.remove('open');
-}
-
-/* ================================================================
-   MODAL GENÉRICO - initCustomSelects após inserir HTML
-   ================================================================ */
-function modal(t,b,onConfirm,txt,cls) {
-    txt = txt || 'Salvar'; cls = cls || 'btn-primary';
-    document.getElementById('modalTitle').innerText=t;
-    document.getElementById('modalBody').innerHTML=b;
-    document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
-    if(onConfirm){var btn=document.createElement('button');btn.className='btn '+cls;btn.innerText=txt;btn.onclick=function(){onConfirm();};document.getElementById('modalFooter').prepend(btn);}
-    document.getElementById('modalGeneric').classList.add('show');
-    // INICIAR CUSTOM SELECTS dentro do modal
-    setTimeout(function(){ initCustomSelects(document.getElementById('modalBody')); }, 10);
-}
+/* ====== MODAL ====== */
+function modal(t,b,onConfirm,txt,cls){txt=txt||'Salvar';cls=cls||'btn-primary';document.getElementById('modalTitle').innerText=t;document.getElementById('modalBody').innerHTML=b;document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';if(onConfirm){var btn=document.createElement('button');btn.className='btn '+cls;btn.innerText=txt;btn.onclick=function(){onConfirm();};document.getElementById('modalFooter').prepend(btn);}document.getElementById('modalGeneric').classList.add('show');setTimeout(function(){initCustomSelects(document.getElementById('modalBody'));},10);}
 function closeModal(){closeAllCSDropdowns();document.getElementById('modalGeneric').classList.remove('show');}
 function closeModalDoc(){closeAllCSDropdowns();document.getElementById('modalDoc').classList.remove('show');}
 
-/* ================================================================
-   DASHBOARD
-   ================================================================ */
-function loadDashboard() {
-    var trans=filterArr(DB.get('transactions')),suppliers=DB.get('suppliers'),clients=filterArr(DB.get('clients')),cu=getCurrency();
-    document.getElementById('kpiBilled').innerText=fmt(trans.filter(function(t){return t.type==='income'&&t.docType!=='ND';}).reduce(function(a,b){return a+b.val;},0))+' '+cu;
-    document.getElementById('kpiCash').innerText=fmt(trans.filter(function(t){return t.type==='income'&&t.status==='paid';}).reduce(function(a,b){return a+b.val;},0))+' '+cu;
-    document.getElementById('kpiPayables').innerText=fmt(suppliers.reduce(function(a,b){return a+(b.debt||0);},0))+' '+cu;
-    document.getElementById('kpiReceivables').innerText=fmt(clients.reduce(function(a,b){return a+(b.divida||0);},0))+' '+cu;
-    var alerts=document.getElementById('dashboardAlerts'),hoje=new Date();hoje.setHours(0,0,0,0);
-    var overdue=clients.filter(function(c){if(!c.validade||c.divida<=0)return false;return new Date(c.validade+'T00:00:00')<hoje;});
-    if(overdue.length>0){alerts.innerHTML=overdue.map(function(c){return '<div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;"><div><span style="color:var(--danger);font-weight:bold;">'+c.name+'</span><span style="color:var(--text-muted);font-size:.8rem;margin-left:8px;">'+(c.pkg||'-')+'</span><span class="badge bg-partial" style="margin-left:8px;">'+fmt(c.divida)+' Kz</span></div><button class="btn btn-success btn-sm" onclick="payClient(\''+c.id+'\')">💳 Cobrar</button></div>';}).join('');}
-    else alerts.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-muted);">✅ Nenhum cliente inadimplente</div>';
-}
+/* ====== DASHBOARD ====== */
+function loadDashboard(){var trans=filterArr(DB.get('transactions')),suppliers=DB.get('suppliers'),clients=filterArr(DB.get('clients')),cu=getCurrency();document.getElementById('kpiBilled').innerText=fmt(trans.filter(function(t){return t.type==='income'&&t.docType!=='ND';}).reduce(function(a,b){return a+b.val;},0))+' '+cu;document.getElementById('kpiCash').innerText=fmt(trans.filter(function(t){return t.type==='income'&&t.status==='paid';}).reduce(function(a,b){return a+b.val;},0))+' '+cu;document.getElementById('kpiPayables').innerText=fmt(suppliers.reduce(function(a,b){return a+(b.debt||0);},0))+' '+cu;document.getElementById('kpiReceivables').innerText=fmt(clients.reduce(function(a,b){return a+(b.divida||0);},0))+' '+cu;var alerts=document.getElementById('dashboardAlerts'),hoje=new Date();hoje.setHours(0,0,0,0);var overdue=clients.filter(function(c){if(!c.validade||c.divida<=0)return false;return new Date(c.validade+'T00:00:00')<hoje;});if(overdue.length>0){alerts.innerHTML=overdue.map(function(c){return '<div style="padding:10px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;"><div><span style="color:var(--danger);font-weight:bold;">'+c.name+'</span><span style="color:var(--text-muted);font-size:.8rem;margin-left:8px;">'+(c.pkg||'-')+'</span><span class="badge bg-partial" style="margin-left:8px;">'+fmt(c.divida)+' Kz</span></div><button class="btn btn-success btn-sm" onclick="payClient(\''+c.id+'\')">💳 Cobrar</button></div>';}).join('');}else alerts.innerHTML='<div style="text-align:center;padding:30px;color:var(--text-muted);">✅ Nenhum cliente inadimplente</div>';}
 function notifyAllOverdue(){alert('📧 Notificações enviadas (simulado)');}
 
-/* ================================================================
-   COMMERCIAL
-   ================================================================ */
-function loadCommercial() {
-    var docs=DB.get('documents').slice().reverse(),tb=document.getElementById('tableCommercialDocs');
-    tb.innerHTML=docs.slice(0,30).map(function(d){var sc=d.status==='paid'?'bg-success':(d.status==='canceled'?'bg-danger':'bg-warning'),st=d.status==='paid'?'PAGO':(d.status==='canceled'?'ANULADO':'PENDENTE');return '<tr><td>'+d.date+'</td><td style="font-family:monospace;font-size:.8rem;">'+d.docId+'</td><td>'+d.clientName+'</td><td><span class="badge bg-info">'+d.docType+'</span></td><td style="font-weight:bold;">'+fmt(d.total)+' '+d.currency+'</td><td><span class="badge '+sc+'">'+st+'</span></td><td><button class="btn btn-outline btn-sm" onclick="viewDoc(\''+d.id+'\')">👁️</button></td></tr>';}).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Nenhum documento</td></tr>';
-}
+/* ====== COMMERCIAL ====== */
+function loadCommercial(){var docs=DB.get('documents').slice().reverse(),tb=document.getElementById('tableCommercialDocs');tb.innerHTML=docs.slice(0,30).map(function(d){var sc=d.status==='paid'?'bg-success':(d.status==='canceled'?'bg-danger':'bg-warning'),st=d.status==='paid'?'PAGO':(d.status==='canceled'?'ANULADO':'PENDENTE');return '<tr><td>'+d.date+'</td><td style="font-family:monospace;font-size:.8rem;">'+d.docId+'</td><td>'+d.clientName+'</td><td><span class="badge bg-info">'+d.docType+'</span></td><td style="font-weight:bold;">'+fmt(d.total)+' '+d.currency+'</td><td><span class="badge '+sc+'">'+st+'</span></td><td><button class="btn btn-outline btn-sm" onclick="viewDoc(\''+d.id+'\')">👁️</button></td></tr>';}).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Nenhum documento</td></tr>';}
 function viewDoc(docId){var doc=DB.get('documents').find(function(d){return d.id===docId;}),cl=DB.get('clients').find(function(c){return c.id===doc.clientId;});if(doc&&cl)showDocPrint(doc,cl);}
-
-function openModalDocGen(clientId) {
-    var c=clientId?DB.get('clients').find(function(x){return x.id===clientId;}):null;
-    var speeds=DB.get('speeds'),items=DB.get('inventory');
-    var wk=speeds.filter(function(s){return s.period==='Semanal';}),bw=speeds.filter(function(s){return s.period==='Quinzenal';}),mn=speeds.filter(function(s){return s.period==='Mensal';});
-    var co=DB.get('clients').map(function(cl){return '<option value="'+cl.id+'" '+(c&&c.id===clientId?'selected':'')+'>'+cl.name+'</option>';}).join('');
-    var optsHTML = '<option value="">-- Selecionar --</option>';
-    optsHTML += '<optgroup label="📅 Semanal (7 dias)">'+wk.map(function(s){return '<option value="'+s.id+'|'+s.preco+'|'+s.nome+' ('+s.period+')">'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    optsHTML += '<optgroup label="🗓️ Quinzenal (15 dias)">'+bw.map(function(s){return '<option value="'+s.id+'|'+s.preco+'|'+s.nome+' ('+s.period+')">'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    optsHTML += '<optgroup label="📆 Mensal (30 dias)">'+mn.map(function(s){return '<option value="'+s.id+'|'+s.preco+'|'+s.nome+' ('+s.period+')">'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    optsHTML += '<optgroup label="📦 Produtos em Stock">'+items.map(function(i){return '<option value="item_'+i.id+'|'+i.val+'|'+i.name+'">'+i.name+' - '+fmt(i.val)+' Kz</option>';}).join('')+'</optgroup>';
-
-    modal('📄 Emissão de Documento',
-        '<div class="form-row"><div><label>Cliente</label><select id="docClient" data-cs data-placeholder="-- Selecionar --"><option value="">-- Selecionar --</option>'+co+'</select></div>'+
-        '<div><label>Tipo Documento</label><select id="docType" data-cs><option value="FR">Fatura-Recibo (FR)</option><option value="FT">Fatura (FT)</option><option value="RC">Recibo (RC)</option><option value="OR">Proforma (OR)</option><option value="ND">Nota de Débito (ND)</option><option value="NC">Nota de Crédito (NC)</option></select></div></div>'+
-        '<div class="form-row"><div><label>Método Pagamento</label><select id="docMet" data-cs><option value="Dinheiro">Dinheiro</option><option value="Transferência">Transferência</option><option value="TPA">TPA</option><option value="Multicaixa">Multicaixa</option></select></div>'+
-        '<div><label>Quantidade</label><input type="number" id="docQty" value="1" min="1" oninput="calcDocTotal()"></div></div>'+
-        '<hr style="border-color:rgba(255,255,255,.1);margin:15px 0;"><label>Seleccionar Plano / Produto</label>'+
-        '<select id="docItemSel" data-cs data-placeholder="-- Selecionar --">'+optsHTML+'</select>'+
-        '<div class="form-row" style="margin-top:10px;"><div><label>Descrição (auto)</label><input id="docDesc" readonly style="background:rgba(0,0,0,.5)"></div>'+
-        '<div><label>Preço Unitário</label><input type="number" id="docPrice" placeholder="0.00" oninput="calcDocTotal()"></div></div>'+
-        '<div style="background:rgba(0,180,216,.1);border:1px solid var(--border-light);padding:15px;border-radius:4px;margin-top:15px;">'+
-        '<div style="display:flex;justify-content:space-between;"><span>Subtotal:</span><span id="docSub">0.00 Kz</span></div>'+
-        '<div style="display:flex;justify-content:space-between;"><span>IVA (14%):</span><span id="docTax">0.00 Kz</span></div>'+
-        '<div style="display:flex;justify-content:space-between;font-size:1.3rem;font-weight:bold;border-top:1px solid rgba(255,255,255,.2);margin-top:8px;padding-top:8px;"><span>TOTAL:</span><span id="docTotalDisp" style="color:var(--success);">0.00 Kz</span></div></div>',
-    function(){processDocGen();}, '📄 Emitir Documento', 'btn-success');
-    setTimeout(calcDocTotal, 50);
-}
-
+function openModalDocGen(clientId){var c=clientId?DB.get('clients').find(function(x){return x.id===clientId;}):null,speeds=DB.get('speeds'),items=DB.get('inventory');var wk=speeds.filter(function(s){return s.period==='Semanal';}),bw=speeds.filter(function(s){return s.period==='Quinzenal';}),mn=speeds.filter(function(s){return s.period==='Mensal';});var co=DB.get('clients').map(function(cl){return '<option value="'+cl.id+'" '+(c&&c.id===clientId?'selected':'')+'>'+cl.name+'</option>';}).join('');var optsHTML='<option value="">-- Selecionar --</option>';optsHTML+='<optgroup label="📅 Semanal (7 dias)">'+wk.map(function(s){return '<option value="'+s.id+'|'+s.preco+'|'+s.nome+' ('+s.period+')">'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';optsHTML+='<optgroup label="🗓️ Quinzenal (15 dias)">'+bw.map(function(s){return '<option value="'+s.id+'|'+s.preco+'|'+s.nome+' ('+s.period+')">'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';optsHTML+='<optgroup label="📆 Mensal (30 dias)">'+mn.map(function(s){return '<option value="'+s.id+'|'+s.preco+'|'+s.nome+' ('+s.period+')">'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';optsHTML+='<optgroup label="📦 Produtos em Stock">'+items.map(function(i){return '<option value="item_'+i.id+'|'+i.val+'|'+i.name+'">'+i.name+' - '+fmt(i.val)+' Kz</option>';}).join('')+'</optgroup>';modal('📄 Emissão de Documento','<div class="form-row"><div><label>Cliente</label><select id="docClient" data-cs data-placeholder="-- Selecionar --"><option value="">-- Selecionar --</option>'+co+'</select></div><div><label>Tipo Documento</label><select id="docType" data-cs><option value="FR">Fatura-Recibo (FR)</option><option value="FT">Fatura (FT)</option><option value="RC">Recibo (RC)</option><option value="OR">Proforma (OR)</option><option value="ND">Nota de Débito (ND)</option><option value="NC">Nota de Crédito (NC)</option></select></div></div><div class="form-row"><div><label>Método Pagamento</label><select id="docMet" data-cs><option value="Dinheiro">Dinheiro</option><option value="Transferência">Transferência</option><option value="TPA">TPA</option><option value="Multicaixa">Multicaixa</option></select></div><div><label>Quantidade</label><input type="number" id="docQty" value="1" min="1" oninput="calcDocTotal()"></div></div><hr style="border-color:rgba(255,255,255,.1);margin:15px 0;"><label>Seleccionar Plano / Produto</label><select id="docItemSel" data-cs data-placeholder="-- Selecionar --">'+optsHTML+'</select><div class="form-row" style="margin-top:10px;"><div><label>Descrição (auto)</label><input id="docDesc" readonly style="background:rgba(0,0,0,.5)"></div><div><label>Preço Unitário</label><input type="number" id="docPrice" placeholder="0.00" oninput="calcDocTotal()"></div></div><div style="background:rgba(0,180,216,.1);border:1px solid var(--border-light);padding:15px;border-radius:4px;margin-top:15px;"><div style="display:flex;justify-content:space-between;"><span>Subtotal:</span><span id="docSub">0.00 Kz</span></div><div style="display:flex;justify-content:space-between;"><span>IVA (14%):</span><span id="docTax">0.00 Kz</span></div><div style="display:flex;justify-content:space-between;font-size:1.3rem;font-weight:bold;border-top:1px solid rgba(255,255,255,.2);margin-top:8px;padding-top:8px;"><span>TOTAL:</span><span id="docTotalDisp" style="color:var(--success);">0.00 Kz</span></div></div>',function(){processDocGen();},'📄 Emitir Documento','btn-success');setTimeout(calcDocTotal,50);}
 function fillDocItem(){var s=val('docItemSel');if(s){var p=s.split('|');document.getElementById('docPrice').value=p[1];document.getElementById('docDesc').value=p[2];calcDocTotal();}}
-// Override do onchange do select customizado para docItemSel
-document.addEventListener('change', function(e) { if(e.target.id==='docItemSel') fillDocItem(); });
+document.addEventListener('change',function(e){if(e.target.id==='docItemSel')fillDocItem();});
+function calcDocTotal(){var price=parseFloat(val('docPrice'))||0,qty=parseInt(val('docQty'))||1,settings=DB.get('settings'),tr=(settings.taxRate||0)/100,cu=settings.currency||'AKZ';var sub=price*qty,tax=sub*tr,total=sub+tax;document.getElementById('docSub').innerText=fmt(sub)+' '+cu;document.getElementById('docTax').innerText=fmt(tax)+' '+cu;document.getElementById('docTotalDisp').innerText=fmt(total)+' '+cu;}
+function processDocGen(){var cId=val('docClient'),type=val('docType'),price=parseFloat(val('docPrice')),qty=parseInt(val('docQty'))||1,desc=val('docDesc')||'Serviço';var client=DB.get('clients').find(function(x){return x.id===cId;}),settings=DB.get('settings'),taxRate=(settings.taxRate||0)/100;if(!client)return alert("Selecione um cliente!");if(!price||price<=0)return alert("Informe o preço!");var sub=price*qty,tax=sub*taxRate,total=sub+tax,docId=generateDocId(type),today=getTodayStr(),isPaid=(type==='FR'||type==='RC');var itemSel=val('docItemSel');var speedId=null,planDays=0;if(itemSel&&itemSel.indexOf('item_')!==0){var p=itemSel.split('|');speedId=p[0];var sp=getSpeedById(speedId);if(sp)planDays=sp.days;}if(type==='FT'||type==='ND')client.divida=(client.divida||0)+total;if(type==='RC'||type==='NC')client.divida=Math.max(0,(client.divida||0)-total);if(speedId){client.speedId=speedId;client.pkg=getSpeedLabel(speedId);client.mens=price;}if((type==='FR'||type==='FT')&&planDays>0)client.validade=formatDateISO(addDays(new Date(),planDays));if(isPaid&&client.divida<=0)client.status='Pago';DB.set('clients',DB.get('clients'));var doc={id:'d'+Date.now(),docId:docId,docType:type,clientId:cId,clientName:client.name,date:today,desc:desc,qty:qty,subtotal:sub,tax:tax,total:total,status:isPaid?'paid':'pending',met:val('docMet'),currency:getCurrency(),branchId:client.branchId||'b1'};var docs=DB.get('documents');docs.push(doc);DB.set('documents',docs);var tr2={id:'t'+Date.now(),docId:docId,docType:type,type:'income',val:total,date:today,desc:type+' '+client.name+' - '+desc,status:isPaid?'paid':'pending',branchId:client.branchId||'b1'};var trans=DB.get('transactions');trans.push(tr2);DB.set('transactions',trans);showDocPrint(doc,client);closeModal();loadCommercial();loadDashboard();}
 
-function calcDocTotal() {
-    var price=parseFloat(val('docPrice'))||0,qty=parseInt(val('docQty'))||1,settings=DB.get('settings'),tr=(settings.taxRate||0)/100,cu=settings.currency||'AKZ';
-    var sub=price*qty,tax=sub*tr,total=sub+tax;
-    document.getElementById('docSub').innerText=fmt(sub)+' '+cu;
-    document.getElementById('docTax').innerText=fmt(tax)+' '+cu;
-    document.getElementById('docTotalDisp').innerText=fmt(total)+' '+cu;
-}
-
-function processDocGen() {
-    var cId=val('docClient'),type=val('docType'),price=parseFloat(val('docPrice')),qty=parseInt(val('docQty'))||1,desc=val('docDesc')||'Serviço';
-    var client=DB.get('clients').find(function(x){return x.id===cId;}),settings=DB.get('settings'),taxRate=(settings.taxRate||0)/100;
-    if(!client)return alert("Selecione um cliente!");if(!price||price<=0)return alert("Informe o preço!");
-    var sub=price*qty,tax=sub*taxRate,total=sub+tax,docId=generateDocId(type),today=getTodayStr(),isPaid=(type==='FR'||type==='RC');
-    var itemSel=val('docItemSel');var speedId=null,planDays=0;
-    if(itemSel&&itemSel.indexOf('item_')!==0){var p=itemSel.split('|');speedId=p[0];var sp=getSpeedById(speedId);if(sp)planDays=sp.days;}
-    if(type==='FT'||type==='ND')client.divida=(client.divida||0)+total;
-    if(type==='RC'||type==='NC')client.divida=Math.max(0,(client.divida||0)-total);
-    if(speedId){client.speedId=speedId;client.pkg=getSpeedLabel(speedId);client.mens=price;}
-    if((type==='FR'||type==='FT')&&planDays>0)client.validade=formatDateISO(addDays(new Date(),planDays));
-    if(isPaid&&client.divida<=0)client.status='Pago';
-    DB.set('clients',DB.get('clients'));
-    var doc={id:'d'+Date.now(),docId:docId,docType:type,clientId:cId,clientName:client.name,date:today,desc:desc,qty:qty,subtotal:sub,tax:tax,total:total,status:isPaid?'paid':'pending',met:val('docMet'),currency:getCurrency(),branchId:client.branchId||'b1'};
-    var docs=DB.get('documents');docs.push(doc);DB.set('documents',docs);
-    var tr2={id:'t'+Date.now(),docId:docId,docType:type,type:'income',val:total,date:today,desc:type+' '+client.name+' - '+desc,status:isPaid?'paid':'pending',branchId:client.branchId||'b1'};
-    var trans=DB.get('transactions');trans.push(tr2);DB.set('transactions',trans);
-    showDocPrint(doc,client);closeModal();loadCommercial();loadDashboard();
-}
-
-/* ================================================================
-   IMPRESSÃO - nova janela
-   ================================================================ */
+/* ====== IMPRESSÃO — LOGO NO TOPO, CARIMBO NO FINAL ====== */
 function buildInvoiceHTML(doc,client){
     var cfg=DB.get('settings'),b=DB.get('branches').find(function(x){return x.id===doc.branchId;});
     var tl={FT:'FATURA',FR:'FATURA-RECIBO',RC:'RECIBO',ND:'NOTA DE DÉBITO',NC:'NOTA DE CRÉDITO',OR:'PROFORMA'};
     var lbl=tl[doc.docType]||doc.docType;
-    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+lbl+' '+doc.docId+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:25px;color:#000;background:#fff;font-size:11pt}.hd{text-align:center;margin-bottom:20px}.lp{width:80px;height:80px;border:2px solid #000;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:bold;background:#f0f0f0;font-size:11px}.hd h2{font-size:16pt;margin:5px 0}.hd p{font-size:9pt;color:#555}.fb{border:1px solid #000;padding:2px 8px;font-size:9pt;font-weight:bold;display:inline-block;margin-bottom:5px}.dt{text-align:center;background:#f0f0f0;padding:6px;border:1px solid #000;margin-bottom:20px;font-size:13pt;font-weight:bold}.it{width:100%;font-size:10pt;margin-bottom:20px}.it td{padding:4px 8px}.it td:first-child{font-weight:bold;width:15%;color:#333}.et{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:20px}.et th{background:#eee;border:1px solid #000;padding:6px 8px;text-align:left}.et td{border:1px solid #ccc;padding:6px 8px}.et .r{text-align:right}.et .c{text-align:center}.tb{width:260px;margin-left:auto;font-size:10pt}.tb td{padding:3px 8px}.tb td:last-child{text-align:right;font-weight:bold}.tb .tr{font-size:12pt;border-top:2px solid #000}.fi{margin-top:25px;font-size:9pt;color:#555}.fd{margin-top:40px;text-align:center;font-size:8pt;color:#888;border-top:1px dashed #ccc;padding-top:10px}@media print{body{padding:0}@page{margin:15mm}}</style></head><body><div class="hd"><div class="lp">LOGO</div><h2>'+(b?b.name:cfg.name)+'</h2><p>NIF: '+cfg.nif+' | Tel: '+cfg.phone+'</p>'+(b&&b.loc?'<p>'+b.loc+'</p>':'')+'</div><div class="fb">'+lbl+'</div><div class="dt">'+lbl+' Nº '+doc.docId+'</div><table class="it"><tr><td>Cliente:</td><td>'+client.name+'</td><td style="font-weight:bold;width:15%">NIF:</td><td>'+(client.nif||'Consumidor Final')+'</td></tr><tr><td>Contacto:</td><td>'+(client.contact||'-')+'</td><td style="font-weight:bold">Data:</td><td>'+doc.date+'</td></tr>'+(client.validade?'<tr><td>Validade:</td><td colspan="3">'+formatDatePT(client.validade)+'</td></tr>':'')+'</table><table class="et"><thead><tr><th>Descrição</th><th class="c">Qtd</th><th class="r">Preço Unit.</th><th class="r">Total</th></tr></thead><tbody><tr><td>'+(doc.desc||'Serviço de Internet')+'</td><td class="c">'+(doc.qty||1)+'</td><td class="r">'+fmt(doc.subtotal/(doc.qty||1))+' '+doc.currency+'</td><td class="r">'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr></tbody></table><table class="tb"><tr><td>Subtotal:</td><td>'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr><tr><td>IVA ('+cfg.taxRate+'%):</td><td>'+fmt(doc.tax)+' '+doc.currency+'</td></tr><tr class="tr"><td>Total:</td><td>'+fmt(doc.total)+' '+doc.currency+'</td></tr></table><div class="fi"><p><strong>Pagamento:</strong> '+(doc.met||'-')+'</p><p><strong>Estado:</strong> '+(doc.status==='paid'?'✓ PAGO':'⏳ PENDENTE')+'</p></div><div class="fd"><p>Documento processado por computador — '+cfg.name+' ERP</p><p>Obrigado pela preferência!</p></div><script>window.onload=function(){window.print();}<\/script></body></html>';
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+lbl+' '+doc.docId+'</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;padding:20px 25px;color:#000;background:#fff;font-size:11pt}.hdr{text-align:center;margin-bottom:12px}.hdr img{width:75px;height:75px;object-fit:contain;margin-bottom:5px}.hdr h2{font-size:15pt;margin:2px 0}.hdr p{font-size:8pt;color:#444}.fb{border:1px solid #000;padding:2px 8px;font-size:9pt;font-weight:bold;display:inline-block;margin-bottom:5px}.dt{text-align:center;background:#f0f0f0;padding:5px;border:1px solid #000;margin-bottom:12px;font-size:12pt;font-weight:bold}.it{width:100%;font-size:9pt;margin-bottom:12px}.it td{padding:3px 6px}.it td:first-child{font-weight:bold;width:13%;color:#333}.et{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:12px}.et th{background:#eee;border:1px solid #000;padding:5px 6px;text-align:left;font-size:8pt}.et td{border:1px solid #ccc;padding:5px 6px}.et .r{text-align:right}.et .c{text-align:center}.tb{width:240px;margin-left:auto;font-size:9pt}.tb td{padding:2px 6px}.tb td:last-child{text-align:right;font-weight:bold}.tb .tr{font-size:11pt;border-top:2px solid #000}.fi{margin-top:15px;font-size:8pt;color:#555}.stamp-area{text-align:center;margin-top:25px;padding-top:15px;border-top:1px dashed #aaa}.stamp-area img{width:120px;height:120px;object-fit:contain;opacity:0.9}.fd{margin-top:8px;text-align:center;font-size:7pt;color:#888}@media print{body{padding:0}@page{margin:12mm}}</style></head><body>'+
+    /* LOGO NO TOPO */
+    '<div class="hdr"><img src="'+LOGO_URL+'" crossorigin="anonymous"><h2>'+(b?b.name:cfg.name)+'</h2><p>NIF: '+cfg.nif+' | Tel: '+cfg.phone+'</p>'+(b&&b.loc?'<p>'+b.loc+'</p>':'')+'</div>'+
+    '<div class="fb">'+lbl+'</div><div class="dt">'+lbl+' Nº '+doc.docId+'</div>'+
+    '<table class="it"><tr><td>Cliente:</td><td>'+client.name+'</td><td style="font-weight:bold;width:13%">NIF:</td><td>'+(client.nif||'Consumidor Final')+'</td></tr><tr><td>Contacto:</td><td>'+(client.contact||'-')+'</td><td style="font-weight:bold">Data:</td><td>'+doc.date+'</td></tr>'+(client.validade?'<tr><td>Validade:</td><td colspan="3">'+formatDatePT(client.validade)+'</td></tr>':'')+'</table>'+
+    '<table class="et"><thead><tr><th>Descrição</th><th class="c">Qtd</th><th class="r">Preço Unit.</th><th class="r">Total</th></tr></thead><tbody><tr><td>'+(doc.desc||'Serviço de Internet')+'</td><td class="c">'+(doc.qty||1)+'</td><td class="r">'+fmt(doc.subtotal/(doc.qty||1))+' '+doc.currency+'</td><td class="r">'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr></tbody></table>'+
+    '<table class="tb"><tr><td>Subtotal:</td><td>'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr><tr><td>IVA ('+cfg.taxRate+'%):</td><td>'+fmt(doc.tax)+' '+doc.currency+'</td></tr><tr class="tr"><td>Total:</td><td>'+fmt(doc.total)+' '+doc.currency+'</td></tr></table>'+
+    '<div class="fi"><p><strong>Pagamento:</strong> '+(doc.met||'-')+'</p><p><strong>Estado:</strong> '+(doc.status==='paid'?'✓ PAGO':'⏳ PENDENTE')+'</p></div>'+
+    /* CARIMBO NO FINAL */
+    '<div class="stamp-area"><img src="'+STAMP_URL+'" crossorigin="anonymous"></div>'+
+    '<div class="fd"><p>Documento processado por computador — '+cfg.name+' ERP</p><p>Obrigado pela preferência!</p></div>'+
+    '<script>window.onload=function(){window.print();}<\/script></body></html>';
 }
 
+/* Pré-visualização — LOGO NO TOPO, CARIMBO NO FINAL */
 function showDocPrint(doc,client){
     var cfg=DB.get('settings'),b=DB.get('branches').find(function(x){return x.id===doc.branchId;});
     var tl={FT:'FATURA',FR:'FATURA-RECIBO',RC:'RECIBO',ND:'NOTA DE DÉBITO',NC:'NOTA DE CRÉDITO',OR:'PROFORMA'};
     var lbl=tl[doc.docType]||doc.docType;
     document.getElementById('docTitle').innerText=lbl+' '+doc.docId;
-    document.getElementById('docBody').innerHTML='<div style="font-family:Arial,sans-serif;padding:20px;color:#000;background:#fff;border-radius:4px;font-size:10pt;"><div style="text-align:center;margin-bottom:20px;"><div style="width:80px;height:80px;border:2px solid #000;border-radius:50%;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-weight:bold;background:#f0f0f0;font-size:11px;">LOGO</div><h2 style="font-size:16pt;margin:5px 0;">'+(b?b.name:cfg.name)+'</h2><p style="font-size:9pt;color:#666;">NIF: '+cfg.nif+' | Tel: '+cfg.phone+'</p></div><div style="border:1px solid #000;padding:2px 8px;font-size:9pt;font-weight:bold;display:inline-block;margin-bottom:5px;">'+lbl+'</div><div style="text-align:center;background:#f0f0f0;padding:6px;border:1px solid #000;margin-bottom:20px;font-size:13pt;font-weight:bold;">'+lbl+' Nº '+doc.docId+'</div><table style="width:100%;font-size:10pt;margin-bottom:20px;"><tr><td style="font-weight:bold;width:15%;padding:4px;">Cliente:</td><td style="padding:4px;">'+client.name+'</td><td style="font-weight:bold;width:15%;padding:4px;">NIF:</td><td style="padding:4px;">'+(client.nif||'Consumidor Final')+'</td></tr><tr><td style="font-weight:bold;padding:4px;">Contacto:</td><td style="padding:4px;">'+(client.contact||'-')+'</td><td style="font-weight:bold;padding:4px;">Data:</td><td style="padding:4px;">'+doc.date+'</td></tr>'+(client.validade?'<tr><td style="font-weight:bold;padding:4px;">Validade:</td><td colspan="3" style="padding:4px;">'+formatDatePT(client.validade)+'</td></tr>':'')+'</table><table style="width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:20px;"><thead><tr style="background:#eee;border:1px solid #000;"><th style="text-align:left;padding:6px;border:1px solid #ccc;">Descrição</th><th style="text-align:center;padding:6px;border:1px solid #ccc;">Qtd</th><th style="text-align:right;padding:6px;border:1px solid #ccc;">Preço Unit.</th><th style="text-align:right;padding:6px;border:1px solid #ccc;">Total</th></tr></thead><tbody><tr><td style="padding:6px;border:1px solid #ccc;">'+(doc.desc||'Serviço de Internet')+'</td><td style="text-align:center;padding:6px;border:1px solid #ccc;">'+(doc.qty||1)+'</td><td style="text-align:right;padding:6px;border:1px solid #ccc;">'+fmt(doc.subtotal/(doc.qty||1))+' '+doc.currency+'</td><td style="text-align:right;padding:6px;border:1px solid #ccc;">'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr></tbody></table><div style="width:260px;margin-left:auto;font-size:10pt;"><table style="width:100%;"><tr><td style="padding:3px 8px;">Subtotal:</td><td style="text-align:right;padding:3px 8px;font-weight:bold;">'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr><tr><td style="padding:3px 8px;">IVA ('+cfg.taxRate+'%):</td><td style="text-align:right;padding:3px 8px;font-weight:bold;">'+fmt(doc.tax)+' '+doc.currency+'</td></tr><tr style="font-size:12pt;border-top:2px solid #000;"><td style="padding:3px 8px;">Total:</td><td style="text-align:right;padding:3px 8px;">'+fmt(doc.total)+' '+doc.currency+'</td></tr></table></div><div style="margin-top:25px;font-size:9pt;color:#555;"><p><strong>Pagamento:</strong> '+(doc.met||'-')+'</p><p><strong>Estado:</strong> '+(doc.status==='paid'?'✓ PAGO':'⏳ PENDENTE')+'</p></div><div style="margin-top:40px;text-align:center;font-size:8pt;color:#888;border-top:1px dashed #ccc;padding-top:10px;"><p>Documento processado por computador — '+cfg.name+' ERP</p></div></div>';
+    document.getElementById('docBody').innerHTML=
+        '<div style="font-family:Arial,sans-serif;padding:15px;color:#000;background:#fff;border-radius:4px;font-size:10pt;">' +
+        /* LOGO NO TOPO */
+        '<div style="text-align:center;margin-bottom:10px;"><img src="'+LOGO_URL+'" style="width:65px;height:65px;object-fit:contain;margin-bottom:4px;" crossorigin="anonymous"><h2 style="font-size:14pt;margin:2px 0;">'+(b?b.name:cfg.name)+'</h2><p style="font-size:8pt;color:#666;">NIF: '+cfg.nif+' | Tel: '+cfg.phone+'</p>'+(b&&b.loc?'<p style="font-size:8pt;color:#666;">'+b.loc+'</p>':'')+'</div>' +
+        '<div style="border:1px solid #000;padding:2px 8px;font-size:9pt;font-weight:bold;display:inline-block;margin-bottom:5px;">'+lbl+'</div>' +
+        '<div style="text-align:center;background:#f0f0f0;padding:5px;border:1px solid #000;margin-bottom:10px;font-size:12pt;font-weight:bold;">'+lbl+' Nº '+doc.docId+'</div>' +
+        '<table style="width:100%;font-size:9pt;margin-bottom:10px;"><tr><td style="font-weight:bold;width:13%;padding:3px;">Cliente:</td><td style="padding:3px;">'+client.name+'</td><td style="font-weight:bold;width:13%;padding:3px;">NIF:</td><td style="padding:3px;">'+(client.nif||'Consumidor Final')+'</td></tr><tr><td style="font-weight:bold;padding:3px;">Contacto:</td><td style="padding:3px;">'+(client.contact||'-')+'</td><td style="font-weight:bold;padding:3px;">Data:</td><td style="padding:3px;">'+doc.date+'</td></tr>'+(client.validade?'<tr><td style="font-weight:bold;padding:3px;">Validade:</td><td colspan="3" style="padding:3px;">'+formatDatePT(client.validade)+'</td></tr>':'')+'</table>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:10px;"><thead><tr style="background:#eee;border:1px solid #000;"><th style="text-align:left;padding:5px;border:1px solid #ccc;font-size:8pt;">Descrição</th><th style="text-align:center;padding:5px;border:1px solid #ccc;">Qtd</th><th style="text-align:right;padding:5px;border:1px solid #ccc;">Preço Unit.</th><th style="text-align:right;padding:5px;border:1px solid #ccc;">Total</th></tr></thead><tbody><tr><td style="padding:5px;border:1px solid #ccc;">'+(doc.desc||'Serviço de Internet')+'</td><td style="text-align:center;padding:5px;border:1px solid #ccc;">'+(doc.qty||1)+'</td><td style="text-align:right;padding:5px;border:1px solid #ccc;">'+fmt(doc.subtotal/(doc.qty||1))+' '+doc.currency+'</td><td style="text-align:right;padding:5px;border:1px solid #ccc;">'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr></tbody></table>' +
+        '<div style="width:240px;margin-left:auto;font-size:9pt;"><table style="width:100%;"><tr><td style="padding:2px 6px;">Subtotal:</td><td style="text-align:right;padding:2px 6px;font-weight:bold;">'+fmt(doc.subtotal)+' '+doc.currency+'</td></tr><tr><td style="padding:2px 6px;">IVA ('+cfg.taxRate+'%):</td><td style="text-align:right;padding:2px 6px;font-weight:bold;">'+fmt(doc.tax)+' '+doc.currency+'</td></tr><tr style="font-size:11pt;border-top:2px solid #000;"><td style="padding:2px 6px;">Total:</td><td style="text-align:right;padding:2px 6px;">'+fmt(doc.total)+' '+doc.currency+'</td></tr></table></div>' +
+        '<div style="margin-top:12px;font-size:8pt;color:#555;"><p><strong>Pagamento:</strong> '+(doc.met||'-')+'</p><p><strong>Estado:</strong> '+(doc.status==='paid'?'✓ PAGO':'⏳ PENDENTE')+'</p></div>' +
+        /* CARIMBO NO FINAL */
+        '<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:1px dashed #aaa;"><img src="'+STAMP_URL+'" style="width:100px;height:100px;object-fit:contain;opacity:0.9;" crossorigin="anonymous"></div>' +
+        '<div style="margin-top:6px;text-align:center;font-size:7pt;color:#888;"><p>Documento processado por computador — '+cfg.name+' ERP</p><p>Obrigado pela preferência!</p></div></div>';
     document.getElementById('modalDoc').dataset.clientId=client.id;
     document.getElementById('modalDoc').dataset.docId=doc.id;
     document.getElementById('modalDoc').classList.add('show');
 }
-function imprimirDoc(){var m=document.getElementById('modalDoc'),dId=m.dataset.docId,cId=m.dataset.clientId;if(!dId||!cId)return alert('Dados não encontrados.');var doc=DB.get('documents').find(function(d){return d.id===dId;}),client=DB.get('clients').find(function(c){return c.id===cId;});if(!doc||!client)return alert('Documento não encontrado.');var pw=window.open('','_blank','width=800,height=600');if(!pw)return alert('Permita pop-ups para imprimir.');pw.document.write(buildInvoiceHTML(doc,client));pw.document.close();}
+function imprimirDoc(){var m=document.getElementById('modalDoc'),dId=m.dataset.docId,cId=m.dataset.clientId;if(!dId||!cId)return alert('Dados não encontrados.');var doc=DB.get('documents').find(function(d){return d.id===dId;}),client=DB.get('clients').find(function(c){return c.id===cId;});if(!doc||!client)return alert('Documento não encontrado.');var pw=window.open('','_blank','width=800,height:600');if(!pw)return alert('Permita pop-ups para imprimir.');pw.document.write(buildInvoiceHTML(doc,client));pw.document.close();}
 
-/* ================================================================
-   PAY CLIENT
-   ================================================================ */
-function payClient(cId){
-    var clients=DB.get('clients'),client=clients.find(function(x){return x.id===cId;});if(!client)return;
-    modal('💳 Receber Pagamento','<div style="background:rgba(255,0,110,.1);padding:15px;border-radius:8px;margin-bottom:15px;"><p>Cliente: <strong>'+client.name+'</strong></p><p>Plano: <strong>'+(client.pkg||'-')+'</strong></p><p style="font-size:1.2rem;">Dívida: <span class="text-danger">'+fmt(client.divida)+' '+getCurrency()+'</span></p></div><div class="form-row"><div><label>Valor a Receber</label><input type="number" id="payVal" placeholder="0.00"></div><div><label>Método</label><select id="payMet" data-cs><option value="Dinheiro">Dinheiro</option><option value="Transferência">Transferência</option><option value="TPA">TPA</option><option value="Multicaixa">Multicaixa</option></select></div></div><div style="margin-top:10px;"><label>Nota</label><input id="payNote" placeholder="Opcional..."></div>',
-    function(){var v=parseFloat(val('payVal'));if(!v||v<=0)return alert('Valor inválido!');if(v>client.divida)return alert('Valor maior que a dívida!');client.divida-=v;if(client.divida<=0){client.status='Pago';client.divida=0;}DB.set('clients',clients);var docId=generateDocId('RC'),settings=DB.get('settings'),tr=settings.taxRate/100,sub=v/(1+tr),tax=v-sub;var doc={id:'d'+Date.now(),docId:docId,docType:'RC',clientId:cId,clientName:client.name,date:getTodayStr(),desc:val('payNote')||'Recebimento - '+(client.pkg||'Serviço'),qty:1,subtotal:sub,tax:tax,total:v,status:'paid',met:val('payMet'),currency:getCurrency(),branchId:client.branchId||'b1'};var docs=DB.get('documents');docs.push(doc);DB.set('documents',docs);var trn={id:'t'+Date.now(),docId:docId,docType:'RC',type:'income',val:v,date:getTodayStr(),desc:'Recebimento '+client.name,status:'paid',branchId:client.branchId||'b1'};var trans=DB.get('transactions');trans.push(trn);DB.set('transactions',trans);showDocPrint(doc,client);closeModal();loadClients();loadDashboard();},'✓ Receber','btn-success');
-}
+/* ====== PAY CLIENT ====== */
+function payClient(cId){var clients=DB.get('clients'),client=clients.find(function(x){return x.id===cId;});if(!client)return;modal('💳 Receber Pagamento','<div style="background:rgba(255,0,110,.1);padding:15px;border-radius:8px;margin-bottom:15px;"><p>Cliente: <strong>'+client.name+'</strong></p><p>Plano: <strong>'+(client.pkg||'-')+'</strong></p><p style="font-size:1.2rem;">Dívida: <span class="text-danger">'+fmt(client.divida)+' '+getCurrency()+'</span></p></div><div class="form-row"><div><label>Valor a Receber</label><input type="number" id="payVal" placeholder="0.00"></div><div><label>Método</label><select id="payMet" data-cs><option value="Dinheiro">Dinheiro</option><option value="Transferência">Transferência</option><option value="TPA">TPA</option><option value="Multicaixa">Multicaixa</option></select></div></div><div style="margin-top:10px;"><label>Nota</label><input id="payNote" placeholder="Opcional..."></div>',function(){var v=parseFloat(val('payVal'));if(!v||v<=0)return alert('Valor inválido!');if(v>client.divida)return alert('Valor maior que a dívida!');client.divida-=v;if(client.divida<=0){client.status='Pago';client.divida=0;}DB.set('clients',clients);var docId=generateDocId('RC'),settings=DB.get('settings'),tr=settings.taxRate/100,sub=v/(1+tr),tax=v-sub;var doc={id:'d'+Date.now(),docId:docId,docType:'RC',clientId:cId,clientName:client.name,date:getTodayStr(),desc:val('payNote')||'Recebimento - '+(client.pkg||'Serviço'),qty:1,subtotal:sub,tax:tax,total:v,status:'paid',met:val('payMet'),currency:getCurrency(),branchId:client.branchId||'b1'};var docs=DB.get('documents');docs.push(doc);DB.set('documents',docs);var trn={id:'t'+Date.now(),docId:docId,docType:'RC',type:'income',val:v,date:getTodayStr(),desc:'Recebimento '+client.name,status:'paid',branchId:client.branchId||'b1'};var trans=DB.get('transactions');trans.push(trn);DB.set('transactions',trans);showDocPrint(doc,client);closeModal();loadClients();loadDashboard();},'✓ Receber','btn-success');}
 
-/* ================================================================
-   SUPPLIERS
-   ================================================================ */
-function loadSuppliers(){
-    var s=DB.get('suppliers'),cu=getCurrency();
-    document.getElementById('tableSuppliers').innerHTML=s.map(function(u){return '<tr><td>'+u.name+'</td><td>'+(u.nif||'-')+'</td><td class="text-danger">'+fmt(u.debt||0)+' '+cu+'</td><td><button class="btn btn-info btn-sm" onclick="addSupplierBill(\''+u.id+'\')">➕</button><button class="btn btn-success btn-sm" onclick="paySupplier(\''+u.id+'\')">💳</button><button class="btn btn-outline btn-sm" onclick="openModalSupplier(\''+u.id+'\')">✏️</button></td></tr>';}).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Nenhum</td></tr>';
-    var trans=DB.get('transactions').filter(function(t){return t.type==='expense'||t.type==='expense_payment';}).reverse();
-    document.getElementById('supplierBillsList').innerHTML=trans.slice(0,15).map(function(t){return '<div style="background:rgba(255,255,255,.03);padding:10px;margin-bottom:5px;border-left:3px solid '+(t.type==='expense_payment'?'var(--success)':'var(--danger)')+'"><div style="display:flex;justify-content:space-between"><span>'+t.desc+'</span><span class="'+(t.type==='expense_payment'?'text-success':'text-danger')+'">'+(t.type==='expense_payment'?'+':'-')+fmt(t.val)+'</span></div><small style="color:var(--text-muted);">'+t.date+'</small></div>';}).join('')||'<div style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma</div>';
-}
+/* ====== SUPPLIERS ====== */
+function loadSuppliers(){var s=DB.get('suppliers'),cu=getCurrency();document.getElementById('tableSuppliers').innerHTML=s.map(function(u){return '<tr><td>'+u.name+'</td><td>'+(u.nif||'-')+'</td><td class="text-danger">'+fmt(u.debt||0)+' '+cu+'</td><td><button class="btn btn-info btn-sm" onclick="addSupplierBill(\''+u.id+'\')">➕</button><button class="btn btn-success btn-sm" onclick="paySupplier(\''+u.id+'\')">💳</button><button class="btn btn-outline btn-sm" onclick="openModalSupplier(\''+u.id+'\')">✏️</button></td></tr>';}).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">Nenhum</td></tr>';var trans=DB.get('transactions').filter(function(t){return t.type==='expense'||t.type==='expense_payment';}).reverse();document.getElementById('supplierBillsList').innerHTML=trans.slice(0,15).map(function(t){return '<div style="background:rgba(255,255,255,.03);padding:10px;margin-bottom:5px;border-left:3px solid '+(t.type==='expense_payment'?'var(--success)':'var(--danger')+'"><div style="display:flex;justify-content:space-between"><span>'+t.desc+'</span><span class="'+(t.type==='expense_payment'?'text-success':'text-danger')+'">'+(t.type==='expense_payment'?'+':'-')+fmt(t.val)+'</span></div><small style="color:var(--text-muted);">'+t.date+'</small></div>';}).join('')||'<div style="text-align:center;color:var(--text-muted);padding:20px;">Nenhuma</div>';}
 function openModalSupplier(id){var s=id?DB.get('suppliers').find(function(x){return x.id===id;}):{name:'',nif:'',contact:'',debt:0};modal('Fornecedor','<div class="form-row"><div><label>Nome</label><input id="sName" value="'+s.name+'"></div><div><label>NIF</label><input id="sNif" value="'+(s.nif||'')+'"></div></div><div class="form-row"><div><label>Contacto</label><input id="sContact" value="'+(s.contact||'')+'"></div></div>',function(){var d={id:id||'s'+Date.now(),name:val('sName'),nif:val('sNif'),contact:val('sContact'),debt:s.debt||0};var l=DB.get('suppliers');if(id){var i=l.findIndex(function(x){return x.id===id;});l[i]=d;}else l.push(d);DB.set('suppliers',l);closeModal();loadSuppliers();});}
 function addSupplierBill(sId){var s=DB.get('suppliers').find(function(x){return x.id===sId;});modal('Despesa','<p>Fornecedor: <strong>'+s.name+'</strong></p><p>Dívida: <span class="text-danger">'+fmt(s.debt||0)+'</span></p><div class="form-row"><div><label>Valor</label><input type="number" id="billVal" placeholder="0.00"></div><div><label>Descrição</label><input id="billDesc" placeholder="Ex: Compra de routers"></div></div>',function(){var v=parseFloat(val('billVal'));if(!v||v<=0)return alert('Inválido!');s.debt=(s.debt||0)+v;DB.set('suppliers',DB.get('suppliers'));DB.get('transactions').push({id:'t'+Date.now(),type:'expense',val:v,date:getTodayStr(),desc:val('billDesc')||'Despesa',status:'unpaid',branchId:currentBranch==='all'?'b1':currentBranch});DB.set('transactions',DB.get('transactions'));closeModal();loadSuppliers();loadDashboard();});}
 function paySupplier(sId){var s=DB.get('suppliers').find(function(x){return x.id===sId;});modal('Pagar Fornecedor','<p>Fornecedor: <strong>'+s.name+'</strong></p><p style="font-size:1.1rem;">Dívida: <span class="text-danger">'+fmt(s.debt)+'</span></p><div class="form-row"><div><label>Valor</label><input type="number" id="paySupVal" placeholder="0.00"></div><div><label>Método</label><select id="paySupMet" data-cs><option value="Transferência">Transferência</option><option value="Dinheiro">Dinheiro</option><option value="Multicaixa">Multicaixa</option></select></div></div>',function(){var v=parseFloat(val('paySupVal'));if(!v||v<=0)return alert('Inválido!');if(v>s.debt)return alert('Maior que a dívida!');s.debt-=v;DB.set('suppliers',DB.get('suppliers'));DB.get('transactions').push({id:'t'+Date.now(),type:'expense_payment',val:v,date:getTodayStr(),desc:'Pagamento '+s.name,status:'paid',branchId:currentBranch==='all'?'b1':currentBranch});DB.set('transactions',DB.get('transactions'));closeModal();loadSuppliers();loadDashboard();},'💳 Pagar','btn-success');}
 
-/* ================================================================
-   CLIENTS
-   ================================================================ */
+/* ====== CLIENTS ====== */
 function loadClients(){renderClientsTable(filterArr(DB.get('clients')));}
-function renderClientsTable(data){
-    var tbody=document.getElementById('tableClients'),hoje=new Date();hoje.setHours(0,0,0,0);
-    tbody.innerHTML=data.map(function(c){var ie=c.validade?(new Date(c.validade+'T00:00:00')<hoje):false;var sc='bg-success',st='OK';if(c.divida>0){sc=ie?'bg-danger':'bg-partial';st=ie?'INADIMPLENTE':'DÍVIDA';}else if(ie&&c.validade){sc='bg-warning';st='EXPIRADO';}return '<tr><td><strong>'+c.name+'</strong></td><td>'+(c.nif||'-')+'</td><td>'+(c.contact||'-')+'</td><td><small>'+(c.pkg||'-')+'</small></td><td><small>'+(c.validade?formatDatePT(c.validade):'-')+'</small></td><td><span class="badge '+sc+'">'+st+'</span></td><td style="white-space:nowrap;"><button class="btn btn-info btn-sm" onclick="openModalDocGen(\''+c.id+'\')">📄</button>'+(c.divida>0?'<button class="btn btn-success btn-sm" onclick="payClient(\''+c.id+'\')">💳</button>':'')+'<button class="btn btn-outline btn-sm" onclick="openModalClient(\''+c.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteClient(\''+c.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Nenhum cliente</td></tr>';
-}
+function renderClientsTable(data){var tbody=document.getElementById('tableClients'),hoje=new Date();hoje.setHours(0,0,0,0);tbody.innerHTML=data.map(function(c){var ie=c.validade?(new Date(c.validade+'T00:00:00')<hoje):false;var sc='bg-success',st='OK';if(c.divida>0){sc=ie?'bg-danger':'bg-partial';st=ie?'INADIMPLENTE':'DÍVIDA';}else if(ie&&c.validade){sc='bg-warning';st='EXPIRADO';}return '<tr><td><strong>'+c.name+'</strong></td><td>'+(c.nif||'-')+'</td><td>'+(c.contact||'-')+'</td><td><small>'+(c.pkg||'-')+'</small></td><td><small>'+(c.validade?formatDatePT(c.validade):'-')+'</small></td><td><span class="badge '+sc+'">'+st+'</span></td><td style="white-space:nowrap;"><button class="btn btn-info btn-sm" onclick="openModalDocGen(\''+c.id+'\')">📄</button>'+(c.divida>0?'<button class="btn btn-success btn-sm" onclick="payClient(\''+c.id+'\')">💳</button>':'')+'<button class="btn btn-outline btn-sm" onclick="openModalClient(\''+c.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteClient(\''+c.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Nenhum cliente</td></tr>';}
 function searchClients(){var q=document.getElementById('searchClient').value.toLowerCase();renderClientsTable(filterArr(DB.get('clients')).filter(function(c){return c.name.toLowerCase().indexOf(q)>-1||(c.contact||'').indexOf(q)>-1||(c.nif||'').indexOf(q)>-1||(c.pkg||'').toLowerCase().indexOf(q)>-1;}));}
 function deleteClient(cId){if(!confirm('Eliminar?'))return;DB.set('clients',DB.get('clients').filter(function(c){return c.id!==cId;}));loadClients();loadDashboard();}
+function openModalClient(id){var c=id?DB.get('clients').find(function(x){return x.id===id;}):{name:'',contact:'',pkg:'',speedId:'',mens:0,validade:'',divida:0,nif:'',morada:''};var speeds=DB.get('speeds'),wk=speeds.filter(function(s){return s.period==='Semanal';}),bw=speeds.filter(function(s){return s.period==='Quinzenal';}),mn=speeds.filter(function(s){return s.period==='Mensal';});var so='<option value="">-- Sem Plano --</option>';so+='<optgroup label="📅 Semanal (7 dias)">'+wk.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';so+='<optgroup label="🗓️ Quinzenal (15 dias)">'+bw.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';so+='<optgroup label="📆 Mensal (30 dias)">'+mn.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';var dr=c.validade?Math.max(0,Math.ceil((new Date(c.validade+'T00:00:00')-new Date())/(1000*60*60*24))):0;modal('👤 Cliente','<div class="form-row"><div><label>Nome *</label><input id="cName" value="'+c.name+'"></div><div><label>NIF</label><input id="cNif" value="'+(c.nif||'')+'"></div></div><div class="form-row"><div><label>Contacto</label><input id="cContact" value="'+(c.contact||'')+'"></div><div><label>Morada</label><input id="cMorada" value="'+(c.morada||'')+'"></div></div><div class="plan-activate-box"><h4>📡 Plano de Internet</h4><div class="form-row"><div><label>Seleccionar Plano</label><select id="cSpeed" data-cs data-placeholder="-- Sem Plano --">'+so+'</select></div><div><label>Valor Plano</label><input id="cMens" value="'+(c.mens?fmt(c.mens)+' Kz':'')+'" readonly style="background:rgba(0,0,0,.5)"></div></div><div id="planPreviewInfo" style="font-size:.85rem;color:var(--text-muted);margin-top:8px;">'+(c.speedId?'<span style="color:var(--success);">Plano activo:</span> '+(c.pkg||'-')+' | <span style="color:var(--warning);">Validade:</span> '+(c.validade?formatDatePT(c.validade)+' ('+dr+' dias)':'-'):'<em>Nenhum plano activo</em>')+'</div><p style="font-size:.75rem;color:var(--text-muted);margin-top:6px;font-style:italic;">Ao selecionar um plano e salvar, a validade será recalculada a partir de hoje.</p></div>'+(id?'<div style="background:rgba(255,255,255,.05);padding:10px;border-radius:4px;margin-top:10px;"><p>Dívida: <span class="text-danger">'+fmt(c.divida||0)+' '+getCurrency()+'</span></p></div>':''),function(){var name=val('cName');if(!name)return alert('Nome obrigatório!');var speedId=val('cSpeed');var pkg='',mens=0,days=0;if(speedId){var sp=getSpeedById(speedId);if(sp){pkg=getSpeedLabel(speedId);mens=sp.preco;days=sp.days;}}var validade='';if(days>0)validade=formatDateISO(addDays(new Date(),days));else if(id)validade=c.validade||'';var data={id:id||'c'+Date.now(),branchId:'b1',name:name,nif:val('cNif'),contact:val('cContact'),morada:val('cMorada'),speedId:speedId||null,pkg:pkg,mens:mens,validade:validade,divida:c.divida||0};var list=DB.get('clients');var ix=list.findIndex(function(x){return x.id===id;});if(ix>=0)list[ix]=data;else list.push(data);DB.set('clients',list);closeModal();loadClients();});setTimeout(updateClientPlanInfo,50);}
+document.addEventListener('change',function(e){if(e.target.id==='cSpeed')updateClientPlanInfo();});
+function updateClientPlanInfo(){var speedId=val('cSpeed'),mi=document.getElementById('cMens'),pi=document.getElementById('planPreviewInfo');if(!mi||!pi)return;if(speedId){var sp=getSpeedById(speedId);if(sp){mi.value=fmt(sp.preco)+' Kz';var nv=formatDateISO(addDays(new Date(),sp.days));pi.innerHTML='<span style="color:var(--success);">Novo plano:</span> '+getSpeedLabel(speedId)+' | <span style="color:var(--success);">Nova validade:</span> '+formatDatePT(nv)+' ('+sp.days+' dias)';return;}}mi.value='';pi.innerHTML='<em>Nenhum plano seleccionado</em>';}
 
-function openModalClient(id){
-    var c=id?DB.get('clients').find(function(x){return x.id===id;}):{name:'',contact:'',pkg:'',speedId:'',mens:0,validade:'',divida:0,nif:'',morada:''};
-    var speeds=DB.get('speeds'),wk=speeds.filter(function(s){return s.period==='Semanal';}),bw=speeds.filter(function(s){return s.period==='Quinzenal';}),mn=speeds.filter(function(s){return s.period==='Mensal';});
-    var so='<option value="">-- Sem Plano --</option>';
-    so+='<optgroup label="📅 Semanal (7 dias)">'+wk.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    so+='<optgroup label="🗓️ Quinzenal (15 dias)">'+bw.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    so+='<optgroup label="📆 Mensal (30 dias)">'+mn.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    var dr=c.validade?Math.max(0,Math.ceil((new Date(c.validade+'T00:00:00')-new Date())/(1000*60*60*24))):0;
-    modal('👤 Cliente',
-        '<div class="form-row"><div><label>Nome *</label><input id="cName" value="'+c.name+'"></div><div><label>NIF</label><input id="cNif" value="'+(c.nif||'')+'"></div></div>'+
-        '<div class="form-row"><div><label>Contacto</label><input id="cContact" value="'+(c.contact||'')+'"></div><div><label>Morada</label><input id="cMorada" value="'+(c.morada||'')+'"></div></div>'+
-        '<div class="plan-activate-box"><h4>📡 Plano de Internet</h4>'+
-        '<div class="form-row"><div><label>Seleccionar Plano</label><select id="cSpeed" data-cs data-placeholder="-- Sem Plano --">'+so+'</select></div>'+
-        '<div><label>Valor Plano</label><input id="cMens" value="'+(c.mens?fmt(c.mens)+' Kz':'')+'" readonly style="background:rgba(0,0,0,.5)"></div></div>'+
-        '<div id="planPreviewInfo" style="font-size:.85rem;color:var(--text-muted);margin-top:8px;">'+(c.speedId?'<span style="color:var(--success);">Plano activo:</span> '+(c.pkg||'-')+' | <span style="color:var(--warning);">Validade:</span> '+(c.validade?formatDatePT(c.validade)+' ('+dr+' dias)':'-'):'<em>Nenhum plano activo</em>')+'</div>'+
-        '<p style="font-size:.75rem;color:var(--text-muted);margin-top:6px;font-style:italic;">Ao selecionar um plano e salvar, a validade será recalculada a partir de hoje.</p></div>'+
-        (id?'<div style="background:rgba(255,255,255,.05);padding:10px;border-radius:4px;margin-top:10px;"><p>Dívida: <span class="text-danger">'+fmt(c.divida||0)+' '+getCurrency()+'</span></p></div>':''),
-    function(){var name=val('cName');if(!name)return alert('Nome obrigatório!');var speedId=val('cSpeed');var pkg='',mens=0,days=0;if(speedId){var sp=getSpeedById(speedId);if(sp){pkg=getSpeedLabel(speedId);mens=sp.preco;days=sp.days;}}var validade='';if(days>0)validade=formatDateISO(addDays(new Date(),days));else if(id)validade=c.validade||'';var data={id:id||'c'+Date.now(),branchId:'b1',name:name,nif:val('cNif'),contact:val('cContact'),morada:val('cMorada'),speedId:speedId||null,pkg:pkg,mens:mens,validade:validade,divida:c.divida||0};var list=DB.get('clients');var ix=list.findIndex(function(x){return x.id===id;});if(ix>=0)list[ix]=data;else list.push(data);DB.set('clients',list);closeModal();loadClients();});
-    setTimeout(updateClientPlanInfo,50);
-}
-
-// Atualizar preview do plano ao mudar select
-document.addEventListener('change', function(e){ if(e.target.id==='cSpeed') updateClientPlanInfo(); });
-
-function updateClientPlanInfo(){
-    var speedId=val('cSpeed'),mi=document.getElementById('cMens'),pi=document.getElementById('planPreviewInfo');
-    if(!mi||!pi)return;
-    if(speedId){var sp=getSpeedById(speedId);if(sp){mi.value=fmt(sp.preco)+' Kz';var nv=formatDateISO(addDays(new Date(),sp.days));pi.innerHTML='<span style="color:var(--success);">Novo plano:</span> '+getSpeedLabel(speedId)+' | <span style="color:var(--success);">Nova validade:</span> '+formatDatePT(nv)+' ('+sp.days+' dias)';return;}}
-    mi.value='';pi.innerHTML='<em>Nenhum plano seleccionado</em>';
-}
-
-/* ================================================================
-   STOCK
-   ================================================================ */
+/* ====== STOCK / PLANS / USERS / BRANCHES / REPORTS / CONFIG / BACKUP ====== */
 function loadStock(){var cu=getCurrency();document.getElementById('tableStock').innerHTML=DB.get('inventory').map(function(i){return '<tr><td style="font-family:monospace;font-size:.8rem;">'+i.id+'</td><td>'+i.name+'</td><td>'+(i.cat||'Geral')+'</td><td>'+fmt(i.val)+' '+cu+'</td><td><span class="badge '+(i.qty>5?'bg-success':(i.qty>0?'bg-warning':'bg-danger'))+'">'+i.qty+'</span></td><td><button class="btn btn-outline btn-sm" onclick="openModalItem(\''+i.id+'\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteItem(\''+i.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Nenhum</td></tr>';}
 function openModalItem(id){var item=id?DB.get('inventory').find(function(x){return x.id===id;}):{name:'',val:0,qty:0,cat:''};modal('📦 Produto','<div class="form-row"><div><label>Nome</label><input id="iName" value="'+item.name+'"></div><div><label>Categoria</label><input id="iCat" value="'+(item.cat||'')+'"></div></div><div class="form-row"><div><label>Preço</label><input type="number" id="iVal" value="'+item.val+'"></div><div><label>Quantidade</label><input type="number" id="iQty" value="'+item.qty+'"></div></div>',function(){var d={id:id||'i'+Date.now(),name:val('iName'),cat:val('iCat'),val:parseFloat(val('iVal')),qty:parseInt(val('iQty')),branchId:'b1'};var l=DB.get('inventory');var idx=l.findIndex(function(x){return x.id===id;});if(idx>=0)l[idx]=d;else l.push(d);DB.set('inventory',l);closeModal();loadStock();});}
 function deleteItem(id){if(!confirm('Eliminar?'))return;DB.set('inventory',DB.get('inventory').filter(function(i){return i.id!==id;}));loadStock();}
-
-/* ================================================================
-   PLANS - Adicionar / Eliminar planos e streaming
-   ================================================================ */
-function loadPlans(){
-    var speeds=DB.get('speeds'),cu=getCurrency();
-    document.getElementById('tableWeekly').innerHTML=speeds.filter(function(s){return s.period==='Semanal';}).map(function(s){return '<tr><td>'+s.nome+'</td><td><strong>'+fmt(s.preco)+' '+cu+'</strong></td><td><button class="btn btn-danger btn-sm" onclick="delSpeed(\''+s.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem planos</td></tr>';
-    document.getElementById('tableBiweekly').innerHTML=speeds.filter(function(s){return s.period==='Quinzenal';}).map(function(s){return '<tr><td>'+s.nome+'</td><td><strong>'+fmt(s.preco)+' '+cu+'</strong></td><td><button class="btn btn-danger btn-sm" onclick="delSpeed(\''+s.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem planos</td></tr>';
-    document.getElementById('tableMonthly').innerHTML=speeds.filter(function(s){return s.period==='Mensal';}).map(function(s){return '<tr><td>'+s.nome+'</td><td><strong>'+fmt(s.preco)+' '+cu+'</strong></td><td><button class="btn btn-danger btn-sm" onclick="delSpeed(\''+s.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem planos</td></tr>';
-    document.getElementById('tablePlans').innerHTML=DB.get('plans').map(function(p){return '<tr><td>'+p.nome+'</td><td>'+fmt(p.preco)+' '+cu+'</td><td><button class="btn btn-danger btn-sm" onclick="delPlan(\''+p.id+'\')">🗑️</button></td></tr>';}).join('');
-}
-function addSpeed(){
-    var p=val('newSpeedPeriod'),n=val('newSpeedName'),pr=parseFloat(val('newSpeedPrice'));
-    if(!n||!pr||pr<=0){alert('Preencha velocidade e preço!');return;}
-    var dm={Semanal:7,Quinzenal:15,Mensal:30};
-    var speeds=DB.get('speeds');
-    speeds.push({id:'s'+Date.now(),nome:n,preco:pr,period:p,days:dm[p]||30});
-    DB.set('speeds',speeds);
-    document.getElementById('newSpeedName').value='';
-    document.getElementById('newSpeedPrice').value='';
-    loadPlans();
-    alert('✓ Plano '+n+' ('+p+') adicionado com sucesso!');
-}
-function delSpeed(id){if(!confirm('Eliminar este plano?'))return;DB.set('speeds',DB.get('speeds').filter(function(s){return s.id!==id;}));loadPlans();}
-function addPlan(){
-    var n=val('newPlanName'),pr=parseFloat(val('newPlanPrice'));
-    if(!n||!pr){alert('Preencha nome e preço!');return;}
-    var plans=DB.get('plans');
-    plans.push({id:'p'+Date.now(),nome:n,preco:pr});
-    DB.set('plans',plans);
-    document.getElementById('newPlanName').value='';
-    document.getElementById('newPlanPrice').value='';
-    loadPlans();
-    alert('✓ Serviço '+n+' adicionado!');
-}
+function loadPlans(){var speeds=DB.get('speeds'),cu=getCurrency();document.getElementById('tableWeekly').innerHTML=speeds.filter(function(s){return s.period==='Semanal';}).map(function(s){return '<tr><td>'+s.nome+'</td><td><strong>'+fmt(s.preco)+' '+cu+'</strong></td><td><button class="btn btn-danger btn-sm" onclick="delSpeed(\''+s.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem planos</td></tr>';document.getElementById('tableBiweekly').innerHTML=speeds.filter(function(s){return s.period==='Quinzenal';}).map(function(s){return '<tr><td>'+s.nome+'</td><td><strong>'+fmt(s.preco)+' '+cu+'</strong></td><td><button class="btn btn-danger btn-sm" onclick="delSpeed(\''+s.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem planos</td></tr>';document.getElementById('tableMonthly').innerHTML=speeds.filter(function(s){return s.period==='Mensal';}).map(function(s){return '<tr><td>'+s.nome+'</td><td><strong>'+fmt(s.preco)+' '+cu+'</strong></td><td><button class="btn btn-danger btn-sm" onclick="delSpeed(\''+s.id+'\')">🗑️</button></td></tr>';}).join('')||'<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Sem planos</td></tr>';document.getElementById('tablePlans').innerHTML=DB.get('plans').map(function(p){return '<tr><td>'+p.nome+'</td><td>'+fmt(p.preco)+' '+cu+'</td><td><button class="btn btn-danger btn-sm" onclick="delPlan(\''+p.id+'\')">🗑️</button></td></tr>';}).join('');}
+function addSpeed(){var p=val('newSpeedPeriod'),n=val('newSpeedName'),pr=parseFloat(val('newSpeedPrice'));if(!n||!pr||pr<=0){alert('Preencha velocidade e preço!');return;}var dm={Semanal:7,Quinzenal:15,Mensal:30};var speeds=DB.get('speeds');speeds.push({id:'s'+Date.now(),nome:n,preco:pr,period:p,days:dm[p]||30});DB.set('speeds',speeds);document.getElementById('newSpeedName').value='';document.getElementById('newSpeedPrice').value='';loadPlans();alert('✓ Plano '+n+' ('+p+') adicionado!');}
+function delSpeed(id){if(!confirm('Eliminar?'))return;DB.set('speeds',DB.get('speeds').filter(function(s){return s.id!==id;}));loadPlans();}
+function addPlan(){var n=val('newPlanName'),pr=parseFloat(val('newPlanPrice'));if(!n||!pr){alert('Preencha nome e preço!');return;}var plans=DB.get('plans');plans.push({id:'p'+Date.now(),nome:n,preco:pr});DB.set('plans',plans);document.getElementById('newPlanName').value='';document.getElementById('newPlanPrice').value='';loadPlans();alert('✓ Serviço '+n+' adicionado!');}
 function delPlan(id){if(!confirm('Eliminar?'))return;DB.set('plans',DB.get('plans').filter(function(p){return p.id!==id;}));loadPlans();}
-
-/* ================================================================
-   USERS / BRANCHES / REPORTS / CONFIG / BACKUP
-   ================================================================ */
 function loadUsers(){document.getElementById('tableUsers').innerHTML=DB.get('users').map(function(u){return '<tr><td><strong>'+u.name+'</strong></td><td>'+u.user+'</td><td><span class="badge '+(u.role==='admin'?'bg-danger':'bg-info')+'">'+(u.role==='admin'?'ADMIN':'GERENTE')+'</span></td><td>'+(u.commission||0)+'%</td><td><button class="btn btn-outline btn-sm" onclick="openModalUser(\''+u.id+'\')">✏️</button></td></tr>';}).join('');}
 function openModalUser(id){var u=id?DB.get('users').find(function(x){return x.id===id;}):{name:'',user:'',pass:'',role:'manager',commission:0};modal('👤 Utilizador','<div class="form-row"><div><label>Nome</label><input id="uName" value="'+u.name+'"></div><div><label>Username</label><input id="uUser" value="'+u.user+'" '+(id?'disabled style="opacity:.5"':'')+'></div></div><div class="form-row"><div><label>Senha '+(id?'(vazio=manter)':'*')+'</label><input type="password" id="uPass" value="'+(id?'':u.pass)+'"></div><div><label>Função</label><select id="uRole" data-cs><option value="manager" '+(u.role==='manager'?'selected':'')+'>Gerente</option><option value="admin" '+(u.role==='admin'?'selected':'')+'>Admin</option></select></div></div><div class="form-row"><div><label>Comissão (%)</label><input type="number" id="uComm" value="'+(u.commission||0)+'" min="0" max="100"></div></div>',function(){var p=val('uPass');if(!id&&!p)return alert('Senha obrigatória!');var d={id:id||'u'+Date.now(),name:val('uName'),user:id?u.user:val('uUser'),pass:p||u.pass,role:val('uRole'),branchId:'all',commission:parseFloat(val('uComm'))||0};var l=DB.get('users');var idx=l.findIndex(function(x){return x.id===id;});if(idx>=0)l[idx]=d;else l.push(d);DB.set('users',l);closeModal();loadUsers();});}
-
 function loadBranches(){document.getElementById('tableBranches').innerHTML=DB.get('branches').map(function(b){return '<tr><td><strong>'+b.name+'</strong></td><td>'+(b.loc||'-')+'</td><td>'+(b.mgr||'-')+'</td><td>'+(b.phone||'-')+'</td><td><button class="btn btn-outline btn-sm" onclick="openModalBranch(\''+b.id+'\')">✏️</button></td></tr>';}).join('');}
 function openModalBranch(id){var b=id?DB.get('branches').find(function(x){return x.id===id;}):{name:'',loc:'',mgr:'',phone:''};modal('🏢 Filial','<div class="form-row"><div><label>Nome</label><input id="bName" value="'+b.name+'"></div><div><label>Localização</label><input id="bLoc" value="'+(b.loc||'')+'"></div></div><div class="form-row"><div><label>Gerente</label><input id="bMgr" value="'+(b.mgr||'')+'"></div><div><label>Telefone</label><input id="bPhone" value="'+(b.phone||'')+'"></div></div>',function(){var d={id:id||'b'+Date.now(),name:val('bName'),loc:val('bLoc'),mgr:val('bMgr'),phone:val('bPhone'),active:true};var l=DB.get('branches');var idx=l.findIndex(function(x){return x.id===id;});if(idx>=0)l[idx]=d;else l.push(d);DB.set('branches',l);closeModal();loadBranches();loadSidebar();});}
-
-function loadReportData(){
-    var mi=document.getElementById('reportMonth');if(!mi.value){var n=new Date();mi.value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}
-    var y=parseInt(mi.value.split('-')[0]),m=parseInt(mi.value.split('-')[1]),trans=DB.get('transactions'),docs=DB.get('documents'),cu=getCurrency();
-    var td=docs.filter(function(d){var p=parseDate(d.date);return d.docType!=='NC'&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+(b.tax||0);},0);
-    var tc=trans.filter(function(t){var p=parseDate(t.date);return t.type==='expense'&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+(b.val*0.14);},0);
-    document.getElementById('rptTaxDebit').innerText=fmt(td)+' '+cu;document.getElementById('rptTaxCredit').innerText=fmt(tc)+' '+cu;document.getElementById('rptTaxTotal').innerText=fmt(td-tc)+' '+cu;
-    var inc=trans.filter(function(t){var p=parseDate(t.date);return t.type==='income'&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+b.val;},0);
-    var exp=trans.filter(function(t){var p=parseDate(t.date);return(t.type==='expense'||t.type==='expense_payment')&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+b.val;},0);
-    var pf=inc-exp;
-    document.getElementById('reportContent').innerHTML='<div style="text-align:center;margin-bottom:15px;"><h3 style="color:var(--primary);">Resumo '+String(m).padStart(2,'0')+'/'+y+'</h3></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:rgba(0,255,136,.1);padding:15px;border-radius:8px;text-align:center;"><div style="color:var(--text-muted);font-size:.8rem;">Receitas</div><div style="font-size:1.2rem;color:var(--success);font-weight:bold;">'+fmt(inc)+' '+cu+'</div></div><div style="background:rgba(255,0,110,.1);padding:15px;border-radius:8px;text-align:center;"><div style="color:var(--text-muted);font-size:.8rem;">Despesas</div><div style="font-size:1.2rem;color:var(--danger);font-weight:bold;">'+fmt(exp)+' '+cu+'</div></div></div><div style="background:rgba(0,180,216,.1);padding:15px;border-radius:8px;text-align:center;margin-top:10px;"><div style="color:var(--text-muted);font-size:.8rem;">Lucro Líquido</div><div style="font-size:1.5rem;color:'+(pf>=0?'var(--success)':'var(--danger)')+';font-weight:bold;font-family:Orbitron;">'+fmt(pf)+' '+cu+'</div></div>';
-}
-function exportFiscalCSV(){var docs=DB.get('documents');if(!docs.length)return alert('Nenhum documento!');var csv='Data,Documento,Tipo,Cliente,NIF,Descricao,Qtd,Subtotal,IVA,Total,Estado,Pagamento\n';docs.forEach(function(d){var c=DB.get('clients').find(function(x){return x.id===d.clientId;});csv+=d.date+','+d.docId+','+d.docType+',"'+d.clientName+'","'+(c?c.nif||'':'')+'","'+(d.desc||'')+'",'+(d.qty||1)+','+d.subtotal+','+d.tax+','+d.total+','+d.status+','+(d.met||'')+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='fiscal_'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(a.href);}
-
+function loadReportData(){var mi=document.getElementById('reportMonth');if(!mi.value){var n=new Date();mi.value=n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0');}var y=parseInt(mi.value.split('-')[0]),m=parseInt(mi.value.split('-')[1]),trans=DB.get('transactions'),docs=DB.get('documents'),cu=getCurrency();var td=docs.filter(function(d){var p=parseDate(d.date);return d.docType!=='NC'&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+(b.tax||0);},0);var tc=trans.filter(function(t){var p=parseDate(t.date);return t.type==='expense'&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+(b.val*0.14);},0);document.getElementById('rptTaxDebit').innerText=fmt(td)+' '+cu;document.getElementById('rptTaxCredit').innerText=fmt(tc)+' '+cu;document.getElementById('rptTaxTotal').innerText=fmt(td-tc)+' '+cu;var inc=trans.filter(function(t){var p=parseDate(t.date);return t.type==='income'&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+b.val;},0);var exp=trans.filter(function(t){var p=parseDate(t.date);return(t.type==='expense'||t.type==='expense_payment')&&p&&p.getMonth()===m-1&&p.getFullYear()===y;}).reduce(function(a,b){return a+b.val;},0);var pf=inc-exp;document.getElementById('reportContent').innerHTML='<div style="text-align:center;margin-bottom:15px;"><h3 style="color:var(--primary);">Resumo '+String(m).padStart(2,'0')+'/'+y+'</h3></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:rgba(0,255,136,.1);padding:15px;border-radius:8px;text-align:center;"><div style="color:var(--text-muted);font-size:.8rem;">Receitas</div><div style="font-size:1.2rem;color:var(--success);font-weight:bold;">'+fmt(inc)+' '+cu+'</div></div><div style="background:rgba(255,0,110,.1);padding:15px;border-radius:8px;text-align:center;"><div style="color:var(--text-muted);font-size:.8rem;">Despesas</div><div style="font-size:1.2rem;color:var(--danger);font-weight:bold;">'+fmt(exp)+' '+cu+'</div></div></div><div style="background:rgba(0,180,216,.1);padding:15px;border-radius:8px;text-align:center;margin-top:10px;"><div style="color:var(--text-muted);font-size:.8rem;">Lucro Líquido</div><div style="font-size:1.5rem;color:'+(pf>=0?'var(--success)':'var(--danger)')+';font-weight:bold;font-family:Orbitron;">'+fmt(pf)+' '+cu+'</div></div>';}
+function exportFiscalCSV(){var docs=DB.get('documents');if(!docs.length)return alert('Nenhum!');var csv='Data,Documento,Tipo,Cliente,NIF,Descricao,Qtd,Subtotal,IVA,Total,Estado,Pagamento\n';docs.forEach(function(d){var c=DB.get('clients').find(function(x){return x.id===d.clientId;});csv+=d.date+','+d.docId+','+d.docType+',"'+d.clientName+'","'+(c?c.nif||'':'')+'","'+(d.desc||'')+'",'+(d.qty||1)+','+d.subtotal+','+d.tax+','+d.total+','+d.status+','+(d.met||'')+'\n';});var b=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='fiscal_'+new Date().toISOString().split('T')[0]+'.csv';a.click();URL.revokeObjectURL(a.href);}
 function loadSettings(){var s=DB.get('settings');if(s){document.getElementById('cfgCompanyName').value=s.name||'';document.getElementById('cfgCompanyNif').value=s.nif||'';document.getElementById('cfgCompanyPhone').value=s.phone||'';document.getElementById('cfgTaxRate').value=s.taxRate||14;document.getElementById('cfgCurrency').value=s.currency||'AKZ';}}
 function saveSettings(){var s=DB.get('settings');s.name=val('cfgCompanyName');s.nif=val('cfgCompanyNif');s.phone=val('cfgCompanyPhone');s.taxRate=parseFloat(val('cfgTaxRate'))||14;s.currency=val('cfgCurrency');DB.set('settings',s);alert('✓ Configurações salvas!');}
-
-function exportDB(){try{var d={_v:'2.0',_d:new Date().toISOString(),branches:DB.get('branches'),users:DB.get('users'),clients:DB.get('clients'),suppliers:DB.get('suppliers'),transactions:DB.get('transactions'),documents:DB.get('documents'),inventory:DB.get('inventory'),speeds:DB.get('speeds'),plans:DB.get('plans'),settings:DB.get('settings')};var b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='backup_conex_'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(a.href);}catch(e){alert('Erro: '+e.message);}}
+function exportDB(){try{var d={_v:'2.0',branches:DB.get('branches'),users:DB.get('users'),clients:DB.get('clients'),suppliers:DB.get('suppliers'),transactions:DB.get('transactions'),documents:DB.get('documents'),inventory:DB.get('inventory'),speeds:DB.get('speeds'),plans:DB.get('plans'),settings:DB.get('settings')};var b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='backup_conex_'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(a.href);}catch(e){alert('Erro: '+e.message);}}
 function importDB(e){var f=e.target.files[0];if(!f)return;if(!confirm('Substituir todos os dados?')){e.target.value='';return;}var r=new FileReader();r.onload=function(ev){try{var d=JSON.parse(ev.target.result);['branches','users','clients','suppliers','transactions','documents','inventory','speeds','plans','settings'].forEach(function(k){if(d[k])DB.set(k,d[k]);});alert('✓ Importado!');location.reload();}catch(err){alert('Erro: '+err.message);}};r.readAsText(f);e.target.value='';}
-
-/* ================================================================
-   INIT
-   ================================================================ */
 init();
 </script>
 </body>
