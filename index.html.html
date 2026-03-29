@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conex Cass - ERP Pro Max</title>
-<!-- BIBLIOTECAS DO FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 <style>
@@ -69,13 +68,6 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
 </head>
 <body>
 
-<div id="loadingScreen" style="position:fixed;inset:0;background:var(--bg-dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;">
-    <img src="https://z-cdn-media.chatglm.cn/files/514d9689-ab21-4064-826f-1aa292cad192.png?auth_key=1874721613-3bcbbecf27f14f25961f961ab421db23-0-a2ff1cb41756bb27c666799966a9de0b" style="width:100px;border-radius:50%;border:3px solid var(--primary);padding:5px;background:#fff;margin-bottom:20px;animation:pulse 2s infinite;">
-    <h2 style="font-family:'Orbitron';color:var(--primary);margin-bottom:10px;">CONECTANDO NUVEM</h2>
-    <p style="color:var(--text-muted);">Sincronizando dados do Firebase...</p>
-    <style>@keyframes pulse{0%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:0.7}100%{transform:scale(1);opacity:1}}</style>
-</div>
-
 <img id="imgLogo" src="https://z-cdn-media.chatglm.cn/files/514d9689-ab21-4064-826f-1aa292cad192.png?auth_key=1874721613-3bcbbecf27f14f25961f961ab421db23-0-a2ff1cb41756bb27c666799966a9de0b" style="display:none;" crossorigin="anonymous">
 <img id="imgStamp" src="https://z-cdn-media.chatglm.cn/files/6d064e2c-1efe-471e-9fec-518b428e99fc.png?auth_key=1874721613-52c3047109374f67bd7b835e05a09542-0-f5e11c366247df146483221ced90e5df" style="display:none;" crossorigin="anonymous">
 
@@ -85,10 +77,7 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
         <h1>CONEX CASS</h1>
         <p style="font-size:.7rem;color:var(--primary);">ERP Pro Max</p>
     </div>
-    <div style="padding:10px 15px;border-bottom:1px solid rgba(255,255,255,.1);">
-        <label style="font-size:.65rem;margin-bottom:2px;">FILIAL ATIVA</label>
-        <select id="activeBranchSelect" onchange="setActiveBranch()" style="padding:6px;font-size:.8rem;"></select>
-    </div>
+    <div style="padding:10px 15px;border-bottom:1px solid rgba(255,255,255,.1);"><label style="font-size:.65rem;margin-bottom:2px;">FILIAL ATIVA</label><select id="activeBranchSelect" onchange="setActiveBranch()" style="padding:6px;font-size:.8rem;"></select></div>
     <nav id="menuNav"></nav>
     <div style="padding:15px;border-top:1px solid rgba(255,255,255,.1);"><button class="btn btn-danger" style="width:100%;" onclick="doLogout()">Terminar Sessão</button></div>
 </nav>
@@ -132,9 +121,6 @@ tbody tr:nth-child(even){background:rgba(255,255,255,.02);}tbody tr:hover{backgr
 var LOGO_URL = 'https://z-cdn-media.chatglm.cn/files/514d9689-ab21-4064-826f-1aa292cad192.png?auth_key=1874721613-3bcbbecf27f14f25961f961ab421db23-0-a2ff1cb41756bb27c666799966a9de0b';
 var STAMP_URL = 'https://z-cdn-media.chatglm.cn/files/6d064e2c-1efe-471e-9fec-518b428e99fc.png?auth_key=1874721613-52c3047109374f67bd7b835e05a09542-0-f5e11c366247df146483221ced90e5df';
 
-// ==========================================
-// CONFIGURAÇÃO E INICIALIZAÇÃO DO FIREBASE
-// ==========================================
 const firebaseConfig = {
     apiKey: "AIzaSyBYmu1zoNLdomnj3fkl5nPSJsIYrnfW0mQ",
     authDomain: "conexcass-erp.firebaseapp.com",
@@ -147,22 +133,21 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const dbRef = firebase.database();
 
-// ==========================================
-// SISTEMA DE BANCO DE DADOS HÍBRIDO (NUVEM + CACHE LOCAL)
-// ==========================================
 var LOCAL_CACHE = {}; 
-
 var DB = {
     get: function(k) {
-        try { return LOCAL_CACHE[k] ? JSON.parse(JSON.stringify(LOCAL_CACHE[k])) : null; }
-        catch(e) { return null; }
+        try { 
+            if(!LOCAL_CACHE[k]) {
+                var localVal = localStorage.getItem('cx_'+k);
+                if(localVal) LOCAL_CACHE[k] = JSON.parse(localVal);
+            }
+            return LOCAL_CACHE[k] ? JSON.parse(JSON.stringify(LOCAL_CACHE[k])) : null; 
+        } catch(e) { return null; }
     },
     set: function(k, v) {
         LOCAL_CACHE[k] = v;
-        dbRef.child(k).set(v).catch(err => {
-            console.error("Erro ao salvar na nuvem:", err);
-            alert("Erro de conexão. Dados salvos apenas localmente por agora.");
-        });
+        localStorage.setItem('cx_'+k, JSON.stringify(v));
+        dbRef.child(k).set(v).catch(err => console.error("Erro nuvem:", err));
     },
     init: function() {
         if(!this.get('branches'))this.set('branches',[{id:'b1',name:'Matriz',loc:'Camama',mgr:'Cassoca',phone:'+244 945 740 125',active:true}]);
@@ -180,20 +165,11 @@ function startCloudSync() {
     dbRef.on('value', (snapshot) => {
         LOCAL_CACHE = snapshot.val() || {};
         DB.init(); 
-        document.getElementById('loadingScreen').style.display = 'none';
-        if(currentUser) {
-            var activePage = document.querySelector('.page.active');
-            if(activePage) navigate(activePage.id.replace('page-', ''));
-        }
-    }, (error) => {
-        console.error("Erro Firebase:", error);
-        document.getElementById('loadingScreen').innerHTML = '<h2 style="color:var(--danger);">ERRO DE ACESSO AO BANCO DE DADOS</h2><p>Verifique as regras no Firebase Console.</p>';
+        var activePage = document.querySelector('.page.active');
+        if(activePage) navigate(activePage.id.replace('page-', ''));
     });
 }
 
-// ==========================================
-// FUNÇÕES DO SISTEMA (IDENTICAS ANTES, AGORA COM DB.CLOUD)
-// ==========================================
 var currentUser=null,currentBranch='all';
 function getTodayStr(){var d=new Date();return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
 function parseDate(s){if(!s)return null;if(s.indexOf('/')>-1){var p=s.split('/');if(p.length===3)return new Date(p[2],p[1]-1,p[0]);}if(s.indexOf('-')>-1){var p=s.split('-');if(p.length===3)return new Date(p[0],p[1]-1,p[2]);}return new Date(s);}
@@ -213,7 +189,7 @@ function closeAllCSDropdowns(){if(_activeCSDD){_activeCSDD.style.display='none';
 document.addEventListener('click',function(e){if(!e.target.closest('.cs-wrap'))closeAllCSDropdowns();});
 function initCustomSelects(container){var root=container||document;root.querySelectorAll('select[data-cs]').forEach(function(sel){if(sel._csDone)return;sel._csDone=true;sel.classList.add('cs-original');var wrap=document.createElement('div');wrap.className='cs-wrap';sel.parentNode.insertBefore(wrap,sel);wrap.appendChild(sel);var trigger=document.createElement('div');trigger.className='cs-trigger';var selOpt=sel.options[sel.selectedIndex];trigger.innerHTML='<span>'+(selOpt&&selOpt.value?selOpt.text:sel.getAttribute('data-placeholder')||'Selecionar...')+'</span><span class="cs-arrow">▼</span>';if(!selOpt||!selOpt.value)trigger.classList.add('placeholder');wrap.insertBefore(trigger,sel);var dd=document.createElement('div');dd.className='cs-dd';document.body.appendChild(dd);function buildDD(){dd.innerHTML='';Array.from(sel.children).forEach(function(child){if(child.tagName==='OPTGROUP'){var grp=document.createElement('div');grp.className='cs-dd-group';grp.textContent=child.label;dd.appendChild(grp);Array.from(child.children).forEach(function(opt){addOpt(dd,opt);});}else if(child.tagName==='OPTION'){addOpt(dd,child);}});}function addOpt(parent,opt){var item=document.createElement('div');item.className='cs-dd-opt';if(opt.disabled)item.classList.add('disabled');if(opt.selected)item.classList.add('selected');item.textContent=opt.text;item.setAttribute('data-val',opt.value);item.addEventListener('click',function(e){e.stopPropagation();sel.value=opt.value;trigger.querySelector('span').textContent=opt.text;trigger.classList.remove('placeholder');dd.querySelectorAll('.cs-dd-opt').forEach(function(o){o.classList.remove('selected');});item.classList.add('selected');closeAllCSDropdowns();sel.dispatchEvent(new Event('change',{bubbles:true}));});parent.appendChild(item);}buildDD();trigger.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();if(dd.style.display==='block'){closeAllCSDropdowns();return;}closeAllCSDropdowns();var rect=trigger.getBoundingClientRect();dd.style.minWidth=rect.width+'px';dd.style.left=rect.left+'px';dd.style.top=(rect.bottom+4)+'px';dd.style.display='block';trigger.classList.add('open');_activeCSDD=dd;requestAnimationFrame(function(){var dr=dd.getBoundingClientRect();if(dr.bottom>window.innerHeight-10)dd.style.top=(rect.top-dr.height-4)+'px';if(dr.right>window.innerWidth-10)dd.style.left=(window.innerWidth-dr.width-10)+'px';});});sel._csUpdate=function(){var o=sel.options[sel.selectedIndex];if(o&&o.value){trigger.querySelector('span').textContent=o.text;trigger.classList.remove('placeholder');}else{trigger.querySelector('span').textContent=sel.getAttribute('data-placeholder')||'Selecionar...';trigger.classList.add('placeholder');}dd.querySelectorAll('.cs-dd-opt').forEach(function(item){item.classList.toggle('selected',item.getAttribute('data-val')===sel.value);});};});}
 
-function init(){var s=sessionStorage.getItem('cx_session');if(s){currentUser=JSON.parse(s);startCloudSync();}else{document.getElementById('loadingScreen').style.display='none';showLogin();}}
+function init(){var s=sessionStorage.getItem('cx_session');if(s){currentUser=JSON.parse(s);run();startCloudSync();}else{showLogin();}}
 function showLogin(){document.body.innerHTML='<div style="display:flex;height:100vh;align-items:center;justify-content:center;background:var(--bg-dark);"><div class="card" style="width:380px;text-align:center;padding:35px;background:var(--bg-panel);border:var(--border-light);"><img src="'+LOGO_URL+'" style="width:90px;height:90px;border-radius:50%;border:2px solid var(--primary);margin-bottom:15px;padding:5px;background:#fff;object-fit:contain;"><h2 style="font-family:Orbitron;margin-bottom:5px;color:var(--primary);font-size:1.1rem;">CONEX CASS</h2><p style="font-size:.8rem;color:var(--text-muted);margin-bottom:20px;">Sistema de Gestão ERP</p><input type="text" id="lUser" placeholder="Usuário" style="margin-bottom:10px;"><input type="password" id="lPass" placeholder="Senha" style="margin-bottom:15px;" onkeydown="if(event.key===\'Enter\')login()"><button class="btn btn-primary" style="width:100%;padding:12px;" onclick="login()">ENTRAR</button></div></div>';}
 function login(){var u=document.getElementById('lUser').value,p=document.getElementById('lPass').value;var user=DB.get('users').find(function(x){return x.user===u&&x.pass===p;});if(user){currentUser=user;sessionStorage.setItem('cx_session',JSON.stringify(user));location.reload();}else alert('Credenciais inválidas!');}
 function doLogout(){sessionStorage.removeItem('cx_session');location.reload();}
@@ -253,18 +229,7 @@ function renderClientsTable(data){var tbody=document.getElementById('tableClient
 function searchClients(){var q=document.getElementById('searchClient').value.toLowerCase();renderClientsTable(filterArr(DB.get('clients')).filter(function(c){return c.name.toLowerCase().indexOf(q)>-1||(c.contact||'').indexOf(q)>-1||(c.nif||'').indexOf(q)>-1||(c.pkg||'').toLowerCase().indexOf(q)>-1;}));}
 function deleteClient(cId){if(!confirm('Eliminar?'))return;var cl = DB.get('clients').find(c=>c.id===cId); if(cl && cl.ip){ var pool = DB.get('ip_pool'); var ipObj = pool.find(p=>p.ip===cl.ip); if(ipObj) ipObj.status='available'; DB.set('ip_pool', pool);} DB.set('clients',DB.get('clients').filter(function(c){return c.id!==cId;}));loadClients();loadDashboard();}
 
-function openModalClient(id){
-    var c=id?DB.get('clients').find(function(x){return x.id===id;}):{name:'',contact:'',pkg:'',speedId:'',mens:0,validade:'',divida:0,nif:'',morada:'', conexao:'', mac:''};
-    var speeds=DB.get('speeds'),wk=speeds.filter(function(s){return s.period==='Semanal';}),bw=speeds.filter(function(s){return s.period==='Quinzenal';}),mn=speeds.filter(function(s){return s.period==='Mensal';});
-    var so='<option value="">-- Sem Plano --</option>';so+='<optgroup label="📅 Semanal (7 dias)">'+wk.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';so+='<optgroup label="🗓️ Quinzenal (15 dias)">'+bw.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';so+='<optgroup label="📆 Mensal (30 dias)">'+mn.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';
-    var ipsDisponiveis = getAvailableIPs(id); var ipOptions = '<option value="">-- Sem IP --</option>' + ipsDisponiveis.map(function(ip){return '<option value="'+ip.ip+'" '+(c.ip===ip.ip?'selected':'')+'>'+ip.ip+(ip.status!=='available'?' (Em uso)':'')+'</option>';}).join('');
-    var dr=c.validade?Math.max(0,Math.ceil((new Date(c.validade+'T00:00:00')-new Date())/(1000*60*60*24))):0;
-    modal('👤 Cliente','<div class="form-row"><div><label>Nome *</label><input id="cName" value="'+c.name+'"></div><div><label>NIF</label><input id="cNif" value="'+(c.nif||'')+'"></div></div><div class="form-row"><div><label>Contacto</label><input id="cContact" value="'+(c.contact||'')+'"></div><div><label>Morada</label><input id="cMorada" value="'+(c.morada||'')+'"></div></div><div class="form-row"><div><label>Atribuir IP do Pool</label><select id="cIp" data-cs data-placeholder="-- Selecionar IP Livre --">'+ipOptions+'</select></div><div><label>MAC Address</label><input id="cMac" value="'+(c.mac||'')+'" placeholder="AA:BB:CC:DD:EE:FF" maxlength="17" oninput="formatMACInput(this)"></div></div><div class="form-row"><div><label>Tipo de Conexão Física</label><select id="cConexao" data-cs><option value="">-- Selecionar --</option><option value="UTP" '+(c.conexao==='UTP'?'selected':'')+'>🔌 UTP (Cabo de Par Trançado)</option><option value="FIBRA" '+(c.conexao==='FIBRA'?'selected':'')+'>💡 FIBRA (FTTH)</option></select></div></div><div class="plan-activate-box"><h4>📡 Plano de Internet</h4><div class="form-row"><div><label>Seleccionar Plano</label><select id="cSpeed" data-cs data-placeholder="-- Sem Plano --">'+so+'</select></div><div><label>Valor Plano</label><input id="cMens" value="'+(c.mens?fmt(c.mens)+' Kz':'')+'" readonly style="background:rgba(0,0,0,.5)"></div></div><div id="planPreviewInfo" style="font-size:.85rem;color:var(--text-muted);margin-top:8px;">'+(c.speedId?'<span style="color:var(--success);">Plano activo:</span> '+(c.pkg||'-')+' | <span style="color:var(--warning);">Validade:</span> '+(c.validade?formatDatePT(c.validade)+' ('+dr+' dias)':'-'):'<em>Nenhum plano activo</em>')+'</div><p style="font-size:.75rem;color:var(--text-muted);margin-top:6px;font-style:italic;">Ao selecionar um plano e salvar, a validade será recalculada a partir de hoje.</p></div>'+(id?'<div style="background:rgba(255,255,255,.05);padding:10px;border-radius:4px;margin-top:10px;"><p>Dívida: <span class="text-danger">'+fmt(c.divida||0)+' '+getCurrency()+'</span></p></div>':''),
-    function(){
-        var name=val('cName');if(!name)return alert('Nome obrigatório!');var speedId=val('cSpeed');var pkg='',mens=0,days=0;if(speedId){var sp=getSpeedById(speedId);if(sp){pkg=getSpeedLabel(speedId);mens=sp.preco;days=sp.days;}}var validade='';if(days>0)validade=formatDateISO(addDays(new Date(),days));else if(id)validade=c.validade||'';var selectedIp = val('cIp');var oldClient = id ? DB.get('clients').find(function(x){return x.id===id;}) : null;var oldIp = oldClient ? oldClient.ip : null;var pool = DB.get('ip_pool');if(oldIp && oldIp !== selectedIp){var ipToFree = pool.find(function(p){ return p.ip === oldIp; });if(ipToFree) ipToFree.status = 'available';}var ipToUse = null;if(selectedIp){ipToUse = pool.find(function(p){ return p.ip === selectedIp; });if(ipToUse) ipToUse.status = 'used';}DB.set('ip_pool', pool);
-        var data={id:id||'c'+Date.now(),branchId:'b1',name:name,nif:val('cNif'),contact:val('cContact'),morada:val('cMorada'),ip: selectedIp, mac:val('cMac').toUpperCase(), conexao:val('cConexao'), speedId:speedId||null,pkg:pkg,mens:mens,validade:validade,divida:c.divida||0,networkBlocked: oldClient ? oldClient.networkBlocked : false};var list=DB.get('clients');var ix=list.findIndex(function(x){return x.id===id;});if(ix>=0)list[ix]=data;else list.push(data);DB.set('clients',list);closeModal();loadClients();
-    });setTimeout(updateClientPlanInfo,50);
-}
+function openModalClient(id){var c=id?DB.get('clients').find(function(x){return x.id===id;}):{name:'',contact:'',pkg:'',speedId:'',mens:0,validade:'',divida:0,nif:'',morada:'', conexao:'', mac:''};var speeds=DB.get('speeds'),wk=speeds.filter(function(s){return s.period==='Semanal';}),bw=speeds.filter(function(s){return s.period==='Quinzenal';}),mn=speeds.filter(function(s){return s.period==='Mensal';});var so='<option value="">-- Sem Plano --</option>';so+='<optgroup label="📅 Semanal (7 dias)">'+wk.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';so+='<optgroup label="🗓️ Quinzenal (15 dias)">'+bw.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';so+='<optgroup label="📆 Mensal (30 dias)">'+mn.map(function(s){return '<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' - '+fmt(s.preco)+' Kz</option>';}).join('')+'</optgroup>';var ipsDisponiveis = getAvailableIPs(id); var ipOptions = '<option value="">-- Sem IP --</option>' + ipsDisponiveis.map(function(ip){return '<option value="'+ip.ip+'" '+(c.ip===ip.ip?'selected':'')+'>'+ip.ip+(ip.status!=='available'?' (Em uso)':'')+'</option>';}).join('');var dr=c.validade?Math.max(0,Math.ceil((new Date(c.validade+'T00:00:00')-new Date())/(1000*60*60*24))):0;modal('👤 Cliente','<div class="form-row"><div><label>Nome *</label><input id="cName" value="'+c.name+'"></div><div><label>NIF</label><input id="cNif" value="'+(c.nif||'')+'"></div></div><div class="form-row"><div><label>Contacto</label><input id="cContact" value="'+(c.contact||'')+'"></div><div><label>Morada</label><input id="cMorada" value="'+(c.morada||'')+'"></div></div><div class="form-row"><div><label>Atribuir IP do Pool</label><select id="cIp" data-cs data-placeholder="-- Selecionar IP Livre --">'+ipOptions+'</select></div><div><label>MAC Address</label><input id="cMac" value="'+(c.mac||'')+'" placeholder="AA:BB:CC:DD:EE:FF" maxlength="17" oninput="formatMACInput(this)"></div></div><div class="form-row"><div><label>Tipo de Conexão Física</label><select id="cConexao" data-cs><option value="">-- Selecionar --</option><option value="UTP" '+(c.conexao==='UTP'?'selected':'')+'>🔌 UTP (Cabo de Par Trançado)</option><option value="FIBRA" '+(c.conexao==='FIBRA'?'selected':'')+'>💡 FIBRA (FTTH)</option></select></div></div><div class="plan-activate-box"><h4>📡 Plano de Internet</h4><div class="form-row"><div><label>Seleccionar Plano</label><select id="cSpeed" data-cs data-placeholder="-- Sem Plano --">'+so+'</select></div><div><label>Valor Plano</label><input id="cMens" value="'+(c.mens?fmt(c.mens)+' Kz':'')+'" readonly style="background:rgba(0,0,0,.5)"></div></div><div id="planPreviewInfo" style="font-size:.85rem;color:var(--text-muted);margin-top:8px;">'+(c.speedId?'<span style="color:var(--success);">Plano activo:</span> '+(c.pkg||'-')+' | <span style="color:var(--warning);">Validade:</span> '+(c.validade?formatDatePT(c.validade)+' ('+dr+' dias)':'-'):'<em>Nenhum plano activo</em>')+'</div><p style="font-size:.75rem;color:var(--text-muted);margin-top:6px;font-style:italic;">Ao selecionar um plano e salvar, a validade será recalculada a partir de hoje.</p></div>'+(id?'<div style="background:rgba(255,255,255,.05);padding:10px;border-radius:4px;margin-top:10px;"><p>Dívida: <span class="text-danger">'+fmt(c.divida||0)+' '+getCurrency()+'</span></p></div>':''),function(){var name=val('cName');if(!name)return alert('Nome obrigatório!');var speedId=val('cSpeed');var pkg='',mens=0,days=0;if(speedId){var sp=getSpeedById(speedId);if(sp){pkg=getSpeedLabel(speedId);mens=sp.preco;days=sp.days;}}var validade='';if(days>0)validade=formatDateISO(addDays(new Date(),days));else if(id)validade=c.validade||'';var selectedIp = val('cIp');var oldClient = id ? DB.get('clients').find(function(x){return x.id===id;}) : null;var oldIp = oldClient ? oldClient.ip : null;var pool = DB.get('ip_pool');if(oldIp && oldIp !== selectedIp){var ipToFree = pool.find(function(p){ return p.ip === oldIp; });if(ipToFree) ipToFree.status = 'available';}var ipToUse = null;if(selectedIp){ipToUse = pool.find(function(p){ return p.ip === selectedIp; });if(ipToUse) ipToUse.status = 'used';}DB.set('ip_pool', pool);var data={id:id||'c'+Date.now(),branchId:'b1',name:name,nif:val('cNif'),contact:val('cContact'),morada:val('cMorada'),ip: selectedIp, mac:val('cMac').toUpperCase(), conexao:val('cConexao'), speedId:speedId||null,pkg:pkg,mens:mens,validade:validade,divida:c.divida||0,networkBlocked: oldClient ? oldClient.networkBlocked : false};var list=DB.get('clients');var ix=list.findIndex(function(x){return x.id===id;});if(ix>=0)list[ix]=data;else list.push(data);DB.set('clients',list);closeModal();loadClients();});setTimeout(updateClientPlanInfo,50);}
 document.addEventListener('change',function(e){if(e.target.id==='cSpeed')updateClientPlanInfo();});
 function updateClientPlanInfo(){var speedId=val('cSpeed'),mi=document.getElementById('cMens'),pi=document.getElementById('planPreviewInfo');if(!mi||!pi)return;if(speedId){var sp=getSpeedById(speedId);if(sp){mi.value=fmt(sp.preco)+' Kz';var nv=formatDateISO(addDays(new Date(),sp.days));pi.innerHTML='<span style="color:var(--success);">Novo plano:</span> '+getSpeedLabel(speedId)+' | <span style="color:var(--success);">Nova validade:</span> '+formatDatePT(nv)+' ('+sp.days+' dias)';return;}}mi.value='';pi.innerHTML='<em>Nenhum plano seleccionado</em>';}
 
