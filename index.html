@@ -96,7 +96,7 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
 .contract-signatures{display:flex;justify-content:space-between;margin-top:50px}
 .search-box input{max-width:400px;background:rgba(0,180,216,.1);border:1px solid rgba(0,180,216,.3)}
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
-.kpi-card{padding:15px;border-radius:8px;border-left:4px solid;display:flex;flex-direction:column;transition:transform .2s}
+.kpi-card{padding:15px;border-radius:8px;border-left:4px solid;display:flex;flex-direction:column;transition:transform .2s; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,.2);}
 .kpi-card:hover{transform:translateY(-2px)}
 .kpi-label{font-size:.8rem;color:var(--text-muted);margin-bottom:5px}
 .kpi-value{font-size:1.4rem;font-family:'Orbitron';font-weight:bold}
@@ -115,6 +115,19 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
 .confirm-btns{display:flex;gap:10px;justify-content:center}
 .activity-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
 .activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* NOVO HEADER E NOTIFICAÇÕES */
+.header-actions { display:flex; align-items:center; gap:15px; position:relative; }
+.notif-bell { position:relative; cursor:pointer; font-size:1.3rem; color:var(--text-muted); transition:color .2s; }
+.notif-bell:hover { color:var(--primary); }
+.notif-badge { position:absolute; top:-5px; right:-5px; background:var(--danger); color:#fff; border-radius:50%; width:16px; height:16px; font-size:.6rem; display:flex; align-items:center; justify-content:center; font-weight:bold; box-shadow:0 0 5px rgba(255,0,110,.5); }
+.notif-dropdown { position:absolute; top:55px; right:0; width:320px; max-height:400px; overflow-y:auto; background:var(--bg-panel); border:1px solid rgba(0,180,216,.3); border-radius:8px; padding:10px; display:none; z-index:1000; box-shadow:0 10px 30px rgba(0,0,0,.5); }
+.notif-dropdown.show { display:block; animation:modalIn .2s ease; }
+.notif-item { padding:10px; border-bottom:1px solid rgba(255,255,255,.1); font-size:.82rem; display:flex; gap:8px; align-items:flex-start; }
+.notif-item:last-child { border-bottom:none; }
+.notif-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; flex-shrink:0; }
+.notif-empty { text-align:center; color:var(--text-muted); padding:20px; font-size:.85rem; }
+
 @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}#menuToggle{display:inline-flex!important}.form-row{grid-template-columns:1fr}.grid{grid-template-columns:1fr!important}.kpi-grid{grid-template-columns:1fr 1fr}.header{padding:10px 15px}}
 @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}}
 </style>
@@ -130,7 +143,30 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
 
 <nav class="sidebar" id="mainSidebar"><div class="sidebar-header"><div class="sidebar-logo"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg"></div><h1>CONEX CASS</h1></div><nav id="menuNav"></nav><div style="padding:12px;border-top:1px solid rgba(255,255,255,.1)"><button class="btn btn-danger" style="width:100%" onclick="doLogout()">Sair</button></div></nav>
 
-<main class="main"><header class="header"><div style="display:flex;align-items:center;gap:10px"><button class="btn btn-outline" id="menuToggle" onclick="document.getElementById('mainSidebar').classList.toggle('open')">☰</button><h1 style="font-family:'Orbitron';font-size:.95rem"><span id="pageTitle">Dashboard</span></h1></div><div style="display:flex;align-items:center;gap:10px"><button class="btn btn-success btn-sm" id="installAppBtn" style="display:none" onclick="installPWA()">📥 Instalar App</button><span id="currentUserName" style="font-size:.85rem;color:var(--text-muted)">Admin</span></div></header><div class="content" id="appContent"></div></main>
+<main class="main">
+    <header class="header">
+        <div style="display:flex;align-items:center;gap:10px">
+            <button class="btn btn-outline" id="menuToggle" onclick="document.getElementById('mainSidebar').classList.toggle('open')">☰</button>
+            <h1 style="font-family:'Orbitron';font-size:.95rem"><span id="pageTitle">Dashboard</span></h1>
+        </div>
+        <div class="header-actions">
+            <button class="btn btn-success btn-sm" id="installAppBtn" style="display:none" onclick="installPWA()">📥 Instalar App</button>
+            
+            <!-- SINO DE NOTIFICAÇÕES -->
+            <div class="notif-bell" onclick="toggleNotifications(event)">
+                🔔
+                <span class="notif-badge" id="notifCount" style="display:none">0</span>
+                <div class="notif-dropdown" id="notifDropdown">
+                    <h3 style="font-size:.9rem; color:var(--primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Alertas do Sistema</h3>
+                    <div id="notifList"></div>
+                </div>
+            </div>
+
+            <span id="currentUserName" style="font-size:.85rem;color:var(--text-muted)">Admin</span>
+        </div>
+    </header>
+    <div class="content" id="appContent"></div>
+</main>
 
 <div id="modalGeneric" class="modal-overlay"><div class="modal-box"><div class="modal-header"><h2 id="modalTitle"></h2><span class="btn btn-outline" onclick="closeModal()">✕</span></div><div class="modal-body" id="modalBody"></div><div class="modal-footer" id="modalFooter"></div></div></div>
 <div id="modalDoc" class="modal-overlay"><div class="modal-box" style="max-width:800px"><div class="modal-header"><h2 id="docTitle"></h2><span class="btn btn-outline" onclick="closeModalDoc()">✕</span></div><div class="modal-body" id="docBody" style="padding:0;max-height:70vh;overflow-y:auto"></div><div class="modal-footer" id="modalDocFooter"></div></div></div>
@@ -184,7 +220,14 @@ insert:async function(t,r){
 update:async function(t,id,d){try{var res=await sb.from(t).update(d).eq('id',id).select();if(res.error)throw res.error;if(!res.data||!res.data.length)throw new Error("Sem retorno");if(this.cache[t]&&Array.isArray(this.cache[t])){var i=this.cache[t].findIndex(function(x){return x.id===id;});if(i>=0)this.cache[t][i]=Object.assign({},this.cache[t][i],d);}else if(t==='settings'||t==='cash_register'){this.cache[t]=Object.assign({},this.cache[t],d);}return res.data[0];}catch(e){showToast("Erro BD: "+e.message,'danger');return null;}},
 upsert:async function(t,r){try{var res=await sb.from(t).upsert(r,{onConflict:'id'}).select();if(res.error)throw res.error;if(!res.data||!res.data.length)throw new Error("Sem retorno");if(t==='settings'){this.cache[t]=res.data[0];}else if(t==='cash_register'){this.cache[t]=res.data[0];}else{if(Array.isArray(this.cache[t])){var d=res.data[0];var i=this.cache[t].findIndex(function(x){return x.id===d.id;});if(i>=0)this.cache[t][i]=d;else this.cache[t].push(d);}else{this.cache[t]=res.data[0];}}return res.data[0];}catch(e){showToast("Erro Upsert: "+e.message,'danger');return null;}},
 del:async function(t,id){try{var res=await sb.from(t).delete().eq('id',id);if(res.error)throw res.error;if(this.cache[t]&&Array.isArray(this.cache[t]))this.cache[t]=this.cache[t].filter(function(x){return x.id!==id;});return true;}catch(e){showToast("Erro BD: "+e.message,'danger');return false;}},
-loadAll:async function(){var ks=['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances'];for(var i=0;i<ks.length;i++){if(this.cache[ks[i]]===undefined)await this.get(ks[i]);}},
+loadAll: async function() {
+    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances'];
+    var promises = ks.map(k => {
+        if (this.cache[k] === undefined) return this.get(k);
+        return Promise.resolve();
+    });
+    await Promise.all(promises);
+},
 clearCache:function(t){if(t){delete this.cache[t];}else{this.cache={};}}
 };
 
@@ -230,7 +273,6 @@ async function loadClientPortal(){
     var fresh=(await DB.get('clients',true)).find(function(c){return c.id===currentClient.id;});if(fresh)currentClient=fresh;
     var c=currentClient,cu=getCurrency(),today=new Date();
     
-    // Calcular Estado do Serviço
     var validade=c.validade?parseDate(c.validade):null;
     var diasRestantes=validade?daysDiff(today,validade):null;
     var statusCor, statusTxt;
@@ -251,13 +293,10 @@ async function loadClientPortal(){
         html+='<div class="card" style="border:2px solid var(--warning); margin-bottom:20px;"><h3 style="color:var(--warning)">⏳ Pagamento a Aguardar Confirmação</h3><p>Recebemos o seu aviso de pagamento de <strong>'+fmt(pendingTx.val)+' '+cu+'</strong>.</p><ul style="font-size:0.85rem; color:var(--text-muted); margin-left:20px;">'+itemsHtml+'</ul><p>A sua fatura estará disponível assim que a administração confirmar.</p></div>';
     }
     
-    // KPIs
     html+='<div class="kpi-grid" style="margin-bottom:20px"><div class="kpi-card" style="background:rgba(0,180,216,.05);border-left-color:var(--primary)"><div class="kpi-label">O meu Plano</div><div class="kpi-value" style="color:var(--primary);font-size:1.1rem">'+(c.pkg||'N/A')+'</div></div><div class="kpi-card" style="background:rgba(0,255,136,.05);border-left-color:'+statusCor+'"><div class="kpi-label">Estado do Serviço</div><div class="kpi-value" style="color:'+statusCor+';font-size:1.1rem">'+statusTxt+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-left-color:'+(c.divida>0?'var(--danger)':'var(--success)')+'"><div class="kpi-label">Dívida em Aberto</div><div class="kpi-value" style="color:'+(c.divida>0?'var(--danger)':'var(--success)')+'">'+fmt(Math.max(0, c.divida||0))+' '+cu+'</div></div></div>';
     
-    // Abas
     html+='<div class="card"><div style="display:flex;gap:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:15px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="renderClientTab(\'home\')">Início</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'plans\')">Planos</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'streaming\')">Streaming</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'shop\')">Loja</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'support\')">Apoio Técnico</button></div><div id="clientTabContent"></div></div>';
     
-    // Carrinho Flutuante
     html+='<div id="clientCartBar" style="position:fixed;bottom:0;left:0;right:0;background:var(--bg-panel);border-top:1px solid var(--primary);padding:10px 20px;display:none;justify-content:space-between;align-items:center;z-index:100;"><div><strong>Carrinho: <span id="cartTotal">0.00</span> '+cu+'</strong></div><button class="btn btn-success btn-sm" onclick="openCartCheckout()">💳 Finalizar Compra</button></div>';
     
     html+='<div class="card" style="margin-top:20px"><h3>As Minhas Faturas</h3>'+(docs.length?'<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Doc</th><th>Valor</th><th>Estado</th><th>Ação</th></tr></thead><tbody>'+docs.map(function(d){return '<tr><td>'+d.date+'</td><td>'+d.docId+'</td><td>'+fmt(d.total)+'</td><td><span class="badge '+(d.status==='paid'?'bg-success':'bg-warning')+'">'+(d.status==='paid'?'PAGO':'PEND.')+'</span></td><td><button class="btn btn-sm btn-outline" onclick="viewDoc(\''+d.id+'\')">Ver Fatura</button></td></tr>';}).join('')+'</tbody></table></div>':'<p style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma fatura encontrada.</p>')+'</div>';
@@ -269,36 +308,64 @@ async function loadClientPortal(){
 function renderClientTab(tab){
     var c=currentClient,cu=getCurrency();
     var content=document.getElementById('clientTabContent');
+    
     if(tab==='home'){
         content.innerHTML='<h3>Pagamento Rápido</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Pague a sua mensalidade ou dívida pendente.</p><button class="btn btn-success" style="width:100%" onclick="addCartMensalidade()">'+(c.divida>0?'Pagar Dívida ('+fmt(c.divida)+' '+cu+')':'Pagar Mensalidade ('+fmt(c.mens||0)+' '+cu+')')+'</button><hr><h3>Contrato e Dados</h3><button class="btn btn-primary btn-sm" onclick="viewContract(\''+c.id+'\')" style="margin-bottom:10px">Ver Contrato</button><div class="form-row"><div><label>Nome</label><input value="'+c.name+'" disabled></div><div><label>Contacto</label><input value="'+(c.contact||'')+'" disabled></div><div><label>Morada</label><input value="'+(c.address||'')+'" disabled></div><div><label>NIF</label><input value="'+(c.nif||'')+'" disabled></div></div>';
-    } else if(tab==='plans'){
-        var speeds=DB.cache.speeds||[];
-        var html='<h3>Alterar Plano de Internet</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Selecione um plano para adicionar ao carrinho. O pagamento é antecipado.</p>';
+    } 
+    else if(tab==='plans'){
+        var speeds = DB.cache.speeds || [];
+        var plansHtml = '<h3>Alterar Plano de Internet</h3><p style="font-size:.85rem;color:var(--warning);margin-bottom:10px">⚠️ O pedido de alteração será adicionado ao carrinho. A mudança fica ativa após o pagamento ser confirmado pela administração.</p>';
         speeds.forEach(function(s){
-            html+='<div class="plan-card"><span>'+s.nome+' ('+s.period+')</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(s.preco)+' '+cu+'</strong><button class="btn btn-success btn-sm" onclick="addCartPlan(\''+s.id+'\')">➕</button></div></div>';
+            plansHtml += '<div class="plan-card"><span>'+s.nome+' ('+s.period+')</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(s.preco)+' '+cu+'</strong><button class="btn btn-success btn-sm" onclick="addCartPlan(\''+s.id+'\')">➕ Solicitar</button></div></div>';
         });
-        content.innerHTML=html;
-    } else if(tab==='streaming'){
-        var html='<h3>Aplicações de Streaming</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Ative o serviço ou baixe o aplicativo diretamente.</p>';
+        content.innerHTML = plansHtml;
+    } 
+    else if(tab==='streaming'){
+        var streamHtml = '<h3>Aplicações de Streaming</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Ative o serviço ou baixe o aplicativo diretamente.</p>';
         STREAMING_APPS.forEach(function(app){
-            html+='<div class="plan-card"><span>'+app.name+'</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(app.price)+' '+cu+'</strong><a href="'+app.url+'" target="_blank" class="btn btn-info btn-sm">⬇ Baixar</a><button class="btn btn-success btn-sm" onclick="addCartStream(\''+app.name+'\','+app.price+')">➕ Ativar</button></div></div>';
+            streamHtml += '<div class="plan-card"><span>'+app.name+'</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(app.price)+' '+cu+'</strong><a href="'+app.url+'" target="_blank" class="btn btn-info btn-sm">⬇ Baixar</a><button class="btn btn-success btn-sm" onclick="addCartStream(\''+app.name+'\','+app.price+')">➕ Ativar</button></div></div>';
         });
-        content.innerHTML=html;
-    } else if(tab==='shop'){
-        var inv=DB.cache.inventory||[];
-        var html='<h3>Loja de Equipamentos</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Preços com taxa de montagem/deslocação incluída.</p>';
+        content.innerHTML = streamHtml;
+    } 
+    else if(tab==='shop'){
+        var inv = DB.cache.inventory || [];
+        var deliveryFee = 2000; // Entrega e montagem
+        var configFee = 5000;   // Configuração de câmera/equipamento
+        var shopHtml = '<h3>Loja de Equipamentos</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Escolha o serviço adicional. O equipamento é entregue após confirmação do pagamento.</p>';
         inv.forEach(function(i){
             if(i.status==='Em Stock' && i.qty>0){
-                var fee = DB.cache.settings.displacementFee || 5000;
-                var totalPrice = i.val + fee;
-                html+='<div class="plan-card"><div><strong>'+i.name+'</strong><br><small style="color:var(--text-muted)">Equip: '+fmt(i.val)+' + Montagem: '+fmt(fee)+'</small></div><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(totalPrice)+' '+cu+'</strong><button class="btn btn-success btn-sm" onclick="addCartItem(\''+i.name+' (c/ Montagem)\','+totalPrice+',\'stock\')">➕</button></div></div>';
+                shopHtml += '<div class="plan-card" style="flex-direction:column;align-items:stretch;gap:10px;">';
+                shopHtml += '<div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>'+i.name+'</strong> ('+fmt(i.val)+' '+cu+')</div></div>';
+                shopHtml += '<div class="form-row" style="margin-bottom:0;"><div><label>Taxa de Serviço</label><select id="fee_'+i.id+'" onchange="updateShopPrice(\''+i.id+'\')"><option value="'+deliveryFee+'">Entrega/Montagem ('+fmt(deliveryFee)+' Kz)</option><option value="'+configFee+'">Config. Câmera/Equip. ('+fmt(configFee)+' Kz)</option></select></div><div style="text-align:right;"><label>Total a Pagar</label><strong id="price_'+i.id+'" style="font-size:1.1rem;">'+fmt(i.val + deliveryFee)+' Kz</strong></div></div>';
+                shopHtml += '<button class="btn btn-success btn-sm" onclick="addShopItem(\''+i.id+'\')">➕ Adicionar ao Carrinho</button>';
+                shopHtml += '</div>';
             }
         });
-        content.innerHTML=html;
-    } else if(tab==='support'){
-        var fee = DB.cache.settings.displacementFee || 5000;
-        content.innerHTML='<h3>Agendar Apoio Técnico</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Taxa de deslocação: <strong>'+fmt(fee)+' '+cu+'</strong> (paga antecipadamente).</p><div class="form-group"><label>Descreva o problema</label><textarea id="supProblem" rows="3" placeholder="Ex: Sem internet, lentidão..."></textarea></div><button class="btn btn-warning" onclick="addCartSupport()"><strong>Agendar e Pagar '+fmt(fee)+' '+cu+'</strong></button>';
+        content.innerHTML = shopHtml;
+    } 
+    else if(tab==='support'){
+        var supportFee = 5000; // Valor fixo de apoio técnico
+        content.innerHTML = '<h3>Agendar Apoio Técnico</h3><p style="font-size:.85rem;color:var(--warning);margin-bottom:10px">A taxa de apoio técnico é fixa de <strong>'+fmt(supportFee)+' '+cu+'</strong>. O técnico só é despachado após a confirmação do pagamento pela administração.</p><div class="form-group"><label>Descreva o problema</label><textarea id="supProblem" rows="3" placeholder="Ex: Sem internet, lentidão..."></textarea></div><button class="btn btn-warning" onclick="addCartSupport()"><strong>Agendar e Pagar '+fmt(supportFee)+' '+cu+'</strong></button>';
     }
+}
+
+function updateShopPrice(itemId) {
+    var i = DB.cache.inventory.find(function(x){return x.id===itemId;});
+    var feeVal = parseFloat(document.getElementById('fee_'+itemId).value) || 0;
+    document.getElementById('price_'+itemId).innerText = fmt(i.val + feeVal) + ' Kz';
+}
+
+function addShopItem(itemId) {
+    var i = DB.cache.inventory.find(function(x){return x.id===itemId;});
+    var feeSelect = document.getElementById('fee_'+itemId);
+    var feeVal = parseFloat(feeSelect.value) || 0;
+    var feeName = feeSelect.options[feeSelect.selectedIndex].text;
+    var total = i.val + feeVal;
+    var itemName = i.name + (feeVal > 0 ? ' (c/ ' + feeName + ')' : '');
+    
+    clientCart.push({name: itemName, price: total, type: 'stock', extra: {invId: itemId, fee: feeVal}});
+    updateCartBar();
+    showToast(itemName+' adicionado ao carrinho!','success');
 }
 
 // Funções do Carrinho
@@ -321,7 +388,7 @@ function addCartStream(name, price){
 }
 function addCartSupport(){
     var prob=val('supProblem'); if(!prob) return showToast('Descreva o problema.','danger');
-    var fee = DB.cache.settings.displacementFee || 5000;
+    var fee = 5000; // Fixo
     addCartItem('Apoio Técnico: '+prob.substring(0,20)+'...', fee, 'support', {problem:prob});
     document.getElementById('supProblem').value='';
 }
@@ -335,18 +402,31 @@ function updateCartBar(){
         bar.style.display='none';
     }
 }
+
 function openCartCheckout(){
     if(clientCart.length===0) return;
-    var c=currentClient; var total=clientCart.reduce(function(a,b){return a+b.price;},0);
+    var c=currentClient; 
+    var total=clientCart.reduce(function(a,b){return a+b.price;},0);
+    
+    // Buscar IBAN e Express da filial do cliente
     var branchData = (DB.cache.branches || []).find(function(b){return b.id === c.branchId;});
-    var iban = (branchData && branchData.iban) ? branchData.iban : '000600000083984030135'; 
-    var express = (branchData && branchData.express) ? branchData.express : '945740125';
+    if(!branchData) branchData = (DB.cache.branches||[])[0]; // Fallback para a primeira filial (Matriz)
+    
+    var iban = (branchData && branchData.iban) ? branchData.iban : '0006 0000 0083 9840 3013 5'; 
+    var express = (branchData && branchData.express) ? branchData.express : '945 740 125';
     
     var itemsHtml=clientCart.map(function(it){return '<tr><td>'+it.name+'</td><td style="text-align:right">'+fmt(it.price)+'</td></tr>';}).join('');
     
-    var b='<div class="form-row"><div><label>Método de Pagamento *</label><select id="pcMet" onchange="togglePayDetails()"><option value="iban">Transferência via IBAN</option><option value="express">Multicaixa Express</option></select></div></div>';
-    b+='<div id="ibanBox" class="card" style="padding:10px; margin-bottom:10px; background:rgba(0,0,0,0.2); text-align:center;"><p>IBAN:</p><h3 style="color:var(--primary); word-break:break-all;">'+iban+'</h3></div>';
-    b+='<div id="expressBox" class="card" style="display:none; padding:10px; margin-bottom:10px; background:rgba(0,0,0,0.2); text-align:center;"><p>Express:</p><h3 style="color:var(--success);">'+express+'</h3></div>';
+    var b='<div class="card" style="padding:15px; margin-bottom:15px; background:rgba(0,180,216,.05); border:1px dashed var(--primary); text-align:center;">';
+    b+='<h3 style="margin-bottom:15px; color:var(--primary);">Dados para Pagamento</h3>';
+    b+='<p style="margin-bottom:5px; font-size:.85rem; color:var(--text-muted);">Transferência IBAN:</p>';
+    b+='<h3 style="color:var(--primary); word-break:break-all; font-size:1.1rem; margin-top:0;">'+iban+'</h3>';
+    b+='<hr style="border-color:rgba(255,255,255,.1); margin:15px 0;">';
+    b+='<p style="margin-bottom:5px; font-size:.85rem; color:var(--text-muted);">Multicaixa Express:</p>';
+    b+='<h3 style="color:var(--success); font-size:1.3rem; margin-top:0;">'+express+'</h3>';
+    b+='</div>';
+    
+    b+='<div class="form-row"><div><label>Método Utilizado *</label><select id="pcMet"><option value="iban">Transferência via IBAN</option><option value="express">Multicaixa Express</option></select></div></div>';
     b+='<div class="card" style="margin-bottom:10px"><h4>Resumo do Carrinho</h4><table><tbody>'+itemsHtml+'</tbody><tfoot><tr><td style="text-align:right;font-weight:bold">Total:</td><td style="text-align:right;font-weight:bold">'+fmt(total)+' '+getCurrency()+'</td></tr></tfoot></table></div>';
     b+='<div class="form-row"><div><label>Anexar Comprovativo *</label><input type="file" id="proofFile" accept="image/*, application/pdf" required></div></div>';
     
@@ -374,19 +454,41 @@ async function doCheckoutCart(total){
 }
 
 async function viewProof(txId){
-    var tx=DB.cache.transactions.find(function(x){return x.id===txId;});
+    var tx = DB.cache.transactions.find(function(x){return x.id===txId;});
     if(!tx || !tx.proof_file) return showToast('Comprovativo não encontrado.','danger');
+    
     var content='';
-    if(tx.proof_file.includes('application/pdf')){content='<embed src="'+tx.proof_file+'" type="application/pdf" width="100%" height="450px" />';} else {content='<img src="'+tx.proof_file+'" style="width:100%; height:auto; border-radius:8px;" />';}
+    if(tx.proof_file.includes('application/pdf')){
+        content='<embed src="'+tx.proof_file+'" type="application/pdf" width="100%" height="450px" />';
+    } else {
+        content='<img src="'+tx.proof_file+'" style="width:100%; height:auto; border-radius:8px;" />';
+    }
+    
     var clientName = (DB.cache.clients.find(c=>c.id===tx.clientId)||{}).name || 'N/A';
-    modal('Comprovativo de Pagamento', '<div style="text-align:center">'+content+'</div><p style="margin-top:15px; text-align:center;">Cliente: <strong>'+clientName+'</strong><br>Valor: '+fmt(tx.val)+' '+getCurrency()+'<br>Método: '+(tx.met==='iban'?'IBAN':'Express')+'</p>', function(){confirmPayment(txId);}, 'Confirmar Pagamento', 'btn-success');
+    var itemsHtml = '<p style="margin-top:15px; text-align:center;"><strong>Cliente:</strong> '+clientName+'<br><strong>Valor:</strong> '+fmt(tx.val)+' '+getCurrency()+'<br><strong>Método:</strong> '+(tx.met==='iban'?'IBAN':'Express')+'</p>';
+    
+    if(tx.cart_items){
+        var items = JSON.parse(tx.cart_items);
+        itemsHtml += '<div style="margin-top:10px; border-top:1px solid rgba(255,255,255,.1); padding-top:10px;"><h4>Itens do Pedido:</h4><ul style="font-size:.85rem; color:var(--text-muted); margin-left:20px;">';
+        items.forEach(function(it){
+            var typeTxt = it.type === 'plan' ? '🔄 Alteração de Plano' : 
+                          it.type === 'streaming' ? '📺 Streaming' : 
+                          it.type === 'stock' ? '📦 Equipamento' : 
+                          it.type === 'support' ? '🛠️ Apoio Técnico' : '💰 Mensalidade';
+            itemsHtml += '<li><strong>'+typeTxt+'</strong>: '+it.name+' - '+fmt(it.price)+' '+getCurrency()+'</li>';
+            if(it.type === 'support' && it.extra && it.extra.problem) itemsHtml += '<li>Detalhe: '+it.extra.problem+'</li>';
+        });
+        itemsHtml += '</ul><p style="font-size:.8rem; color:var(--warning); margin-top:5px;">⚠️ Ao confirmar, o sistema aplicará estas alterações automaticamente no perfil do cliente e no stock.</p></div>';
+    }
+    
+    modal('Comprovativo de Pagamento', '<div style="text-align:center">'+content+'</div>'+itemsHtml, function(){confirmPayment(txId);}, 'Confirmar e Processar', 'btn-success');
 }
 
 /* ==================== INIT & SIDEBAR ==================== */
 async function seedData(){var users=await DB.get('users');if(!users.find(function(x){return x.user==='cassoca';}))await DB.upsert('users',{id:'u1',name:'Cassoca',user:'cassoca',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});if(!users.find(function(x){return x.user==='admin';}))await DB.upsert('users',{id:'u0',name:'Admin',user:'admin',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});var br=await DB.get('branches');if(!br.length)await DB.insert('branches',{id:'b1',name:'Matriz',loc:'Luanda',nif:'003982940LA041',phone:'+244 923 000 000',iban:'000600000083984030135',express:'945740125',mgr:'Cassoca',active:true});var sp=await DB.get('speeds');if(!sp.length){await DB.insert('speeds',{id:'s1',nome:'5 MB',preco:25000,period:'Mensal',days:30});await DB.insert('speeds',{id:'s2',nome:'10 MB',preco:35000,period:'Mensal',days:30});}var pl=await DB.get('plans');if(!pl.length)await DB.insert('plans',{id:'p1',nome:'NETFLIX',preco:7000});var st=await DB.get('settings');if(!st||!st.id)await DB.upsert('settings',{id:1,name:'Conex Cass',nif:'003982940LA041',taxRate:14,currency:'AKZ',docSeq:0,receiptSeq:0,displacementFee:5000,damagePenaltyPct:100,cutoffGraceDays:3});var emp=await DB.get('employees');if(!emp.length)await DB.insert('employees',{id:'e1',name:'Técnico A',role:'Instalador',department:'Rede',salary:0,contact:'',startDate:'',status:'Activo'});var inv=await DB.get('inventory');if(!inv.find(function(i){return i.name==='Roteador TP-Link';}))await DB.insert('inventory',{id:'i1',name:'Roteador TP-Link',cat:'Equipamento',val:15000,qty:50,branchId:'all',status:'Em Stock'});}
 async function syncLegacyBranchData() {if (!currentUser || currentUser.role !== 'admin') return; var tablesToSync = ['clients','transactions','documents','inventory','suppliers','tickets','installations','advances'];for (var i=0; i<tablesToSync.length; i++) {var t = tablesToSync[i];try {var raw = await sb.from(t).select('id').is('branchId', null).limit(50000);if (raw.data && raw.data.length > 0) {showToast('A organizar dados antigos...','info');for (var j=0; j<raw.data.length; j++) { await sb.from(t).update({ branchId: 'all' }).eq('id', raw.data[j].id); }DB.clearCache(t); }} catch(e) {}}}
 async function init(){showSpinner('A inicializar sistema...');await DB.loadAll();await seedData();hideSpinner();var sid=localStorage.getItem('cx_session');if(sid){var u=await DB.get('users');var f=u.find(function(x){return x.id===sid;});if(f){currentUser=f;await syncLegacyBranchData();showApp();return;}}showLoginScreen();}
-async function run(){await loadSidebar();document.getElementById('currentUserName').innerText=currentUser.name;navigate('dashboard');}
+async function run(){await loadSidebar();document.getElementById('currentUserName').innerText=currentUser.name;checkSystemNotifications();navigate('dashboard');}
 
 var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
 async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
@@ -425,6 +527,7 @@ async function shareContractWhatsApp(clientId){var c=DB.cache.clients.find(funct
 /* ==================== DASHBOARD (Mês Atual e Lembretes) ==================== */
 async function loadDashboard(){
     var t=await DB.get('transactions'),cl=await DB.get('clients'),inv=await DB.get('inventory'),cu=getCurrency(),hoje=new Date();
+    checkSystemNotifications(); // Atualiza notificações
     function isThisMonth(dateStr){var d = parseDate(dateStr);return d && d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear();}
     var tMes = t.filter(function(x){ return isThisMonth(x.date); });
     var inc=tMes.filter(function(x){return x.type==='income';}).reduce(function(a,b){return safeAdd(a,b.val);},0);
@@ -478,6 +581,7 @@ async function confirmPayment(txId){
     var cu=getCurrency();
     var invoiceItems=[];
     var clientUpdates={};
+    var txsToLog=[];
     
     if(tx.cart_items){
         var items=JSON.parse(tx.cart_items);
@@ -492,21 +596,22 @@ async function confirmPayment(txId){
             } 
             else if(it.type==='plan'){
                 clientUpdates.speedId=it.extra.speedId; clientUpdates.pkg=it.extra.nome; clientUpdates.mens=it.price;
-                clientUpdates.validade=fmtISO(addDays(new Date(), it.extra.days));
+                clientUpdates.validade=fmtISO(addDays(new Date(), it.extra.days || 30));
             } 
             else if(it.type==='streaming'){
                 var oldStream=c.streamings||''; if(oldStream.indexOf(it.extra.name)===-1) clientUpdates.streamings=oldStream+(oldStream?', ':'')+it.extra.name;
             } 
             else if(it.type==='stock'){
-                var prod=DB.cache.inventory.find(function(p){return p.name===it.name.split(' (c/')[0];});
-                if(prod){await DB.update('inventory',prod.id,{qty:safeSub(prod.qty,1)});}
+                if(it.extra && it.extra.invId){
+                    var prod=DB.cache.inventory.find(function(p){return p.id === it.extra.invId;});
+                    if(prod){ await DB.update('inventory', prod.id, {qty: safeSub(prod.qty, 1)}); }
+                }
             } 
             else if(it.type==='support'){
-                await DB.insert('tickets',{id:'tk'+Date.now(),clientName:c.name,tech:'',subject:'Apoio Técnico Agendado',status:'Aberto',description:it.extra.problem,dateCreated:getTodayStr()});
+                await DB.insert('tickets',{id:'tk'+Date.now()+i,clientName:c.name,tech:'',subject:'Apoio Técnico Agendado (Portal)',status:'Aberto',description:it.extra.problem,dateCreated:getTodayStr()});
             }
         }
     } else {
-        // Fluxo antigo de mensalidade simples
         invoiceItems.push({desc:'Mensalidade - '+clientName,qty:1,price:tx.val,total:tx.val});
         var sp=c.speedId?(DB.cache.speeds||[]).find(function(s){return s.id===c.speedId;}):null;
         if(sp&&sp.days){var baseDate=c.validade?parseDate(c.validade):new Date();if(daysDiff(new Date(),baseDate)<0)baseDate=new Date();clientUpdates.validade=fmtISO(addDays(baseDate,sp.days));}
@@ -519,7 +624,17 @@ async function confirmPayment(txId){
     await DB.upsert('settings',{id:1,docSeq:cfg.docSeq});
     await DB.update('transactions',txId,{status:'paid',receiptId:docId,desc:invoiceItems.map(function(x){return x.desc;}).join(' | ')});
     
-    await logAction('Confirmar Pagamento','Cliente: '+clientName+' - '+fmt(tx.val));hideSpinner();showToast('Pagamento confirmado e Fatura '+docId+' gerada!');loadDashboard();
+    await logAction('Confirmar Pagamento','Cliente: '+clientName+' - '+fmt(tx.val));hideSpinner();showToast('Pagamento confirmado e Fatura '+docId+' gerada!');closeModal();loadDashboard();
+}
+
+// REJEITAR COMPROVATIVO (Admin)
+async function rejectPayment(txId) {
+    var ok = await showConfirm('Rejeitar Comprovativo', 'Tem certeza que deseja rejeitar este pagamento? A transação será eliminada do sistema.', 'Rejeitar', 'btn-danger');
+    if (!ok) return;
+    await DB.del('transactions', txId);
+    await logAction('Rejeitar Pagamento', 'Tx ID: ' + txId);
+    showToast('Pagamento rejeitado e eliminado.');
+    loadDashboard();
 }
 
 /* ==================== CLIENTES ==================== */
@@ -642,7 +757,7 @@ function exportDB(){var data=JSON.stringify(DB.cache,null,2);var blob=new Blob([
 async function importDB(event){var file=event.target.files[0];if(!file)return;var ok=await showConfirm('Importar Backup','Substituir dados actuais pelo backup? Esta acção pode demorar.','Importar','btn-warning');if(!ok){event.target.value='';return;}showSpinner('A importar dados...');var reader=new FileReader();reader.onload=async function(e){try{var data=JSON.parse(e.target.result);var count=0;for(var table in data){if(data.hasOwnProperty(table)&&Array.isArray(data[table])){for(var i=0;i<data[table].length;i++){try{await DB.upsert(table,data[table][i]);count++;}catch(err){}}}}await logAction('Import',count+' registos');hideSpinner();showToast('Importados '+count+' registos!','info');loadConfig();}catch(err){hideSpinner();showToast('Erro: '+err.message,'danger');}};reader.readAsText(file);event.target.value='';}
 function resetCache(){DB.cache={};showToast('Cache limpa! Recarregando...','info');setTimeout(function(){location.reload();},1000);}
 
-/* ==================== FUNÇÕES EM FALTA (CORREÇÕES) ==================== */
+/* ==================== FUNÇÕES CORRIGIDAS E ADICIONADAS ==================== */
 
 // 1. PAGAR MENSALIDADE / COBRAR (Admin)
 async function payClientGeneral(clientId) {
@@ -707,17 +822,7 @@ async function payClientGeneral(clientId) {
     );
 }
 
-// 2. REJEITAR COMPROVATIVO (Admin)
-async function rejectPayment(txId) {
-    var ok = await showConfirm('Rejeitar Comprovativo', 'Tem certeza que deseja rejeitar este pagamento? A transação será eliminada do sistema.', 'Rejeitar', 'btn-danger');
-    if (!ok) return;
-    await DB.del('transactions', txId);
-    await logAction('Rejeitar Pagamento', 'Tx ID: ' + txId);
-    showToast('Pagamento rejeitado e eliminado.');
-    loadDashboard();
-}
-
-// 3. GRÁFICO DO DASHBOARD
+// 2. GRÁFICO DO DASHBOARD
 function toggleDashChart() {
     dashChartHidden = !dashChartHidden;
     loadDashboard();
@@ -769,6 +874,71 @@ async function renderChart(t) {
         }
     });
 }
+
+/* ==================== SISTEMA DE NOTIFICAÇÕES ==================== */
+async function checkSystemNotifications() {
+    var cl = DB.cache.clients || [];
+    var inv = DB.cache.inventory || [];
+    var txs = DB.cache.transactions || [];
+    var hoje = new Date();
+    var notifs = [];
+
+    // 1. Stock Baixo
+    var lowStock = inv.filter(function(i) { return i.qty > 0 && i.qty <= 5; });
+    lowStock.forEach(function(i) {
+        notifs.push({ type: 'warning', icon: '📦', msg: 'Stock baixo: <strong>'+i.name+'</strong> ('+i.qty+' restantes)' });
+    });
+
+    // 2. Clientes a expirar (próximos 3 dias)
+    var expiring = cl.filter(function(c) {
+        if(!c.validade || !c.speedId) return false;
+        var diff = daysDiff(hoje, parseDate(c.validade));
+        return diff >= 0 && diff <= 3;
+    });
+    expiring.forEach(function(c) {
+        notifs.push({ type: 'danger', icon: '⏳', msg: 'Internet de <strong>'+c.name+'</strong> expira em '+daysDiff(hoje, parseDate(c.validade))+' dia(s).' });
+    });
+
+    // 3. Pagamentos Pendentes no Portal
+    var pending = txs.filter(function(t) { return t.status === 'pending_verification'; });
+    pending.forEach(function(t) {
+        var clientName = (cl.find(c=>c.id===t.clientId)||{}).name || 'Cliente';
+        notifs.push({ type: 'info', icon: '💳', msg: 'Pagamento de <strong>'+fmt(t.val)+' KZ</strong> aguardando confirmação ('+clientName+').' });
+    });
+
+    // Renderizar
+    var countEl = document.getElementById('notifCount');
+    var listEl = document.getElementById('notifList');
+    
+    if (notifs.length > 0) {
+        countEl.innerText = notifs.length;
+        countEl.style.display = 'flex';
+        var html = '';
+        notifs.forEach(function(n) {
+            var color = n.type === 'danger' ? 'var(--danger)' : n.type === 'warning' ? 'var(--warning)' : 'var(--primary)';
+            var bg = n.type === 'danger' ? 'rgba(255,0,110,.1)' : n.type === 'warning' ? 'rgba(255,195,0,.1)' : 'rgba(0,180,216,.1)';
+            html += '<div class="notif-item"><div class="notif-icon" style="background:'+bg+';color:'+color+'">'+n.icon+'</div><div style="flex:1;color:var(--text-main)">'+n.msg+'</div></div>';
+        });
+        listEl.innerHTML = html;
+    } else {
+        countEl.style.display = 'none';
+        listEl.innerHTML = '<div class="notif-empty">✅ Tudo em dia! Sem alertas.</div>';
+    }
+}
+
+function toggleNotifications(e) {
+    if(e) e.stopPropagation();
+    document.getElementById('notifDropdown').classList.toggle('show');
+}
+
+// Fechar notificação ao clicar fora
+window.addEventListener('click', function(e) {
+    var dropdown = document.getElementById('notifDropdown');
+    var bell = document.querySelector('.notif-bell');
+    if (dropdown && bell && !bell.contains(e.target)) {
+        dropdown.classList.remove('show');
+    }
+});
 
 /* ==================== PWA ==================== */
 let deferredPrompt;window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; var installBtn = document.getElementById('installAppBtn'); if(installBtn) installBtn.style.display = 'inline-flex'; });function installPWA(){ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then((choiceResult) => { if(choiceResult.outcome === 'accepted') showToast('Aplicação instalada com sucesso!',''); deferredPrompt = null; document.getElementById('installAppBtn').style.display = 'none'; }); } else { showToast('Para instalar, abre o menu do navegador (3 pontinhos) e escolhe "Adicionar ao ecrã principal".','info'); } }
