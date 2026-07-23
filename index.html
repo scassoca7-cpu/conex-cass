@@ -115,8 +115,6 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
 .confirm-btns{display:flex;gap:10px;justify-content:center}
 .activity-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem}
 .activity-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-
-/* NOVO HEADER E NOTIFICAÇÕES */
 .header-actions { display:flex; align-items:center; gap:15px; position:relative; }
 .notif-bell { position:relative; cursor:pointer; font-size:1.3rem; color:var(--text-muted); transition:color .2s; }
 .notif-bell:hover { color:var(--primary); }
@@ -127,15 +125,13 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
 .notif-item:last-child { border-bottom:none; }
 .notif-icon { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.8rem; flex-shrink:0; }
 .notif-empty { text-align:center; color:var(--text-muted); padding:20px; font-size:.85rem; }
-
 @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}#menuToggle{display:inline-flex!important}.form-row{grid-template-columns:1fr}.grid{grid-template-columns:1fr!important}.kpi-grid{grid-template-columns:1fr 1fr}.header{padding:10px 15px}}
 @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN OVERLAY -->
-<div id="loginOverlay"><div class="login-bg-grid"></div><div class="login-card"><div class="logo-area"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg" alt="Logo"><h2>CONEX CASS</h2><p style="font-size:.7rem;color:var(--primary)">ERP Enterprise</p></div><div class="login-tabs"><div class="login-tab active" onclick="switchTab('login')">Admin</div><div class="login-tab" onclick="switchTab('client')">Cliente</div></div><form id="loginForm" class="login-form active" onsubmit="return handleLogin(event)"><div id="loginError" class="login-error"></div><div class="form-group"><label>Utilizador</label><input type="text" id="loginUser" required autocomplete="username"></div><div class="form-group"><label>Senha</label><input type="password" id="loginPass" required autocomplete="current-password"></div><button type="submit" class="login-btn login-btn-primary">Entrar</button></form><form id="clientLoginForm" class="login-form" onsubmit="return handleClientLogin(event)"><div id="clientLoginError" class="login-error"></div><p style="color:var(--text-muted);font-size:.82rem;margin-bottom:12px;text-align:center">Aceda ao seu perfil para ver estado, pagar e tirar faturas.</p><div class="form-group"><label>Número de Telefone</label><input type="tel" id="clientPhoneInput" required placeholder="Ex: 923000000"></div><button type="submit" class="login-btn login-btn-primary">Entrar como Cliente</button></form></div></div>
+<div id="loginOverlay"><div class="login-bg-grid"></div><div class="login-card"><div class="logo-area"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg" alt="Logo"><h2>CONEX CASS</h2><p style="font-size:.7rem;color:var(--primary)">ERP Enterprise</p></div><div class="login-tabs"><div class="login-tab active" onclick="switchTab('login')">Admin</div><div class="login-tab" onclick="switchTab('client')">Cliente</div></div><form id="loginForm" class="login-form active" onsubmit="return handleLogin(event)"><div id="loginError" class="login-error"></div><div class="form-group"><label>Utilizador</label><input type="text" id="loginUser" required autocomplete="username"></div><div class="form-group"><label>Senha</label><input type="password" id="loginPass" required autocomplete="current-password"></div><button type="submit" class="login-btn login-btn-primary">Entrar</button></form><form id="clientLoginForm" class="login-form" onsubmit="return handleClientLogin(event)"><div id="clientLoginError" class="login-error"></div><p style="color:var(--text-muted);font-size:.82rem;margin-bottom:12px;text-align:center">Aceda ao seu perfil para ver estado, pagar e tirar faturas.</p><div class="form-group"><label>Número de Telefone</label><input type="tel" id="clientPhoneInput" required placeholder="Ex: 923000000"></div><div class="form-group"><label>Código de Acesso</label><input type="password" id="clientPassInput" required placeholder="Insira o seu código"></div><button type="submit" class="login-btn login-btn-primary">Entrar como Cliente</button></form></div></div>
 
 <div id="spinnerOverlay" class="spinner-overlay hidden"><div class="spinner"></div><p style="color:var(--text-muted);font-size:.85rem">A carregar...</p></div>
 <div class="toast-container" id="toastContainer"></div>
@@ -150,18 +146,9 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
             <h1 style="font-family:'Orbitron';font-size:.95rem"><span id="pageTitle">Dashboard</span></h1>
         </div>
         <div class="header-actions">
+            <button class="btn btn-outline btn-sm" onclick="forceRefreshData()" title="Sincronizar Dados" style="margin-right:5px;">🔄 Atualizar</button>
             <button class="btn btn-success btn-sm" id="installAppBtn" style="display:none" onclick="installPWA()">📥 Instalar App</button>
-            
-            <!-- SINO DE NOTIFICAÇÕES -->
-            <div class="notif-bell" onclick="toggleNotifications(event)">
-                🔔
-                <span class="notif-badge" id="notifCount" style="display:none">0</span>
-                <div class="notif-dropdown" id="notifDropdown">
-                    <h3 style="font-size:.9rem; color:var(--primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Alertas do Sistema</h3>
-                    <div id="notifList"></div>
-                </div>
-            </div>
-
+            <div class="notif-bell" onclick="toggleNotifications(event)">🔔 <span class="notif-badge" id="notifCount" style="display:none">0</span><div class="notif-dropdown" id="notifDropdown"><h3 style="font-size:.9rem; color:var(--primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Alertas do Sistema</h3><div id="notifList"></div></div></div>
             <span id="currentUserName" style="font-size:.85rem;color:var(--text-muted)">Admin</span>
         </div>
     </header>
@@ -181,6 +168,8 @@ var LOGO='https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg';
 var STAMP='https://i.postimg.cc/47vfQ9z4/carimbo-conextv.jpg';
 var ADMIN_WHATSAPP='244945740125'; 
 var currentUser=null,currentClient=null,mainChart=null,dashChartHidden=false,tempDocItems=[];
+var currentPageId = 'dashboard';
+var syncInterval = null;
 
 /* ==================== HELPERS ==================== */
 function showSpinner(msg){var o=document.getElementById('spinnerOverlay');o.querySelector('p').textContent=msg||'A carregar...';o.classList.remove('hidden');}
@@ -222,10 +211,7 @@ upsert:async function(t,r){try{var res=await sb.from(t).upsert(r,{onConflict:'id
 del:async function(t,id){try{var res=await sb.from(t).delete().eq('id',id);if(res.error)throw res.error;if(this.cache[t]&&Array.isArray(this.cache[t]))this.cache[t]=this.cache[t].filter(function(x){return x.id!==id;});return true;}catch(e){showToast("Erro BD: "+e.message,'danger');return false;}},
 loadAll: async function() {
     var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances'];
-    var promises = ks.map(k => {
-        if (this.cache[k] === undefined) return this.get(k);
-        return Promise.resolve();
-    });
+    var promises = ks.map(k => { if (this.cache[k] === undefined) return this.get(k); return Promise.resolve(); });
     await Promise.all(promises);
 },
 clearCache:function(t){if(t){delete this.cache[t];}else{this.cache={};}}
@@ -248,20 +234,158 @@ async function logAction(action,detail){try{await DB.insert('audit_logs',{id:'lo
 var _filterTimeout=null;function filterTable(el,tid){clearTimeout(_filterTimeout);_filterTimeout=setTimeout(function(){var f=el.value.toLowerCase();var tb=document.getElementById(tid);if(!tb)return;var rows=tb.getElementsByTagName('tr');for(var i=1;i<rows.length;i++){var cells=rows[i].getElementsByTagName('td');var m=false;for(var j=0;j<cells.length;j++){if(cells[j].innerText.toLowerCase().indexOf(f)>-1)m=true;}rows[i].style.display=m?'':'none';}},200);}
 function getActiveBranchConfig(){var cfg=Object.assign({},DB.cache.settings||{});var branchId=currentUser?currentUser.branchId:null;if(branchId&&branchId!=='all'){var branch=(DB.cache.branches||[]).find(function(b){return b.id===branchId;});if(branch){cfg.name=branch.name||cfg.name;cfg.nif=branch.nif||cfg.nif;cfg.address=branch.loc||cfg.address;cfg.phone=branch.phone||cfg.phone;}}return cfg;}
 
+/* ==================== PAGINAÇÃO E EXPORTAÇÃO ==================== */
+var _tablePagination = {};
+function setupPagination(tableId, data, renderFn, pageSize) {
+    pageSize = pageSize || 15;
+    _tablePagination[tableId] = { data: data, page: 1, pageSize: pageSize, renderFn: renderFn };
+    renderPaginatedTable(tableId);
+}
+function renderPaginatedTable(tableId) {
+    var p = _tablePagination[tableId];
+    if (!p) return;
+    var start = (p.page - 1) * p.pageSize; var end = start + p.pageSize;
+    var pageData = p.data.slice(start, end);
+    p.renderFn(pageData);
+    var pagDiv = document.getElementById('pag_' + tableId);
+    if (!pagDiv) return;
+    var totalPages = Math.ceil(p.data.length / p.pageSize);
+    var html = '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; font-size:.8rem;">';
+    html += '<span>'+p.data.length+' registos (Pág '+p.page+' de '+totalPages+')</span>';
+    html += '<div style="display:flex; gap:5px;">';
+    html += '<button class="btn btn-outline btn-sm" '+(p.page===1?'disabled':'')+' onclick="changePage(\''+tableId+'\', '+(p.page-1)+')">⬅️ Anterior</button>';
+    html += '<button class="btn btn-outline btn-sm" '+(p.page>=totalPages?'disabled':'')+' onclick="changePage(\''+tableId+'\', '+(p.page+1)+')">Seguinte ➡️</button>';
+    html += '</div></div>';
+    pagDiv.innerHTML = html;
+}
+function changePage(tableId, newPage) { if (_tablePagination[tableId]) { _tablePagination[tableId].page = newPage; renderPaginatedTable(tableId); } }
+function exportTableToCSV(tableId, filename) {
+    var table = document.getElementById(tableId); if (!table) return showToast('Tabela não encontrada.', 'danger');
+    var rows = table.querySelectorAll('tr'); var csv = [];
+    rows.forEach(function(row) {
+        var cols = row.querySelectorAll('td, th'); var rowData = [];
+        cols.forEach(function(col) { var text = col.innerText.replace(/"/g, '""').replace(/\n/g, ' '); rowData.push('"' + text + '"'); });
+        csv.push(rowData.join(';'));
+    });
+    var blob = new Blob(["\ufeff" + csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = (filename || 'exportacao') + '_' + todayISO() + '.csv'; a.click();
+    showToast('Exportado para CSV!', 'success');
+}
+
+/* ==================== SINCRONIZAÇÃO AUTOMÁTICA ==================== */
+async function autoSyncAdmin() {
+    var isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+    var isModalOpen = document.getElementById('modalGeneric').classList.contains('show') || 
+                      document.getElementById('modalDoc').classList.contains('show') || 
+                      document.getElementById('confirmOverlay').style.display === 'flex';
+    if (isTyping || isModalOpen) return;
+
+    var oldPending = (DB.cache.transactions || []).filter(t => t.status === 'pending_verification').length;
+    
+    DB.clearCache();
+    await DB.loadAll();
+    checkSystemNotifications();
+    
+    var newPending = (DB.cache.transactions || []).filter(t => t.status === 'pending_verification').length;
+    if(newPending > oldPending) {
+        showToast('🔔 Novo pagamento do portal aguardando confirmação!', 'info');
+    }
+    
+    if (currentPageId) navigate(currentPageId);
+}
+
+async function autoSyncClient() {
+    var isTyping = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+    var isModalOpen = document.getElementById('modalGeneric').classList.contains('show') || 
+                      document.getElementById('modalDoc').classList.contains('show');
+    if (isTyping || isModalOpen) return;
+
+    DB.clearCache();
+    await DB.loadAll();
+    var fresh = (DB.cache.clients || []).find(c => c.id === currentClient.id);
+    if(fresh) {
+        currentClient = fresh;
+        loadClientPortal(); 
+    }
+}
+
+async function forceRefreshData() {
+    showSpinner('A sincronizar dados...');
+    DB.clearCache();
+    await DB.loadAll();
+    checkSystemNotifications();
+    navigate(currentPageId); 
+    hideSpinner();
+    showToast('Dados atualizados com sucesso!', 'success');
+}
+
 /* ==================== AUTENTICAÇÃO ==================== */
 async function hashPassword(pass){try{if(window.crypto&&window.crypto.subtle){var enc=new TextEncoder().encode(pass);var buf=await crypto.subtle.digest('SHA-256',enc);return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0')}).join('');}}catch(e){}var h=0;for(var i=0;i<pass.length;i++){h=((h<<5)-h)+pass.charCodeAt(i);h|=0;}return'fb_'+Math.abs(h).toString(36);}
 function switchTab(t){document.querySelectorAll('.login-tab').forEach(function(x){x.classList.remove('active');});document.querySelectorAll('.login-form').forEach(function(x){x.classList.remove('active');});if(t==='login'){document.querySelectorAll('.login-tab')[0].classList.add('active');document.getElementById('loginForm').classList.add('active');}else{document.querySelectorAll('.login-tab')[1].classList.add('active');document.getElementById('clientLoginForm').classList.add('active');}}
 async function handleLogin(e){e.preventDefault();var u=document.getElementById('loginUser').value.trim(),p=document.getElementById('loginPass').value,err=document.getElementById('loginError');err.classList.remove('show');showSpinner('A verificar credenciais...');var users=await DB.get('users');var f=users.find(function(x){return x.user.toLowerCase()===u.toLowerCase();});if(!f){hideSpinner();err.textContent='Utilizador não encontrado';err.classList.add('show');return false;}if(f.blocked){hideSpinner();err.textContent='Conta bloqueada. Contacte o administrador.';err.classList.add('show');return false;}var h=await hashPassword(p);if(f.pass!==h){hideSpinner();err.textContent='Senha incorrecta';err.classList.add('show');return false;}currentUser=f;localStorage.setItem('cx_session',f.id);await logAction('Login','Entrada');DB.clearCache(); await DB.loadAll(); hideSpinner();showApp();return false;}
-async function handleClientLogin(e){e.preventDefault();var phone=val('clientPhoneInput').replace(/\s/g,'');var err=document.getElementById('clientLoginError');err.classList.remove('show');if(!phone)return false;showSpinner('A procurar perfil...');var clients=await DB.get('clients',true);var client=clients.find(function(c){var cp=(c.contact||'').replace(/\s/g,'').replace('+244','').replace(/^0/,'');var ip=phone.replace('+244','').replace(/^0/,'');return cp===ip&&cp!=='';});hideSpinner();if(!client){err.textContent='Número não encontrado. Verifique ou contacte a empresa.';err.classList.add('show');return false;}currentClient=client;showClientApp();return false;}
+
+async function handleClientLogin(e){
+    e.preventDefault();
+    var phone=val('clientPhoneInput').replace(/\s/g,'');
+    var pass=val('clientPassInput');
+    var err=document.getElementById('clientLoginError');
+    err.classList.remove('show');
+    if(!phone)return false;
+    showSpinner('A procurar perfil...');
+    var clients=await DB.get('clients',true);
+    var client=clients.find(function(c){
+        var cp=(c.contact||'').replace(/\s/g,'').replace('+244','').replace(/^0/,'');
+        var ip=phone.replace('+244','').replace(/^0/,'');
+        return cp===ip&&cp!=='';
+    });
+    hideSpinner();
+    if(!client){
+        err.textContent='Número não encontrado. Verifique ou contacte a empresa.';
+        err.classList.add('show');
+        return false;
+    }
+    if(!client.accessCode || client.accessCode !== pass){
+        err.textContent='Código de acesso incorreto. Contacte a empresa para obter o seu código.';
+        err.classList.add('show');
+        return false;
+    }
+    currentClient=client;
+    await DB.loadAll(); 
+    showClientApp();
+    return false;
+}
+
 function showLoginScreen(){document.getElementById('loginOverlay').classList.remove('hidden');}
 function showApp(){document.getElementById('loginOverlay').classList.add('hidden');run();}
-function doLogout(){currentUser=null;currentClient=null;localStorage.removeItem('cx_session');DB.clearCache();document.getElementById('mainSidebar').style.display='';document.getElementById('menuToggle').style.display='';showLoginScreen();}
-function showClientApp(){document.getElementById('loginOverlay').classList.add('hidden');document.getElementById('mainSidebar').style.display='none';document.getElementById('menuToggle').style.display='none';document.getElementById('currentUserName').innerText=currentClient.name;document.getElementById('pageTitle').innerText='Meu Perfil';loadClientPortal();}
-function clientLogout(){currentClient=null;document.getElementById('mainSidebar').style.display='';document.getElementById('menuToggle').style.display='';showLoginScreen();switchTab('client');}
+function doLogout(){
+    if(syncInterval) clearInterval(syncInterval); 
+    currentUser=null;currentClient=null;localStorage.removeItem('cx_session');DB.clearCache();
+    document.getElementById('mainSidebar').style.display='';document.getElementById('menuToggle').style.display='';
+    document.querySelector('.notif-bell').style.display='';document.getElementById('notifCount').style.display='none';
+    showLoginScreen();
+}
+function showClientApp(){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('mainSidebar').style.display='none';
+    document.getElementById('menuToggle').style.display='none';
+    document.querySelector('.notif-bell').style.display='none'; 
+    document.getElementById('currentUserName').innerText=currentClient.name;
+    document.getElementById('pageTitle').innerText='Meu Perfil';
+    loadClientPortal();
+}
+function clientLogout(){
+    if(syncInterval) clearInterval(syncInterval); 
+    currentClient=null;
+    document.getElementById('mainSidebar').style.display='';
+    document.getElementById('menuToggle').style.display='';
+    document.querySelector('.notif-bell').style.display=''; 
+    document.getElementById('notifCount').style.display='none'; 
+    showLoginScreen();
+    switchTab('client');
+}
 
 /* ==================== PORTAL CLIENTE ==================== */
 var clientCart = [];
-
 var STREAMING_APPS = [
     { name: 'Unitv', price: 8000, url: 'http://aftv.news/3651689' },
     { name: 'New ONE P2P', price: 5000, url: 'https://p2p.onetv.plus/new_one_2.0.1.apk' },
@@ -270,9 +394,11 @@ var STREAMING_APPS = [
 ];
 
 async function loadClientPortal(){
+    if(syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(autoSyncClient, 45000); 
+
     var fresh=(await DB.get('clients',true)).find(function(c){return c.id===currentClient.id;});if(fresh)currentClient=fresh;
     var c=currentClient,cu=getCurrency(),today=new Date();
-    
     var validade=c.validade?parseDate(c.validade):null;
     var diasRestantes=validade?daysDiff(today,validade):null;
     var statusCor, statusTxt;
@@ -280,60 +406,55 @@ async function loadClientPortal(){
     else if(diasRestantes<0){statusCor='var(--danger)';statusTxt='Expirado há '+Math.abs(diasRestantes)+' dias';}
     else if(diasRestantes<=3){statusCor='var(--warning)';statusTxt='Activo ('+diasRestantes+' dias restantes)';}
     else{statusCor='var(--success)';statusTxt='Activo ('+diasRestantes+' dias restantes)';}
-
     var txs=(await DB.get('transactions')).filter(function(t){return t.clientId===c.id;}).reverse();
     var docs=(await DB.get('documents')).filter(function(d){return d.clientId===c.id;}).reverse();
     var pendingTx = txs.find(function(t){return t.status==='pending_verification';});
-    
     var html='<div style="max-width:900px;margin:0 auto"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px"><h2>Olá, '+c.name+'</h2><button class="btn btn-danger btn-sm" onclick="clientLogout()">Sair</button></div>';
-    
     if(pendingTx){
         var cartItems = pendingTx.cart_items ? JSON.parse(pendingTx.cart_items) : [{name: pendingTx.desc, price: pendingTx.val}];
         var itemsHtml = cartItems.map(function(it){return '<li>'+it.name+' - '+fmt(it.price)+' '+cu+'</li>';}).join('');
         html+='<div class="card" style="border:2px solid var(--warning); margin-bottom:20px;"><h3 style="color:var(--warning)">⏳ Pagamento a Aguardar Confirmação</h3><p>Recebemos o seu aviso de pagamento de <strong>'+fmt(pendingTx.val)+' '+cu+'</strong>.</p><ul style="font-size:0.85rem; color:var(--text-muted); margin-left:20px;">'+itemsHtml+'</ul><p>A sua fatura estará disponível assim que a administração confirmar.</p></div>';
     }
-    
     html+='<div class="kpi-grid" style="margin-bottom:20px"><div class="kpi-card" style="background:rgba(0,180,216,.05);border-left-color:var(--primary)"><div class="kpi-label">O meu Plano</div><div class="kpi-value" style="color:var(--primary);font-size:1.1rem">'+(c.pkg||'N/A')+'</div></div><div class="kpi-card" style="background:rgba(0,255,136,.05);border-left-color:'+statusCor+'"><div class="kpi-label">Estado do Serviço</div><div class="kpi-value" style="color:'+statusCor+';font-size:1.1rem">'+statusTxt+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-left-color:'+(c.divida>0?'var(--danger)':'var(--success)')+'"><div class="kpi-label">Dívida em Aberto</div><div class="kpi-value" style="color:'+(c.divida>0?'var(--danger)':'var(--success)')+'">'+fmt(Math.max(0, c.divida||0))+' '+cu+'</div></div></div>';
-    
     html+='<div class="card"><div style="display:flex;gap:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:15px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="renderClientTab(\'home\')">Início</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'plans\')">Planos</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'streaming\')">Streaming</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'shop\')">Loja</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'support\')">Apoio Técnico</button></div><div id="clientTabContent"></div></div>';
-    
     html+='<div id="clientCartBar" style="position:fixed;bottom:0;left:0;right:0;background:var(--bg-panel);border-top:1px solid var(--primary);padding:10px 20px;display:none;justify-content:space-between;align-items:center;z-index:100;"><div><strong>Carrinho: <span id="cartTotal">0.00</span> '+cu+'</strong></div><button class="btn btn-success btn-sm" onclick="openCartCheckout()">💳 Finalizar Compra</button></div>';
-    
-    html+='<div class="card" style="margin-top:20px"><h3>As Minhas Faturas</h3>'+(docs.length?'<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Doc</th><th>Valor</th><th>Estado</th><th>Ação</th></tr></thead><tbody>'+docs.map(function(d){return '<tr><td>'+d.date+'</td><td>'+d.docId+'</td><td>'+fmt(d.total)+'</td><td><span class="badge '+(d.status==='paid'?'bg-success':'bg-warning')+'">'+(d.status==='paid'?'PAGO':'PEND.')+'</span></td><td><button class="btn btn-sm btn-outline" onclick="viewDoc(\''+d.id+'\')">Ver Fatura</button></td></tr>';}).join('')+'</tbody></table></div>':'<p style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma fatura encontrada.</p>')+'</div>';
-    
+    html+='<div class="card" style="margin-top:20px"><h3>As Minhas Faturas</h3>'+(docs.length?'<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Doc</th><th>Valor</th><th>Estado</th><th>Ações</th></tr></thead><tbody>'+docs.map(function(d){return '<tr><td>'+d.date+'</td><td>'+d.docId+'</td><td>'+fmt(d.total)+'</td><td><span class="badge '+(d.status==='paid'?'bg-success':'bg-warning')+'">'+(d.status==='paid'?'PAGO':'PEND.')+'</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="viewDoc(\''+d.id+'\')">👁️ Ver</button> <button class="btn btn-sm btn-primary" onclick="downloadClientInvoice(\''+d.id+'\')">📄 PDF</button></td></tr>';}).join('')+'</tbody></table></div>':'<p style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma fatura encontrada.</p>')+'</div>';
     document.getElementById('appContent').innerHTML=html;
     renderClientTab('home');
 }
 
-function renderClientTab(tab){
+async function renderClientTab(tab){
     var c=currentClient,cu=getCurrency();
     var content=document.getElementById('clientTabContent');
+    content.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px;">A carregar...</div>';
     
     if(tab==='home'){
         content.innerHTML='<h3>Pagamento Rápido</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Pague a sua mensalidade ou dívida pendente.</p><button class="btn btn-success" style="width:100%" onclick="addCartMensalidade()">'+(c.divida>0?'Pagar Dívida ('+fmt(c.divida)+' '+cu+')':'Pagar Mensalidade ('+fmt(c.mens||0)+' '+cu+')')+'</button><hr><h3>Contrato e Dados</h3><button class="btn btn-primary btn-sm" onclick="viewContract(\''+c.id+'\')" style="margin-bottom:10px">Ver Contrato</button><div class="form-row"><div><label>Nome</label><input value="'+c.name+'" disabled></div><div><label>Contacto</label><input value="'+(c.contact||'')+'" disabled></div><div><label>Morada</label><input value="'+(c.address||'')+'" disabled></div><div><label>NIF</label><input value="'+(c.nif||'')+'" disabled></div></div>';
     } 
     else if(tab==='plans'){
-        var speeds = DB.cache.speeds || [];
+        var speeds = await DB.get('speeds');
         var plansHtml = '<h3>Alterar Plano de Internet</h3><p style="font-size:.85rem;color:var(--warning);margin-bottom:10px">⚠️ O pedido de alteração será adicionado ao carrinho. A mudança fica ativa após o pagamento ser confirmado pela administração.</p>';
-        speeds.forEach(function(s){
-            plansHtml += '<div class="plan-card"><span>'+s.nome+' ('+s.period+')</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(s.preco)+' '+cu+'</strong><button class="btn btn-success btn-sm" onclick="addCartPlan(\''+s.id+'\')">➕ Solicitar</button></div></div>';
+        if(speeds.length === 0) plansHtml += '<p style="color:var(--text-muted)">Nenhum plano disponível.</p>';
+        speeds.forEach(function(s){ 
+            plansHtml += '<div class="plan-card"><span>'+s.nome+' ('+s.period+')</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(s.preco)+' '+cu+'</strong><button class="btn btn-success btn-sm" onclick="addCartPlan(\''+s.id+'\')">➕ Solicitar</button></div></div>'; 
         });
         content.innerHTML = plansHtml;
     } 
     else if(tab==='streaming'){
         var streamHtml = '<h3>Aplicações de Streaming</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Ative o serviço ou baixe o aplicativo diretamente.</p>';
-        STREAMING_APPS.forEach(function(app){
-            streamHtml += '<div class="plan-card"><span>'+app.name+'</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(app.price)+' '+cu+'</strong><a href="'+app.url+'" target="_blank" class="btn btn-info btn-sm">⬇ Baixar</a><button class="btn btn-success btn-sm" onclick="addCartStream(\''+app.name+'\','+app.price+')">➕ Ativar</button></div></div>';
+        STREAMING_APPS.forEach(function(app){ 
+            streamHtml += '<div class="plan-card"><span>'+app.name+'</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(app.price)+' '+cu+'</strong><a href="'+app.url+'" target="_blank" class="btn btn-info btn-sm">⬇ Baixar</a><button class="btn btn-success btn-sm" onclick="addCartStream(\''+app.name+'\','+app.price+')">➕ Ativar</button></div></div>'; 
         });
         content.innerHTML = streamHtml;
     } 
     else if(tab==='shop'){
-        var inv = DB.cache.inventory || [];
-        var deliveryFee = 2000; // Entrega e montagem
-        var configFee = 5000;   // Configuração de câmera/equipamento
+        var inv = await DB.get('inventory');
+        var deliveryFee = 2000; var configFee = 5000;
         var shopHtml = '<h3>Loja de Equipamentos</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Escolha o serviço adicional. O equipamento é entregue após confirmação do pagamento.</p>';
+        var hasItems = false;
         inv.forEach(function(i){
             if(i.status==='Em Stock' && i.qty>0){
+                hasItems = true;
                 shopHtml += '<div class="plan-card" style="flex-direction:column;align-items:stretch;gap:10px;">';
                 shopHtml += '<div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>'+i.name+'</strong> ('+fmt(i.val)+' '+cu+')</div></div>';
                 shopHtml += '<div class="form-row" style="margin-bottom:0;"><div><label>Taxa de Serviço</label><select id="fee_'+i.id+'" onchange="updateShopPrice(\''+i.id+'\')"><option value="'+deliveryFee+'">Entrega/Montagem ('+fmt(deliveryFee)+' Kz)</option><option value="'+configFee+'">Config. Câmera/Equip. ('+fmt(configFee)+' Kz)</option></select></div><div style="text-align:right;"><label>Total a Pagar</label><strong id="price_'+i.id+'" style="font-size:1.1rem;">'+fmt(i.val + deliveryFee)+' Kz</strong></div></div>';
@@ -341,98 +462,38 @@ function renderClientTab(tab){
                 shopHtml += '</div>';
             }
         });
+        if(!hasItems) shopHtml += '<p style="color:var(--text-muted);text-align:center;padding:20px">Sem equipamentos disponíveis na loja neste momento.</p>';
         content.innerHTML = shopHtml;
     } 
     else if(tab==='support'){
-        var supportFee = 5000; // Valor fixo de apoio técnico
+        var supportFee = 5000;
         content.innerHTML = '<h3>Agendar Apoio Técnico</h3><p style="font-size:.85rem;color:var(--warning);margin-bottom:10px">A taxa de apoio técnico é fixa de <strong>'+fmt(supportFee)+' '+cu+'</strong>. O técnico só é despachado após a confirmação do pagamento pela administração.</p><div class="form-group"><label>Descreva o problema</label><textarea id="supProblem" rows="3" placeholder="Ex: Sem internet, lentidão..."></textarea></div><button class="btn btn-warning" onclick="addCartSupport()"><strong>Agendar e Pagar '+fmt(supportFee)+' '+cu+'</strong></button>';
     }
 }
 
-function updateShopPrice(itemId) {
-    var i = DB.cache.inventory.find(function(x){return x.id===itemId;});
-    var feeVal = parseFloat(document.getElementById('fee_'+itemId).value) || 0;
-    document.getElementById('price_'+itemId).innerText = fmt(i.val + feeVal) + ' Kz';
-}
-
-function addShopItem(itemId) {
-    var i = DB.cache.inventory.find(function(x){return x.id===itemId;});
-    var feeSelect = document.getElementById('fee_'+itemId);
-    var feeVal = parseFloat(feeSelect.value) || 0;
-    var feeName = feeSelect.options[feeSelect.selectedIndex].text;
-    var total = i.val + feeVal;
-    var itemName = i.name + (feeVal > 0 ? ' (c/ ' + feeName + ')' : '');
-    
-    clientCart.push({name: itemName, price: total, type: 'stock', extra: {invId: itemId, fee: feeVal}});
-    updateCartBar();
-    showToast(itemName+' adicionado ao carrinho!','success');
-}
-
-// Funções do Carrinho
-function addCartItem(name, price, type, extra){
-    clientCart.push({name:name, price:price, type:type, extra:extra||{}});
-    updateCartBar();
-    showToast(name+' adicionado ao carrinho!','success');
-}
-function addCartMensalidade(){
-    var c=currentClient; var val=c.divida>0?c.divida:(c.mens||0);
-    if(val<=0) return showToast('Sem valor em dívida.','info');
-    addCartItem('Mensalidade/Dívida', val, 'mensalidade');
-}
-function addCartPlan(id){
-    var s=DB.cache.speeds.find(function(x){return x.id===id;});
-    addCartItem('Plano: '+s.nome, s.preco, 'plan', {speedId:id, days:s.days, nome:s.nome});
-}
-function addCartStream(name, price){
-    addCartItem('Streaming: '+name, price, 'streaming', {name:name});
-}
-function addCartSupport(){
-    var prob=val('supProblem'); if(!prob) return showToast('Descreva o problema.','danger');
-    var fee = 5000; // Fixo
-    addCartItem('Apoio Técnico: '+prob.substring(0,20)+'...', fee, 'support', {problem:prob});
-    document.getElementById('supProblem').value='';
-}
-function updateCartBar(){
-    var bar=document.getElementById('clientCartBar');
-    if(clientCart.length>0){
-        var total=clientCart.reduce(function(a,b){return a+b.price;},0);
-        document.getElementById('cartTotal').innerText=fmt(total);
-        bar.style.display='flex';
-    } else {
-        bar.style.display='none';
-    }
-}
+function updateShopPrice(itemId) { var i = DB.cache.inventory.find(function(x){return x.id===itemId;}); var feeVal = parseFloat(document.getElementById('fee_'+itemId).value) || 0; document.getElementById('price_'+itemId).innerText = fmt(i.val + feeVal) + ' Kz'; }
+function addShopItem(itemId) { var i = DB.cache.inventory.find(function(x){return x.id===itemId;}); var feeSelect = document.getElementById('fee_'+itemId); var feeVal = parseFloat(feeSelect.value) || 0; var feeName = feeSelect.options[feeSelect.selectedIndex].text; var total = i.val + feeVal; var itemName = i.name + (feeVal > 0 ? ' (c/ ' + feeName + ')' : ''); clientCart.push({name: itemName, price: total, type: 'stock', extra: {invId: itemId, fee: feeVal}}); updateCartBar(); showToast(itemName+' adicionado ao carrinho!','success'); }
+function addCartItem(name, price, type, extra){ clientCart.push({name:name, price:price, type:type, extra:extra||{}}); updateCartBar(); showToast(name+' adicionado ao carrinho!','success'); }
+function addCartMensalidade(){ var c=currentClient; var val=c.divida>0?c.divida:(c.mens||0); if(val<=0) return showToast('Sem valor em dívida.','info'); addCartItem('Mensalidade/Dívida', val, 'mensalidade'); }
+function addCartPlan(id){ var s=DB.cache.speeds.find(function(x){return x.id===id;}); addCartItem('Plano: '+s.nome, s.preco, 'plan', {speedId:id, days:s.days, nome:s.nome}); }
+function addCartStream(name, price){ addCartItem('Streaming: '+name, price, 'streaming', {name:name}); }
+function addCartSupport(){ var prob=val('supProblem'); if(!prob) return showToast('Descreva o problema.','danger'); var fee = 5000; addCartItem('Apoio Técnico: '+prob.substring(0,20)+'...', fee, 'support', {problem:prob}); document.getElementById('supProblem').value=''; }
+function updateCartBar(){ var bar=document.getElementById('clientCartBar'); if(clientCart.length>0){ var total=clientCart.reduce(function(a,b){return a+b.price;},0); document.getElementById('cartTotal').innerText=fmt(total); bar.style.display='flex'; } else { bar.style.display='none'; } }
 
 function openCartCheckout(){
     if(clientCart.length===0) return;
-    var c=currentClient; 
-    var total=clientCart.reduce(function(a,b){return a+b.price;},0);
-    
-    // Buscar IBAN e Express da filial do cliente
+    var c=currentClient; var total=clientCart.reduce(function(a,b){return a+b.price;},0);
     var branchData = (DB.cache.branches || []).find(function(b){return b.id === c.branchId;});
-    if(!branchData) branchData = (DB.cache.branches||[])[0]; // Fallback para a primeira filial (Matriz)
-    
+    if(!branchData) branchData = (DB.cache.branches||[])[0];
     var iban = (branchData && branchData.iban) ? branchData.iban : '0006 0000 0083 9840 3013 5'; 
     var express = (branchData && branchData.express) ? branchData.express : '945 740 125';
-    
     var itemsHtml=clientCart.map(function(it){return '<tr><td>'+it.name+'</td><td style="text-align:right">'+fmt(it.price)+'</td></tr>';}).join('');
-    
     var b='<div class="card" style="padding:15px; margin-bottom:15px; background:rgba(0,180,216,.05); border:1px dashed var(--primary); text-align:center;">';
-    b+='<h3 style="margin-bottom:15px; color:var(--primary);">Dados para Pagamento</h3>';
-    b+='<p style="margin-bottom:5px; font-size:.85rem; color:var(--text-muted);">Transferência IBAN:</p>';
-    b+='<h3 style="color:var(--primary); word-break:break-all; font-size:1.1rem; margin-top:0;">'+iban+'</h3>';
-    b+='<hr style="border-color:rgba(255,255,255,.1); margin:15px 0;">';
-    b+='<p style="margin-bottom:5px; font-size:.85rem; color:var(--text-muted);">Multicaixa Express:</p>';
-    b+='<h3 style="color:var(--success); font-size:1.3rem; margin-top:0;">'+express+'</h3>';
-    b+='</div>';
-    
+    b+='<h3 style="margin-bottom:15px; color:var(--primary);">Dados para Pagamento</h3><p style="margin-bottom:5px; font-size:.85rem; color:var(--text-muted);">Transferência IBAN:</p><h3 style="color:var(--primary); word-break:break-all; font-size:1.1rem; margin-top:0;">'+iban+'</h3><hr style="border-color:rgba(255,255,255,.1); margin:15px 0;"><p style="margin-bottom:5px; font-size:.85rem; color:var(--text-muted);">Multicaixa Express:</p><h3 style="color:var(--success); font-size:1.3rem; margin-top:0;">'+express+'</h3></div>';
     b+='<div class="form-row"><div><label>Método Utilizado *</label><select id="pcMet"><option value="iban">Transferência via IBAN</option><option value="express">Multicaixa Express</option></select></div></div>';
     b+='<div class="card" style="margin-bottom:10px"><h4>Resumo do Carrinho</h4><table><tbody>'+itemsHtml+'</tbody><tfoot><tr><td style="text-align:right;font-weight:bold">Total:</td><td style="text-align:right;font-weight:bold">'+fmt(total)+' '+getCurrency()+'</td></tr></tfoot></table></div>';
     b+='<div class="form-row"><div><label>Anexar Comprovativo *</label><input type="file" id="proofFile" accept="image/*, application/pdf" required></div></div>';
-    
-    modal('Finalizar Compra', b, function(){
-        doCheckoutCart(total);
-    }, 'Enviar Comprovativo', 'btn-success');
+    modal('Finalizar Compra', b, function(){ doCheckoutCart(total); }, 'Enviar Comprovativo', 'btn-success');
 }
 
 async function doCheckoutCart(total){
@@ -444,11 +505,9 @@ async function doCheckoutCart(total){
         var base64Proof=e.target.result;
         var cartPayload = JSON.stringify(clientCart);
         await DB.insert('transactions',{id:'tx'+Date.now(),type:'income',date:getTodayStr(),val:total,met:met,desc:'Compra Online - '+c.name,status:'pending_verification',reference:'Carrinho',clientId:c.id,processedBy:'Cliente Portal',receiptType:'cart',proof_file:base64Proof,cart_items:cartPayload});
-        
         var itemsList = clientCart.map(function(it){return '• '+it.name;}).join('%0A');
         var msg='*NOVA COMPRA NO SISTEMA*%0A%0A*Cliente:* '+c.name+'%0A*Valor:* '+fmt(total)+' AKZ%0A*Método:* '+(met==='iban'?'IBAN':'Express')+'%0A%0A*Itens:*%0A'+itemsList;
         window.open('https://api.whatsapp.com/send?phone='+ADMIN_WHATSAPP+'&text='+msg,'_blank');
-        
         hideSpinner();showToast('Comprovativo enviado!','info');closeModal();clientCart=[];updateCartBar();loadClientPortal();
     };reader.readAsDataURL(file);
 }
@@ -456,43 +515,64 @@ async function doCheckoutCart(total){
 async function viewProof(txId){
     var tx = DB.cache.transactions.find(function(x){return x.id===txId;});
     if(!tx || !tx.proof_file) return showToast('Comprovativo não encontrado.','danger');
-    
     var content='';
-    if(tx.proof_file.includes('application/pdf')){
-        content='<embed src="'+tx.proof_file+'" type="application/pdf" width="100%" height="450px" />';
-    } else {
-        content='<img src="'+tx.proof_file+'" style="width:100%; height:auto; border-radius:8px;" />';
-    }
-    
+    if(tx.proof_file.includes('application/pdf')){ content='<embed src="'+tx.proof_file+'" type="application/pdf" width="100%" height="450px" />'; } 
+    else { content='<img src="'+tx.proof_file+'" style="width:100%; height:auto; border-radius:8px;" />'; }
     var clientName = (DB.cache.clients.find(c=>c.id===tx.clientId)||{}).name || 'N/A';
-    var itemsHtml = '<p style="margin-top:15px; text-align:center;"><strong>Cliente:</strong> '+clientName+'<br><strong>Valor:</strong> '+fmt(tx.val)+' '+getCurrency()+'<br><strong>Método:</strong> '+(tx.met==='iban'?'IBAN':'Express')+'</p>';
+    var itemsHtml = '<p style="margin-top:15px; text-align:center;"><strong>Cliente:</strong> '+clientName+'<br><strong>Valor Declarado pelo Cliente:</strong> '+fmt(tx.val)+' '+getCurrency()+'<br><strong>Método:</strong> '+(tx.met==='iban'?'IBAN':'Express')+'</p>';
     
     if(tx.cart_items){
         var items = JSON.parse(tx.cart_items);
         itemsHtml += '<div style="margin-top:10px; border-top:1px solid rgba(255,255,255,.1); padding-top:10px;"><h4>Itens do Pedido:</h4><ul style="font-size:.85rem; color:var(--text-muted); margin-left:20px;">';
         items.forEach(function(it){
-            var typeTxt = it.type === 'plan' ? '🔄 Alteração de Plano' : 
-                          it.type === 'streaming' ? '📺 Streaming' : 
-                          it.type === 'stock' ? '📦 Equipamento' : 
-                          it.type === 'support' ? '🛠️ Apoio Técnico' : '💰 Mensalidade';
+            var typeTxt = it.type === 'plan' ? '🔄 Alteração de Plano' : it.type === 'streaming' ? '📺 Streaming' : it.type === 'stock' ? '📦 Equipamento' : it.type === 'support' ? '🛠️ Apoio Técnico' : '💰 Mensalidade';
             itemsHtml += '<li><strong>'+typeTxt+'</strong>: '+it.name+' - '+fmt(it.price)+' '+getCurrency()+'</li>';
             if(it.type === 'support' && it.extra && it.extra.problem) itemsHtml += '<li>Detalhe: '+it.extra.problem+'</li>';
         });
-        itemsHtml += '</ul><p style="font-size:.8rem; color:var(--warning); margin-top:5px;">⚠️ Ao confirmar, o sistema aplicará estas alterações automaticamente no perfil do cliente e no stock.</p></div>';
+        itemsHtml += '</ul></div>';
     }
-    
-    modal('Comprovativo de Pagamento', '<div style="text-align:center">'+content+'</div>'+itemsHtml, function(){confirmPayment(txId);}, 'Confirmar e Processar', 'btn-success');
+
+    itemsHtml += '<div class="card" style="margin-top:15px; background:rgba(255,195,0,.05); border:1px dashed var(--warning); padding:15px;">';
+    itemsHtml += '<h4 style="color:var(--warning); margin-bottom:5px;">Conciliação Bancária</h4>';
+    itemsHtml += '<p style="font-size:.8rem; color:var(--text-muted); margin-bottom:10px;">Verifique o valor na imagem e insira o valor exato que chegou à conta bancária. Se for diferente do declarado, o sistema ajustará a dívida do cliente.</p>';
+    itemsHtml += '<div class="form-row" style="margin-bottom:0;"><div><label>Valor Confirmado no Banco *</label><input type="number" id="verifiedAmount" value="'+tx.val+'"></div></div>';
+    itemsHtml += '</div>';
+
+    modal('Comprovativo de Pagamento', '<div style="text-align:center">'+content+'</div>'+itemsHtml, function(){
+        var verifiedVal = parseFloat(val('verifiedAmount'));
+        if(!verifiedVal || verifiedVal <= 0) return showToast('Insira um valor válido.', 'danger');
+        confirmPayment(txId, verifiedVal);
+    }, 'Confirmar e Processar', 'btn-success');
 }
 
 /* ==================== INIT & SIDEBAR ==================== */
 async function seedData(){var users=await DB.get('users');if(!users.find(function(x){return x.user==='cassoca';}))await DB.upsert('users',{id:'u1',name:'Cassoca',user:'cassoca',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});if(!users.find(function(x){return x.user==='admin';}))await DB.upsert('users',{id:'u0',name:'Admin',user:'admin',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});var br=await DB.get('branches');if(!br.length)await DB.insert('branches',{id:'b1',name:'Matriz',loc:'Luanda',nif:'003982940LA041',phone:'+244 923 000 000',iban:'000600000083984030135',express:'945740125',mgr:'Cassoca',active:true});var sp=await DB.get('speeds');if(!sp.length){await DB.insert('speeds',{id:'s1',nome:'5 MB',preco:25000,period:'Mensal',days:30});await DB.insert('speeds',{id:'s2',nome:'10 MB',preco:35000,period:'Mensal',days:30});}var pl=await DB.get('plans');if(!pl.length)await DB.insert('plans',{id:'p1',nome:'NETFLIX',preco:7000});var st=await DB.get('settings');if(!st||!st.id)await DB.upsert('settings',{id:1,name:'Conex Cass',nif:'003982940LA041',taxRate:14,currency:'AKZ',docSeq:0,receiptSeq:0,displacementFee:5000,damagePenaltyPct:100,cutoffGraceDays:3});var emp=await DB.get('employees');if(!emp.length)await DB.insert('employees',{id:'e1',name:'Técnico A',role:'Instalador',department:'Rede',salary:0,contact:'',startDate:'',status:'Activo'});var inv=await DB.get('inventory');if(!inv.find(function(i){return i.name==='Roteador TP-Link';}))await DB.insert('inventory',{id:'i1',name:'Roteador TP-Link',cat:'Equipamento',val:15000,qty:50,branchId:'all',status:'Em Stock'});}
 async function syncLegacyBranchData() {if (!currentUser || currentUser.role !== 'admin') return; var tablesToSync = ['clients','transactions','documents','inventory','suppliers','tickets','installations','advances'];for (var i=0; i<tablesToSync.length; i++) {var t = tablesToSync[i];try {var raw = await sb.from(t).select('id').is('branchId', null).limit(50000);if (raw.data && raw.data.length > 0) {showToast('A organizar dados antigos...','info');for (var j=0; j<raw.data.length; j++) { await sb.from(t).update({ branchId: 'all' }).eq('id', raw.data[j].id); }DB.clearCache(t); }} catch(e) {}}}
 async function init(){showSpinner('A inicializar sistema...');await DB.loadAll();await seedData();hideSpinner();var sid=localStorage.getItem('cx_session');if(sid){var u=await DB.get('users');var f=u.find(function(x){return x.id===sid;});if(f){currentUser=f;await syncLegacyBranchData();showApp();return;}}showLoginScreen();}
-async function run(){await loadSidebar();document.getElementById('currentUserName').innerText=currentUser.name;checkSystemNotifications();navigate('dashboard');}
+async function run(){
+    await loadSidebar();
+    document.querySelector('.notif-bell').style.display = ''; 
+    document.getElementById('currentUserName').innerText=currentUser.name;
+    checkSystemNotifications();
+    navigate('dashboard');
+    if(syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(autoSyncAdmin, 45000); 
+}
 
 var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
 async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
-function navigate(id){if(currentClient) { showToast('Acesso restrito ao portal do cliente.','warning'); return loadClientPortal(); }var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];if(!allowed.includes(id))return showToast('Acesso Negado! Permissão insuficiente.','danger');document.querySelectorAll('.sidebar nav a').forEach(function(a){a.classList.remove('active');});var a=document.querySelector('.sidebar nav a[onclick*="'+id+'"]');if(a)a.classList.add('active');document.getElementById('pageTitle').innerText=id.charAt(0).toUpperCase()+id.slice(1);var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};if(actions[id])actions[id]();document.getElementById('mainSidebar').classList.remove('open');}
+function navigate(id){
+    if(currentClient) { showToast('Acesso restrito ao portal do cliente.','warning'); return loadClientPortal(); }
+    var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];
+    if(!allowed.includes(id))return showToast('Acesso Negado! Permissão insuficiente.','danger');
+    document.querySelectorAll('.sidebar nav a').forEach(function(a){a.classList.remove('active');});
+    var a=document.querySelector('.sidebar nav a[onclick*="'+id+'"]');if(a)a.classList.add('active');
+    document.getElementById('pageTitle').innerText=id.charAt(0).toUpperCase()+id.slice(1);
+    currentPageId = id; 
+    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
+    if(actions[id])actions[id]();
+    document.getElementById('mainSidebar').classList.remove('open');
+}
 
 function modal(t,b,fn,txt,cls){txt=txt||'Salvar';cls=cls||'btn-primary';document.getElementById('modalTitle').innerText=t;document.getElementById('modalBody').innerHTML=b;document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';if(fn){var btn=document.createElement('button');btn.className='btn '+cls;btn.innerText=txt;btn.onclick=function(){fn();};document.getElementById('modalFooter').prepend(btn);}document.getElementById('modalGeneric').classList.add('show');}
 function closeModal(){document.getElementById('modalGeneric').classList.remove('show');}
@@ -524,10 +604,10 @@ document.getElementById('docTitle').innerText='Contrato - '+c.name;document.getE
 async function printContractPDF(clientId){var c=DB.cache.clients.find(function(x){return x.id===clientId;});if(!c)return;var content=document.getElementById('docBody').querySelector('.contract-container');if(!content)return;var clone=content.cloneNode(true);clone.style.position='absolute';clone.style.left='-9999px';document.body.appendChild(clone);await html2pdf().from(clone).set({margin:[10,10,10,10],filename:'Contrato_'+c.name.replace(/\s/g,'_')+'.pdf',html2canvas:{scale:2,useCORS:true,allowTaint:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).save();document.body.removeChild(clone);showToast('PDF Gerado!','info');}
 async function shareContractWhatsApp(clientId){var c=DB.cache.clients.find(function(x){return x.id===clientId;});if(!c)return;var cfg=getActiveBranchConfig();var phone=(c.contact||'').replace(/\s/g,'').replace('+','');if(!phone)return showToast('Sem contacto!','danger');if(!phone.startsWith('244'))phone='244'+phone.replace(/^0/,'');var msg='Olá '+c.name+'!%0A*CONTRATO*%0A'+(cfg.name||'Conex Cass')+' ↔ '+c.name+'%0APlano: *'+(c.pkg||'N/A')+'*%0AMensalidade: *'+fmt(c.mens||0)+' '+getCurrency()+'*';window.open('https://api.whatsapp.com/send?phone='+phone+'&text='+msg,'_blank');}
 
-/* ==================== DASHBOARD (Mês Atual e Lembretes) ==================== */
+/* ==================== DASHBOARD ==================== */
 async function loadDashboard(){
     var t=await DB.get('transactions'),cl=await DB.get('clients'),inv=await DB.get('inventory'),cu=getCurrency(),hoje=new Date();
-    checkSystemNotifications(); // Atualiza notificações
+    checkSystemNotifications();
     function isThisMonth(dateStr){var d = parseDate(dateStr);return d && d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear();}
     var tMes = t.filter(function(x){ return isThisMonth(x.date); });
     var inc=tMes.filter(function(x){return x.type==='income';}).reduce(function(a,b){return safeAdd(a,b.val);},0);
@@ -539,23 +619,20 @@ async function loadDashboard(){
     var internetClients=cl.filter(function(c){return c.speedId;}).length;
     var proxRenovacao=cl.filter(function(c){if(!c.validade||!c.speedId)return false;var vDate=parseDate(c.validade);if(!vDate)return false;var diff=daysDiff(hoje,vDate);return diff>=-5&&diff<=7;}).sort(function(a,b){return daysDiff(hoje,parseDate(a.validade))-daysDiff(hoje,parseDate(b.validade));});
     var recentTx=tMes.slice().reverse().slice(0,5);
-    
     var pendingPays = t.filter(function(x){return x.status==='pending_verification';});
     var pendingHtml='';
     if(pendingPays.length){
         pendingHtml='<div class="card" style="border:2px solid var(--warning); margin-bottom:20px;"><h3 style="color:var(--warning)">⚠️ Pagamentos a Aguardar Confirmação ('+pendingPays.length+')</h3><div style="overflow-x:auto"><table><thead><tr><th>Cliente</th><th>Valor</th><th>Método</th><th>Comprovativo</th><th>Ações</th></tr></thead><tbody>';
         pendingPays.forEach(function(p){
             var clientData = cl.find(function(c){return c.id===p.clientId;});
-            pendingHtml+='<tr><td><strong>'+(clientData?clientData.name:'N/A')+'</strong></td><td>'+fmt(p.val)+' '+cu+'</td><td>'+(p.met==='iban'?'Transferência IBAN':'Multicaixa Express')+'</td><td><button class="btn btn-sm btn-info" onclick="viewProof(\''+p.id+'\')">👁️ Ver</button></td><td style="white-space:nowrap"><button class="btn btn-sm btn-success" onclick="confirmPayment(\''+p.id+'\')">✅ Confirmar</button> <button class="btn btn-sm btn-danger" onclick="rejectPayment(\''+p.id+'\')">❌ Rejeitar</button></td></tr>';
+            pendingHtml+='<tr><td><strong>'+(clientData?clientData.name:'N/A')+'</strong></td><td>'+fmt(p.val)+' '+cu+'</td><td>'+(p.met==='iban'?'Transferência IBAN':'Multicaixa Express')+'</td><td><button class="btn btn-sm btn-info" onclick="viewProof(\''+p.id+'\')">👁️ Ver</button></td><td style="white-space:nowrap"><button class="btn btn-sm btn-success" onclick="viewProof(\''+p.id+'\')">✅ Confirmar</button> <button class="btn btn-sm btn-danger" onclick="rejectPayment(\''+p.id+'\')">❌ Rejeitar</button></td></tr>';
         });
         pendingHtml+='</tbody></table></div></div>';
     }
-    
-    var chartSection=dashChartHidden?'<div class="card" style="text-align:center;padding:30px"><p style="color:var(--text-muted);margin-bottom:10px">Gráfico oculto</p><button class="btn btn-outline btn-sm" onclick="toggleDashChart()">📊 Mostrar</button></div>':'<div class="card" id="dashChartCard"><button class="dash-close" onclick="toggleDashChart()">✕</button><h3 style="margin-bottom:12px">Receitas vs Despesas</h3><canvas id="dashChart" height="70"></canvas></div>';
+    var chartSection=dashChartHidden?'<div class="card" style="text-align:center;padding:30px"><p style="color:var(--text-muted);margin-bottom:10px">Gráfico oculto</p><button class="btn btn-outline btn-sm" onclick="toggleDashChart()">📊 Mostrar</button></div>':'<div class="card" id="dashChartCard" style="height: 350px; overflow: hidden;"><button class="dash-close" onclick="toggleDashChart()">✕</button><h3 style="margin-bottom:12px">Receitas vs Despesas</h3><div style="position:relative; height: calc(100% - 45px); width: 100%;"><canvas id="dashChart"></canvas></div></div>';
     var alertHtml='<div style="margin-bottom:10px;padding:10px;background:rgba(255,0,110,.1);border-radius:4px;border-left:3px solid var(--danger)"><strong>🚨 Stock Baixo</strong><br><span style="font-size:.85rem">'+lowStock+' itens com stock <= 5</span></div>';if(inadimplentes>0)alertHtml+='<div style="margin-bottom:10px;padding:10px;background:rgba(255,195,0,.1);border-radius:4px;border-left:3px solid var(--warning)"><strong>💸 Inadimplentes</strong><br><span style="font-size:.85rem">'+inadimplentes+' clientes em dívida</span></div>';alertHtml+='<div style="padding:10px;background:rgba(0,180,216,.1);border-radius:4px;border-left:3px solid var(--primary)"><strong>🎧 Tickets</strong><br><span style="font-size:.85rem">'+openTickets+' abertos</span></div>';
     var renovHtml='';if(proxRenovacao.length){proxRenovacao.forEach(function(c){var vDate=parseDate(c.validade);var diff=daysDiff(hoje,vDate);var cor=diff<0?'var(--danger)':diff<=3?'var(--warning)':'var(--success)';renovHtml+='<div class="activity-item" style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.85rem"><div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:'+cor+'"></div><div style="flex:1"><strong>'+c.name+'</strong> — '+(c.pkg||'N/A')+'</div><span style="color:'+cor+';font-weight:bold;font-size:.82rem">'+(diff<0?diff+'d':'+'+diff+'d')+'</span></div>';});}else{renovHtml='<p style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:10px">Nenhuma renovação próxima</p>';}
     var actHtml='';recentTx.forEach(function(tx){var isInc=tx.type==='income';actHtml+='<div class="activity-item"><div class="activity-dot" style="background:'+(isInc?'var(--success)':'var(--danger)')+'"></div><div style="flex:1"><strong>'+(tx.desc||'Movimento')+'</strong><br><span style="font-size:.75rem;color:var(--text-muted)">'+(tx.date||'')+'</span></div><span style="color:'+(isInc?'var(--success)':'var(--danger)')+';font-weight:bold;font-size:.85rem">'+(isInc?'+':'-')+fmt(tx.val)+'</span></div>';});if(!actHtml)actHtml='<p style="color:var(--text-muted);font-size:.85rem;text-align:center;padding:10px">Sem movimentos neste mês</p>';
-    
     document.getElementById('appContent').innerHTML='<div style="text-align:right; margin-bottom:15px;"><button class="btn btn-success" onclick="sendReminders()">📨 Enviar Lembretes WhatsApp</button></div>'+pendingHtml+'<div class="kpi-grid"><div class="kpi-card" style="background:rgba(0,255,136,.05);border-color:var(--success)"><div class="kpi-label">Receitas (Mês Atual)</div><div class="kpi-value" style="color:var(--success)">'+fmt(inc)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-color:var(--danger)"><div class="kpi-label">Despesas (Mês Atual)</div><div class="kpi-value" style="color:var(--danger)">'+fmt(exp)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(0,180,216,.05);border-color:var(--primary)"><div class="kpi-label">Lucro (Mês Atual)</div><div class="kpi-value" style="color:'+(inc-exp>=0?'var(--success)':'var(--danger)')+'">'+fmt(safeSub(inc,exp))+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,195,0,.05);border-color:var(--warning)"><div class="kpi-label">A Receber (Total)</div><div class="kpi-value" style="color:var(--warning)">'+fmt(rec)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(157,78,221,.05);border-color:var(--purple)"><div class="kpi-label">Clientes Internet</div><div class="kpi-value" style="color:var(--purple)">'+internetClients+'</div></div><div class="kpi-card" style="background:rgba(255,165,0,.05);border-color:orange"><div class="kpi-label">Inadimplentes</div><div class="kpi-value" style="color:orange">'+inadimplentes+'</div></div></div><div class="grid" style="grid-template-columns:2fr 1fr;gap:15px">'+chartSection+'<div class="card"><h3>Alertas</h3>'+alertHtml+'</div></div><div class="grid" style="grid-template-columns:1fr 1fr;gap:15px"><div class="card"><h3>🔄 Renovações Próximas</h3>'+renovHtml+'</div><div class="card"><h3>📋 Actividade Recente (Mês)</h3>'+actHtml+'</div></div>';
     if(!dashChartHidden)renderChart(t);
 }
@@ -564,70 +641,63 @@ async function sendReminders(){
     var cl=await DB.get('clients');var hoje=new Date();
     var toRemind=cl.filter(function(c){if(!c.validade||!c.speedId||!c.contact)return false;var vDate=parseDate(c.validade);var diff=daysDiff(hoje,vDate);return diff>=0&&diff<=3;});
     if(!toRemind.length)return showToast('Nenhum cliente para lembrar hoje.','info');
-    showSpinner('A gerar lembretes...');
-    for(var i=0;i<toRemind.length;i++){
-        var c=toRemind[i];
+    
+    showSpinner('A gerar lembretes... Não feche a janela.');
+    var i = 0;
+    var interval = setInterval(function() {
+        if (i >= toRemind.length) {
+            clearInterval(interval);
+            hideSpinner();
+            showToast(toRemind.length+' lembretes gerados! Verifique o seu navegador.','success');
+            return;
+        }
+        var c = toRemind[i];
         var phone=(c.contact||'').replace(/\s/g,'').replace('+','');if(!phone.startsWith('244'))phone='244'+phone.replace(/^0/,'');
         var msg='Olá '+c.name+'!%0AA sua internet expira em '+daysDiff(hoje,parseDate(c.validade))+' dia(s) ('+fmtPT(c.validade)+').%0AValor: '+fmt(c.mens||0)+' AKZ.%0AEvite o corte, pague via IBAN ou Multicaixa Express.%0AObrigado!';
         window.open('https://api.whatsapp.com/send?phone='+phone+'&text='+msg,'_blank');
-    }
-    hideSpinner();showToast(toRemind.length+' lembretes gerados! Verifique o seu navegador.','success');
+        i++;
+    }, 1500); 
 }
 
-async function confirmPayment(txId){
-    var tx=DB.cache.transactions.find(function(x){return x.id===txId;});if(!tx)return;showSpinner('A processar itens...');
+async function confirmPayment(txId, verifiedAmount){
+    var tx=DB.cache.transactions.find(function(x){return x.id===txId;});if(!tx)return;
+    
+    var v = verifiedAmount || tx.val;
+    var diff = safeSub(v, tx.val); 
+
+    showSpinner('A processar itens...');
     var cfg=DB.cache.settings||{};cfg.docSeq=(cfg.docSeq||0)+1;var docId='FR'+new Date().getFullYear()+'/'+String(cfg.docSeq).padStart(4,'0');var docDbId='d'+Date.now();
     var c=DB.cache.clients.find(function(x){return x.id===tx.clientId;});var clientName = c ? c.name : 'N/A';
-    var cu=getCurrency();
-    var invoiceItems=[];
-    var clientUpdates={};
-    var txsToLog=[];
-    
+    var cu=getCurrency();var invoiceItems=[];var clientUpdates={};
     if(tx.cart_items){
         var items=JSON.parse(tx.cart_items);
         for(var i=0; i<items.length; i++){
             var it=items[i];
             invoiceItems.push({desc:it.name, qty:1, price:it.price, total:it.price});
-            
-            if(it.type==='mensalidade'){
-                var sp=c.speedId?(DB.cache.speeds||[]).find(function(s){return s.id===c.speedId;}):null;
-                if(sp&&sp.days){var baseDate=c.validade?parseDate(c.validade):new Date();if(daysDiff(new Date(),baseDate)<0)baseDate=new Date();clientUpdates.validade=fmtISO(addDays(baseDate,sp.days));}
-                clientUpdates.divida = Math.max(0, safeSub(c.divida||0, it.price));
-            } 
-            else if(it.type==='plan'){
-                clientUpdates.speedId=it.extra.speedId; clientUpdates.pkg=it.extra.nome; clientUpdates.mens=it.price;
-                clientUpdates.validade=fmtISO(addDays(new Date(), it.extra.days || 30));
-            } 
-            else if(it.type==='streaming'){
-                var oldStream=c.streamings||''; if(oldStream.indexOf(it.extra.name)===-1) clientUpdates.streamings=oldStream+(oldStream?', ':'')+it.extra.name;
-            } 
-            else if(it.type==='stock'){
-                if(it.extra && it.extra.invId){
-                    var prod=DB.cache.inventory.find(function(p){return p.id === it.extra.invId;});
-                    if(prod){ await DB.update('inventory', prod.id, {qty: safeSub(prod.qty, 1)}); }
-                }
-            } 
-            else if(it.type==='support'){
-                await DB.insert('tickets',{id:'tk'+Date.now()+i,clientName:c.name,tech:'',subject:'Apoio Técnico Agendado (Portal)',status:'Aberto',description:it.extra.problem,dateCreated:getTodayStr()});
-            }
+            if(it.type==='mensalidade'){var sp=c.speedId?(DB.cache.speeds||[]).find(function(s){return s.id===c.speedId;}):null;if(sp&&sp.days){var baseDate=c.validade?parseDate(c.validade):new Date();if(daysDiff(new Date(),baseDate)<0)baseDate=new Date();clientUpdates.validade=fmtISO(addDays(baseDate,sp.days));}clientUpdates.divida = Math.max(0, safeSub(c.divida||0, it.price));} 
+            else if(it.type==='plan'){clientUpdates.speedId=it.extra.speedId; clientUpdates.pkg=it.extra.nome; clientUpdates.mens=it.price; clientUpdates.validade=fmtISO(addDays(new Date(), it.extra.days || 30));} 
+            else if(it.type==='streaming'){var oldStream=c.streamings||''; if(oldStream.indexOf(it.extra.name)===-1) clientUpdates.streamings=oldStream+(oldStream?', ':'')+it.extra.name;} 
+            else if(it.type==='stock'){if(it.extra && it.extra.invId){var prod=DB.cache.inventory.find(function(p){return p.id === it.extra.invId;});if(prod){ await DB.update('inventory', prod.id, {qty: safeSub(prod.qty, 1)}); }}} 
+            else if(it.type==='support'){await DB.insert('tickets',{id:'tk'+Date.now()+i,clientName:c.name,tech:'',subject:'Apoio Técnico Agendado (Portal)',status:'Aberto',description:it.extra.problem,dateCreated:getTodayStr()});}
         }
     } else {
-        invoiceItems.push({desc:'Mensalidade - '+clientName,qty:1,price:tx.val,total:tx.val});
+        invoiceItems.push({desc:'Mensalidade - '+clientName,qty:1,price:v,total:v});
         var sp=c.speedId?(DB.cache.speeds||[]).find(function(s){return s.id===c.speedId;}):null;
         if(sp&&sp.days){var baseDate=c.validade?parseDate(c.validade):new Date();if(daysDiff(new Date(),baseDate)<0)baseDate=new Date();clientUpdates.validade=fmtISO(addDays(baseDate,sp.days));}
-        clientUpdates.divida = Math.max(0, safeSub(c.divida||0, tx.val));
+        clientUpdates.divida = Math.max(0, safeSub(c.divida||0, v)); 
+    }
+
+    if(diff !== 0) {
+        clientUpdates.divida = Math.max(0, safeSub(clientUpdates.divida || c.divida || 0, diff));
     }
     
     if(Object.keys(clientUpdates).length>0){await DB.update('clients',tx.clientId,clientUpdates);}
-    
-    await DB.insert('documents',{id:docDbId,docId:docId,docType:'FR',clientId:tx.clientId,clientName:clientName,clientNif:c?(c.nif||''):'',clientAddress:c?(c.address||''):'',clientContact:c?(c.contact||''):'',date:getTodayStr(),dueDate:todayISO(),items:invoiceItems,subtotal:tx.val,tax:0,total:tx.val,paidVal:tx.val,status:'paid',met:tx.met,currency:cu,attendedBy:currentUser.name});
+    await DB.insert('documents',{id:docDbId,docId:docId,docType:'FR',clientId:tx.clientId,clientName:clientName,clientNif:c?(c.nif||''):'',clientAddress:c?(c.address||''):'',clientContact:c?(c.contact||''):'',date:getTodayStr(),dueDate:todayISO(),items:invoiceItems,subtotal:v,tax:0,total:v,paidVal:v,status:'paid',met:tx.met,currency:cu,attendedBy:currentUser.name});
     await DB.upsert('settings',{id:1,docSeq:cfg.docSeq});
-    await DB.update('transactions',txId,{status:'paid',receiptId:docId,desc:invoiceItems.map(function(x){return x.desc;}).join(' | ')});
-    
-    await logAction('Confirmar Pagamento','Cliente: '+clientName+' - '+fmt(tx.val));hideSpinner();showToast('Pagamento confirmado e Fatura '+docId+' gerada!');closeModal();loadDashboard();
+    await DB.update('transactions',txId,{status:'paid',val:v,receiptId:docId,desc:invoiceItems.map(function(x){return x.desc;}).join(' | ')});
+    await logAction('Confirmar Pagamento','Cliente: '+clientName+' - '+fmt(v)+(diff!==0?' (Ajuste de '+fmt(diff)+')':''));hideSpinner();showToast('Pagamento confirmado e Fatura '+docId+' gerada!');closeModal();loadDashboard();
 }
 
-// REJEITAR COMPROVATIVO (Admin)
 async function rejectPayment(txId) {
     var ok = await showConfirm('Rejeitar Comprovativo', 'Tem certeza que deseja rejeitar este pagamento? A transação será eliminada do sistema.', 'Rejeitar', 'btn-danger');
     if (!ok) return;
@@ -638,10 +708,49 @@ async function rejectPayment(txId) {
 }
 
 /* ==================== CLIENTES ==================== */
-async function loadClients(){var cl=await DB.get('clients');var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>👥 Clientes</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><input type="text" class="search-box" placeholder="🔍 Pesquisar..." oninput="filterTable(this,\'tblClients\')" style="max-width:300px"><button class="btn btn-primary btn-sm" onclick="openModalClient()">➕ Novo Cliente</button></div></div><div class="card"><table id="tblClients"><thead><tr><th>Nome</th><th>Tipo</th><th>Contacto</th><th>Plano</th><th>Dívida</th><th>Ações</th></tr></thead><tbody>';cl.forEach(function(c){var st=c.clientType==='Avulso'?'bg-avulso':'bg-success';html+='<tr><td><strong>'+c.name+'</strong></td><td><span class="badge '+st+'">'+(c.clientType||'Internet')+'</span></td><td>'+(c.contact||'-')+'</td><td>'+(c.pkg||'-')+'</td><td>'+(c.divida>0?'<span class="badge bg-partial">'+fmt(c.divida)+'</span>':'-')+'</td><td style="white-space:nowrap"><button class="btn btn-info btn-sm" onclick="viewClient360(\''+c.id+'\')">Ver 360</button> <button class="btn btn-success btn-sm" onclick="payClientGeneral(\''+c.id+'\')">Cobrar</button> <button class="btn btn-warning btn-sm" onclick="openModalClient(\''+c.id+'\')">Editar</button> <button class="btn btn-danger btn-sm" onclick="delClient(\''+c.id+'\')">X</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
+async function loadClients(){
+    var cl = await DB.get('clients');
+    var html = '<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>👥 Clientes</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><input type="text" class="search-box" placeholder="🔍 Pesquisar..." oninput="filterTable(this,\'tblClients\')" style="max-width:300px"><button class="btn btn-success btn-sm" onclick="exportTableToCSV(\'tblClients\',\'clientes\')">📊 Excel</button><button class="btn btn-primary btn-sm" onclick="openModalClient()">➕ Novo Cliente</button></div></div><div class="card"><table id="tblClients"><thead><tr><th>Nome</th><th>Tipo</th><th>Contacto</th><th>Plano</th><th>Dívida</th><th>Ações</th></tr></thead><tbody id="tblClientsBody"></tbody></table><div id="pag_tblClients"></div></div>';
+    document.getElementById('appContent').innerHTML = html;
+    var renderFn = function(data) {
+        var body = document.getElementById('tblClientsBody');
+        body.innerHTML = data.map(function(c) {
+            var st = c.clientType === 'Avulso' ? 'bg-avulso' : 'bg-success';
+            return '<tr><td><strong>'+c.name+'</strong></td><td><span class="badge '+st+'">'+(c.clientType||'Internet')+'</span></td><td>'+(c.contact||'-')+'</td><td>'+(c.pkg||'-')+'</td><td>'+(c.divida>0?'<span class="badge bg-partial">'+fmt(c.divida)+'</span>':'-')+'</td><td style="white-space:nowrap"><button class="btn btn-info btn-sm" onclick="viewClient360(\''+c.id+'\')">Ver</button> <button class="btn btn-success btn-sm" onclick="payClientGeneral(\''+c.id+'\')">Cobrar</button> <button class="btn btn-warning btn-sm" onclick="openModalClient(\''+c.id+'\')">Editar</button> <button class="btn btn-danger btn-sm" onclick="delClient(\''+c.id+'\')">X</button></td></tr>';
+        }).join('');
+    };
+    setupPagination('tblClients', cl, renderFn, 15);
+}
 async function viewClient360(id){var c=(await DB.get('clients',true)).find(function(x){return x.id===id;});if(!c)return showToast('Cliente não encontrado!','danger');var docs=(await DB.get('documents')).filter(function(d){return d.clientId===id;}).slice().reverse();var txs=(await DB.get('transactions')).filter(function(t){return t.clientId===id&&t.type==='income';}).slice().reverse();var cu=getCurrency();var html='<h2>👁️ Perfil 360º: '+c.name+'</h2><div class="grid" style="grid-template-columns:1fr 2fr;gap:15px"><div class="card"><h3>Dados</h3><p><strong>Contacto:</strong> '+(c.contact||'-')+'</p><p><strong>Morada:</strong> '+(c.address||'-')+'</p><p><strong>NIF:</strong> '+(c.nif||'---')+'</p><hr style="border-color:rgba(255,255,255,.1)"><p><strong>Internet:</strong> '+(c.pkg||'N/A')+'</p><p><strong>Mensalidade:</strong> '+(c.mens?fmt(c.mens)+' '+cu:'N/A')+'</p><p><strong>Validade:</strong> '+(c.validade?fmtPT(c.validade):'N/A')+'</p><hr style="border-color:rgba(255,255,255,.1)"><h3 style="color:'+(c.divida>0?'var(--danger)':'var(--success)')+'">Dívida: '+fmt(c.divida||0)+' '+cu+'</h3><div style="display:flex;flex-direction:column;gap:5px;margin-top:10px"><button class="btn btn-success btn-sm" onclick="payClientGeneral(\''+c.id+'\')">💳 Cobrar Mensalidade</button><button class="btn btn-warning btn-sm" onclick="openModalClient(\''+c.id+'\')">✏️ Editar</button><button class="btn btn-primary btn-sm" onclick="viewContract(\''+c.id+'\')">📝 Ver Contrato</button><button class="btn btn-info btn-sm" onclick="openModalDocGen(\''+c.id+'\')">📄 Nova Fatura</button><button class="btn btn-danger btn-sm" onclick="delClient(\''+c.id+'\')">🗑️ Eliminar</button></div></div><div><div class="card"><h3>📄 Documentos</h3><table><thead><tr><th>Doc</th><th>Total</th><th>Estado</th><th>Ver</th></tr></thead><tbody>';docs.forEach(function(d){var sc=d.status==='paid'?'bg-success':d.status==='partial'?'bg-partial':'bg-warning';html+='<tr><td>'+d.docId+'</td><td>'+fmt(d.total)+'</td><td><span class="badge '+sc+'">'+(d.status==='paid'?'PAGO':d.status==='partial'?'PARCIAL':'PEND.')+'</span></td><td><button class="btn btn-sm btn-outline" onclick="viewDoc(\''+d.id+'\')">👁️</button></td></tr>';});html+='</tbody></table></div><div class="card"><h3>💰 Pagamentos</h3><table><thead><tr><th>Data</th><th>Recibo</th><th>Valor</th><th>Ver</th></tr></thead><tbody>';txs.forEach(function(tx){if(tx.receiptId)html+='<tr><td>'+(tx.date||'-')+'</td><td style="font-family:monospace">'+tx.receiptId+'</td><td class="text-success">'+fmt(tx.val)+'</td><td><button class="btn btn-sm btn-outline" onclick="viewClientReceipt(\''+tx.id+'\',\''+c.id+'\')">📄</button></td></tr>';});html+='</tbody></table></div></div></div>';document.getElementById('appContent').innerHTML=html;}
 async function delClient(id){var ok=await showConfirm('Eliminar Cliente','ATENÇÃO: Eliminar este cliente removerá também todos os seus documentos e pagamentos associados. Esta acção é irreversível! Continuar?','Eliminar','btn-danger');if(!ok)return;showSpinner('A eliminar...');var docs=DB.cache.documents.filter(function(d){return d.clientId===id;});for(var i=0;i<docs.length;i++){await DB.del('documents',docs[i].id);}var txs=DB.cache.transactions.filter(function(t){return t.clientId===id;});for(var j=0;j<txs.length;j++){await DB.del('transactions',txs[j].id);}await DB.del('clients',id);hideSpinner();await logAction('Eliminar','Cliente e dados associados');showToast('Cliente e todos os seus dados eliminados!');loadClients();}
-async function openModalClient(id){var cls=await DB.get('clients');var c=id?cls.find(function(x){return x.id===id;}):{name:'',contact:'',nif:'',address:'',clientType:'Internet',speedId:'',mens:0,divida:0,streamings:'',equipments:'',lat:'',lng:'',ip:''};var speeds=await DB.get('speeds');var plans=await DB.get('plans');var inv=await DB.get('inventory');var so='<option value="">-- Sem --</option>'+speeds.map(function(s){return'<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' ('+s.period+') - '+fmt(s.preco)+'</option>';}).join('');var streamOpts=plans.map(function(p){return'<option value="'+p.nome+'" '+(c.streamings&&c.streamings.includes(p.nome)?'selected':'')+'>'+p.nome+'</option>';}).join('');var equipOpts=inv.filter(function(i){return i.cat&&i.cat.toLowerCase().match(/equip|disp|roteador|cabo/);}).map(function(i){return'<option value="'+i.name+'" '+(c.equipments&&c.equipments.includes(i.name)?'selected':'')+'>'+i.name+'</option>';}).join('');modal(id?'✏️ Editar Cliente':'👤 Novo Cliente','<div class="form-row"><div><label>Nome *</label><input id="cName" value="'+c.name+'"></div><div><label>Tipo</label><select id="cType" onchange="toggleInternetBlock()"><option value="Internet" '+(c.clientType==='Internet'?'selected':'')+'>Internet</option><option value="Avulso" '+(c.clientType==='Avulso'?'selected':'')+'>Avulso</option></select></div></div><div class="form-row"><div><label>Contacto</label><input id="cContact" value="'+(c.contact||'')+'"></div><div><label>Morada</label><input id="cAddress" value="'+(c.address||'')+'"></div><div><label>NIF</label><input id="cNif" value="'+(c.nif||'')+'"></div></div><div id="internetBlock" style="display:'+(c.clientType==='Avulso'?'none':'block')+'"><div class="form-row"><div><label>Plano Internet</label><select id="cSpeed">'+so+'</select></div></div></div><div class="form-row"><div><label>Streamings</label><select id="cStreamings" multiple style="height:70px">'+streamOpts+'</select></div><div><label>Equipamentos</label><select id="cEquipments" multiple style="height:70px">'+equipOpts+'</select></div></div><div class="form-row"><div><label>Latitude</label><input type="number" step="any" id="cLat" value="'+(c.lat||'')+'"></div><div><label>Longitude</label><input type="number" step="any" id="cLng" value="'+(c.lng||'')+'"></div><div><label>IP</label><input id="cIP" value="'+(c.ip||'')+'"></div></div>',async function(){var name=val('cName');if(!name)return showToast('Nome obrigatório!','danger');var speedId=val('cSpeed'),pkg='',mens=0,days=0;if(speedId){var sp=DB.cache.speeds.find(function(s){return s.id===speedId;});if(sp){pkg=sp.nome+' ('+sp.period+')';mens=sp.preco;days=sp.days;}}var validade='';if(days>0)validade=fmtISO(addDays(new Date(),days));else if(id)validade=c.validade||'';var streamArr=[],equipArr=[];var streamEl=document.getElementById('cStreamings');for(var i=0;i<streamEl.options.length;i++){if(streamEl.options[i].selected)streamArr.push(streamEl.options[i].value);}var equipEl=document.getElementById('cEquipments');for(var j=0;j<equipEl.options.length;j++){if(equipEl.options[j].selected)equipArr.push(equipEl.options[j].value);}var data={name:name,contact:val('cContact'),address:val('cAddress'),nif:val('cNif'),clientType:val('cType'),speedId:speedId||null,pkg:pkg,mens:mens,validade:validade,divida:c.divida||0,streamings:streamArr.join(', '),equipments:equipArr.join(', '),lat:parseFloat(val('cLat'))||null,lng:parseFloat(val('cLng'))||null,ip:val('cIP'),updatedAt:getTodayStr()};if(id){await DB.update('clients',id,data);DB.clearCache('clients');showToast('Cliente actualizado!');}else{data.id='c'+Date.now();data.createdAt=getTodayStr();await DB.insert('clients',data);DB.clearCache('clients');showToast('Cliente criado!');}await logAction('Cliente',name);closeModal();loadClients();});}
+
+async function openModalClient(id){
+    var cls=await DB.get('clients');
+    var c=id?cls.find(function(x){return x.id===id;}):{name:'',contact:'',nif:'',address:'',clientType:'Internet',speedId:'',mens:0,divida:0,streamings:'',equipments:'',lat:'',lng:'',ip:'',accessCode:''};
+    var speeds=await DB.get('speeds');var plans=await DB.get('plans');var inv=await DB.get('inventory');
+    var so='<option value="">-- Sem --</option>'+speeds.map(function(s){return'<option value="'+s.id+'" '+(c.speedId===s.id?'selected':'')+'>'+s.nome+' ('+s.period+') - '+fmt(s.preco)+'</option>';}).join('');
+    var streamOpts=plans.map(function(p){return'<option value="'+p.nome+'" '+(c.streamings&&c.streamings.includes(p.nome)?'selected':'')+'>'+p.nome+'</option>';}).join('');
+    var equipOpts=inv.filter(function(i){return i.cat&&i.cat.toLowerCase().match(/equip|disp|roteador|cabo/);}).map(function(i){return'<option value="'+i.name+'" '+(c.equipments&&c.equipments.includes(i.name)?'selected':'')+'>'+i.name+'</option>';}).join('');
+    modal(id?'✏️ Editar Cliente':'👤 Novo Cliente',
+        '<div class="form-row"><div><label>Nome *</label><input id="cName" value="'+c.name+'"></div><div><label>Tipo</label><select id="cType" onchange="toggleInternetBlock()"><option value="Internet" '+(c.clientType==='Internet'?'selected':'')+'>Internet</option><option value="Avulso" '+(c.clientType==='Avulso'?'selected':'')+'>Avulso</option></select></div></div>'+
+        '<div class="form-row"><div><label>Contacto</label><input id="cContact" value="'+(c.contact||'')+'"></div><div><label>Morada</label><input id="cAddress" value="'+(c.address||'')+'"></div><div><label>NIF</label><input id="cNif" value="'+(c.nif||'')+'"></div></div>'+
+        '<div id="internetBlock" style="display:'+(c.clientType==='Avulso'?'none':'block')+'"><div class="form-row"><div><label>Plano Internet</label><select id="cSpeed">'+so+'</select></div></div></div>'+
+        '<div class="form-row"><div><label>Streamings</label><select id="cStreamings" multiple style="height:70px">'+streamOpts+'</select></div><div><label>Equipamentos</label><select id="cEquipments" multiple style="height:70px">'+equipOpts+'</select></div></div>'+
+        '<div class="form-row"><div><label>Latitude</label><input type="number" step="any" id="cLat" value="'+(c.lat||'')+'"></div><div><label>Longitude</label><input type="number" step="any" id="cLng" value="'+(c.lng||'')+'"></div><div><label>IP</label><input id="cIP" value="'+(c.ip||'')+'"></div></div>'+
+        '<div class="form-row"><div><label>Código Portal (Senha Cliente)</label><input id="cAccessCode" value="'+(c.accessCode||'')+'" placeholder="Ex: 1234 ou cass123"></div></div>',
+    async function(){
+        var name=val('cName');if(!name)return showToast('Nome obrigatório!','danger');
+        var speedId=val('cSpeed'),pkg='',mens=0,days=0;
+        if(speedId){var sp=DB.cache.speeds.find(function(s){return s.id===speedId;});if(sp){pkg=sp.nome+' ('+sp.period+')';mens=sp.preco;days=sp.days;}}
+        var validade='';if(days>0)validade=fmtISO(addDays(new Date(),days));else if(id)validade=c.validade||'';
+        var streamArr=[],equipArr=[];
+        var streamEl=document.getElementById('cStreamings');for(var i=0;i<streamEl.options.length;i++){if(streamEl.options[i].selected)streamArr.push(streamEl.options[i].value);}
+        var equipEl=document.getElementById('cEquipments');for(var j=0;j<equipEl.options.length;j++){if(equipEl.options[j].selected)equipArr.push(equipEl.options[j].value);}
+        var data={name:name,contact:val('cContact'),address:val('cAddress'),nif:val('cNif'),clientType:val('cType'),speedId:speedId||null,pkg:pkg,mens:mens,validade:validade,divida:c.divida||0,streamings:streamArr.join(', '),equipments:equipArr.join(', '),lat:parseFloat(val('cLat'))||null,lng:parseFloat(val('cLng'))||null,ip:val('cIP'),accessCode:val('cAccessCode'),updatedAt:getTodayStr()};
+        if(id){await DB.update('clients',id,data);DB.clearCache('clients');showToast('Cliente actualizado!');}else{data.id='c'+Date.now();data.createdAt=getTodayStr();await DB.insert('clients',data);DB.clearCache('clients');showToast('Cliente criado!');}
+        await logAction('Cliente',name);closeModal();loadClients();
+    });
+}
 function toggleInternetBlock(){document.getElementById('internetBlock').style.display=val('cType')==='Avulso'?'none':'block';}
 
 /* ==================== FATURAÇÃO ==================== */
@@ -665,6 +774,17 @@ async function payInstallment(docId){var d=(await DB.get('documents',true)).find
 async function generateQR(text){try{var c=document.getElementById('qrCanvas');if(!c)return;await QRCode.toCanvas(c,text,{width:80});var img=document.getElementById('qrImg');img.src=c.toDataURL();img.style.display='inline-block';c.style.display='none';}catch(e){}}
 async function printDocPDF(id){var d=DB.cache.documents.find(function(x){return x.id===id;});var cfg=getActiveBranchConfig();var tempDiv=document.createElement('div');tempDiv.innerHTML=getDocTemplate(d,cfg);tempDiv.style.position='absolute';tempDiv.style.left='-9999px';document.body.appendChild(tempDiv);try{await generateQR(d.docId);var imgEl=tempDiv.querySelector('#qrImg');var canvasEl=tempDiv.querySelector('#qrCanvas');if(imgEl&&canvasEl){imgEl.src=canvasEl.toDataURL();imgEl.style.display='inline-block';canvasEl.style.display='none';}}catch(e){}await html2pdf().from(tempDiv.querySelector('.invoice-container')).set({margin:[5,5,5,5],filename:d.docId.replace(/\//g,'_')+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,allowTaint:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).save();document.body.removeChild(tempDiv);showToast('PDF Gerado!','info');}
 async function shareWhatsApp(id){var d=DB.cache.documents.find(function(x){return x.id===id;});if(!d)return;var phone=(d.clientContact||'').replace(/\s/g,'').replace('+','');if(!phone.startsWith('244'))phone='244'+phone.replace(/^0/,'');var msg='Olá '+d.clientName+'!%0ADoc: *'+d.docId+'*%0AValor: *'+fmt(d.total)+' '+(d.currency||getCurrency())+'*%0AAtendido: '+(d.attendedBy||'Sistema');window.open('https://api.whatsapp.com/send?phone='+phone+'&text='+msg,'_blank');}
+
+async function downloadClientInvoice(docId) {
+    var d = (DB.cache.documents || []).find(x => x.id === docId);
+    if (!d) return showToast('Fatura não encontrada.', 'danger');
+    var cfg = getActiveBranchConfig();
+    var tempDiv = document.createElement('div'); tempDiv.innerHTML = getDocTemplate(d, cfg);
+    tempDiv.style.position = 'absolute'; tempDiv.style.left = '-9999px'; document.body.appendChild(tempDiv);
+    try { await generateQR(d.docId); var imgEl = tempDiv.querySelector('#qrImg'); var canvasEl = tempDiv.querySelector('#qrCanvas'); if(imgEl && canvasEl){ imgEl.src = canvasEl.toDataURL(); imgEl.style.display = 'inline-block'; canvasEl.style.display = 'none'; } } catch(e) {}
+    await html2pdf().from(tempDiv.querySelector('.invoice-container')).set({ margin: [5,5,5,5], filename: d.docId.replace(/\//g,'_')+'.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, allowTaint: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } }).save();
+    document.body.removeChild(tempDiv); showToast('PDF Descarregado!', 'info');
+}
 
 /* ==================== OUTROS MÓDULOS ==================== */
 async function loadInstallmentsPage(){var docs=(await DB.get('documents')).filter(function(d){return d.status==='partial';}).slice().reverse();var html='<h2>💳 Cobranças em Prestações</h2><div class="card"><p style="color:var(--text-muted);margin-bottom:15px;font-size:.85rem">Aqui encontram-se as faturas divididas em pagamentos. Pode cancelar a cobrança para reverter a dívida do cliente.</p><table><thead><tr><th>Data</th><th>Doc</th><th>Cliente</th><th>Total</th><th>Pago</th><th>Resta</th><th>Ações</th></tr></thead><tbody>';if(!docs.length)html+='<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:20px">Nenhuma cobrança em prestações ativa.</td></tr>';docs.forEach(function(d){var remaining=safeSub(d.total,d.paidVal||0);html+='<tr><td>'+d.date+'</td><td style="font-family:monospace">'+d.docId+'</td><td>'+d.clientName+'</td><td>'+fmt(d.total)+'</td><td class="text-success">'+fmt(d.paidVal||0)+'</td><td class="text-danger">'+fmt(remaining)+'</td><td style="white-space:nowrap"><button class="btn btn-success btn-sm" onclick="viewDoc(\''+d.id+'\')">💳 Pagar</button> <button class="btn btn-danger btn-sm" onclick="cancelInstallmentDoc(\''+d.id+'\')">🗑️ Cancelar</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
@@ -691,7 +811,38 @@ async function openModalTicket(id){var data=await DB.get('tickets');var r=id?dat
 async function delTicket(id){var ok=await showConfirm('Eliminar Ticket','Eliminar este ticket de suporte?','Eliminar','btn-danger');if(!ok)return;await DB.del('tickets',id);showToast('Eliminado!');loadTickets();}
 
 /* ==================== GESTÃO DE ATIVOS / STOCK ==================== */
-async function loadStock(){var inv=await DB.get('inventory');var cl=await DB.get('clients');var cu=getCurrency();var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📦 Ativos e Stock</h2><button class="btn btn-primary btn-sm" onclick="openModalItem()">➕ Novo Item</button></div><div class="card"><table id="tblStock"><thead><tr><th>Produto</th><th>Cat.</th><th>MAC/Série</th><th>Preço</th><th>Qtd</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';inv.forEach(function(i){var stClass=i.status==='Atribuído'?'bg-warning':i.status==='Avariado'?'bg-danger':'bg-success';html+='<tr><td><strong>'+i.name+'</strong></td><td>'+(i.cat||'-')+'</td><td style="font-family:monospace;font-size:.75rem">'+(i.mac_address||'-')+'</td><td>'+fmt(i.val)+' '+cu+'</td><td>'+(i.status==='Atribuído'?'-':i.qty)+'</td><td><span class="badge '+stClass+'">'+(i.status||'Em Stock')+'</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-info" onclick="assignEquipment(\''+i.id+'\')" '+(i.status==='Atribuído'?'disabled':'')+'>📍 Atribuir</button> <button class="btn btn-warning btn-sm" onclick="openModalItem(\''+i.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delItem(\''+i.id+'\')">🗑️</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
+async function loadStock(){
+    var inv = await DB.get('inventory'); var cl = await DB.get('clients'); var cu = getCurrency();
+    var html = '<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📦 Ativos e Stock</h2><button class="btn btn-primary btn-sm" onclick="openModalItem()">➕ Novo Item</button></div><div class="card"><table id="tblStock"><thead><tr><th>Produto</th><th>Cat.</th><th>MAC/Série</th><th>Preço</th><th>Qtd</th><th>Estado</th><th>Atribuído a</th><th>Ações</th></tr></thead><tbody>';
+    inv.forEach(function(i){
+        var stClass = i.status === 'Atribuído' ? 'bg-warning' : i.status === 'Avariado' ? 'bg-danger' : 'bg-success';
+        var assignedClient = i.assigned_to ? cl.find(c => c.id === i.assigned_to) : null;
+        var assignedName = assignedClient ? assignedClient.name : '-';
+        html += '<tr><td><strong>'+i.name+'</strong></td><td>'+(i.cat||'-')+'</td><td style="font-family:monospace;font-size:.75rem">'+(i.mac_address||'-')+'</td><td>'+fmt(i.val)+' '+cu+'</td><td>'+(i.status==='Atribuído'?'-':i.qty)+'</td><td><span class="badge '+stClass+'">'+(i.status||'Em Stock')+'</span></td><td>'+(assignedName)+'</td><td style="white-space:nowrap">';
+        if(i.status === 'Atribuído') { html += '<button class="btn btn-sm btn-success" onclick="returnEquipment(\''+i.id+'\')">↩️ Recolher</button> '; } 
+        else { html += '<button class="btn btn-sm btn-info" onclick="assignEquipment(\''+i.id+'\')">📍 Atribuir</button> '; }
+        html += '<button class="btn btn-warning btn-sm" onclick="openModalItem(\''+i.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delItem(\''+i.id+'\')">🗑️</button></td></tr>';
+    });
+    html += '</tbody></table></div>';
+    document.getElementById('appContent').innerHTML = html;
+}
+
+async function returnEquipment(itemId) {
+    var item = (DB.cache.inventory || []).find(i => i.id === itemId);
+    if (!item || !item.assigned_to) return showToast('Equipamento não está atribuído.', 'danger');
+    var ok = await showConfirm('Recolher Equipamento', 'Confirmar a recolha de '+item.name+' do cliente? O stock será atualizado.', 'Recolher', 'btn-success');
+    if (!ok) return;
+    var client = (DB.cache.clients || []).find(c => c.id === item.assigned_to);
+    if (client) {
+        var newEq = (client.equipments || '').split(', ').filter(e => e !== item.name).join(', ');
+        await DB.update('clients', client.id, { equipments: newEq });
+    }
+    await DB.update('inventory', itemId, { status: 'Em Stock', assigned_to: null, qty: (item.qty || 0) + 1 });
+    await logAction('Recolha de Ativo', item.name + ' devolvido por ' + (client ? client.name : 'N/A'));
+    showToast('Equipamento recolhido com sucesso!');
+    loadStock();
+}
+
 async function assignEquipment(itemId){var cl=await DB.get('clients');var cOpts=cl.map(function(c){return'<option value="'+c.id+'">'+c.name+'</option>';}).join('');modal('📍 Atribuir Equipamento','<div class="form-row"><div><label>Cliente *</label><select id="assClient">'+cOpts+'</select></div></div>',async function(){var cId=val('assClient');var c=cl.find(function(x){return x.id===cId;});if(!c)return;await DB.update('inventory',itemId,{status:'Atribuído',assigned_to:cId,qty:0});var existingInv=(DB.cache.inventory||[]).find(function(i){return i.id===itemId;});await DB.update('clients',cId,{equipments:((c.equipments||'')+(c.equipments?', ':'')+(existingInv?existingInv.name:'')).trim()});await logAction('Atribuir Ativo',existingInv?existingInv.name+' -> '+c.name:'');showToast('Equipamento atribuído com sucesso!');closeModal();loadStock();},'Atribuir','btn-info');}
 async function openModalItem(id){var inv=await DB.get('inventory');var it=id?inv.find(function(x){return x.id===id;}):{name:'',cat:'Equipamento',val:0,qty:1,mac_address:'',status:'Em Stock'};modal(id?'✏️ Editar Item':'📦 Novo Item','<div class="form-row"><div><label>Nome *</label><input id="iName" value="'+it.name+'"></div><div><label>Categoria</label><select id="iCat"><option '+(it.cat==='Equipamento'?'selected':'')+'>Equipamento</option><option '+(it.cat==='Dispositivo'?'selected':'')+'>Dispositivo</option><option '+(it.cat==='Acessório'?'selected':'')+'>Acessório</option><option '+(it.cat==='Consumível'?'selected':'')+'>Consumível</option><option '+(it.cat==='Outros'?'selected':'')+'>Outros</option></select></div></div><div class="form-row"><div><label>MAC / Nº Série</label><input id="iMac" value="'+(it.mac_address||'')+'"></div><div><label>Estado</label><select id="iStatus"><option '+(it.status==='Em Stock'?'selected':'')+'>Em Stock</option><option '+(it.status==='Avariado'?'selected':'')+'>Avariado</option></select></div></div><div class="form-row"><div><label>Preço</label><input type="number" id="iVal" value="'+it.val+'"></div><div><label>Stock</label><input type="number" id="iQty" value="'+it.qty+'"></div></div>',async function(){var nm=val('iName');if(!nm)return showToast('Nome obrigatório!','danger');var data={name:nm,cat:val('iCat'),val:parseFloat(val('iVal'))||0,qty:parseInt(val('iQty'))||0,mac_address:val('iMac'),status:val('iStatus')};if(id){await DB.update('inventory',id,data);showToast('Item actualizado!');}else{data.id='i'+Date.now();await DB.insert('inventory',data);showToast('Item criado!');}closeModal();loadStock();});}
 async function delItem(id){var ok=await showConfirm('Eliminar Item','Eliminar este item do inventário?','Eliminar','btn-danger');if(!ok)return;await DB.del('inventory',id);showToast('Item eliminado!');loadStock();}
@@ -730,11 +881,36 @@ modal('Registo',formHtml,async function(){
 },'Salvar','btn-primary');}
 function getGPS(){if(!navigator.geolocation)return showToast('GPS não disponível','danger');showSpinner('A obter GPS...');navigator.geolocation.getCurrentPosition(function(pos){document.getElementById('cf_lat').value=pos.coords.latitude.toFixed(6);document.getElementById('cf_lng').value=pos.coords.longitude.toFixed(6);hideSpinner();showToast('Coordenadas obtidas!','success');},function(){hideSpinner();showToast('Não foi possível obter localização','danger');});}
 async function delCRUD(mod,id){var ok=await showConfirm('Eliminar','Eliminar este registo?','Eliminar','btn-danger');if(!ok)return;await DB.del(mod,id);showToast('Eliminado!');if(mod==='installations')loadInstallations();else loadEmployees();}
-async function loadCash(){var cr=DB.cache.cash_register||{};var t=await DB.get('transactions');var cu=getCurrency();var hoje=getTodayStr();var tHoje=t.filter(function(x){return x.date===hoje;});var incHoje=tHoje.filter(function(x){return x.type==='income';}).reduce(function(a,b){return safeAdd(a,b.val);},0);var expHoje=tHoje.filter(function(x){return x.type==='expense_payment'||x.type==='expense';}).reduce(function(a,b){return safeAdd(a,b.val);},0);var isOpen=cr.status==='open';var html='<h2>💰 Caixa</h2><div class="kpi-grid"><div class="kpi-card" style="background:rgba(0,180,216,.05);border-color:var(--primary)"><div class="kpi-label">Estado</div><div class="kpi-value" style="color:'+(isOpen?'var(--success)':'var(--danger)')+'">'+(isOpen?'ABERTA':'FECHADA')+'</div></div><div class="kpi-card" style="background:rgba(0,255,136,.05);border-color:var(--success)"><div class="kpi-label">Entradas Hoje</div><div class="kpi-value" style="color:var(--success)">'+fmt(incHoje)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-color:var(--danger)"><div class="kpi-label">Saídas Hoje</div><div class="kpi-value" style="color:var(--danger)">'+fmt(expHoje)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,195,0,.05);border-color:var(--warning)"><div class="kpi-label">Saldo Hoje</div><div class="kpi-value" style="color:var(--primary)">'+fmt(safeSub(incHoje,expHoje))+' '+cu+'</div></div></div><div class="card">';if(isOpen){html+='<p><strong>Aberto por:</strong> '+(cr.openedBy||'-')+' | <strong>Fundo:</strong> '+fmt(cr.openingFund||0)+' '+cu+'</p><div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-success" onclick="addCashMov(\'in\')">➕ Entrada</button><button class="btn btn-danger" onclick="addCashMov(\'out\')">➖ Saída</button><button class="btn btn-warning" onclick="closeCashRegister()">🔒 Fechar</button><button class="btn btn-primary" onclick="printCashReport()">📄 Relatório</button></div>';}else{html+='<div class="form-row" style="max-width:300px"><div><label>Fundo Inicial ('+cu+')</label><input type="number" id="cashOpenFund" value="0"></div></div><button class="btn btn-success" onclick="openCashRegister()">🔓 Abrir Caixa</button>';}html+='</div>';if(isOpen){html+='<div class="card"><h3>Movimentos de Hoje</h3><table><thead><tr><th>Tipo</th><th>Ref</th><th>Valor</th></tr></thead><tbody>';var todayTrans=t.filter(function(x){return x.date===hoje;}).reverse();todayTrans.forEach(function(tx){var isInc=tx.type==='income';html+='<tr><td><span class="badge '+(isInc?'bg-success':'bg-danger')+'">'+(isInc?'+':'-')+'</span></td><td>'+(tx.reference||tx.desc||'-')+'</td><td class="'+(isInc?'text-success':'text-danger')+'">'+(isInc?'+':'-')+fmt(tx.val)+'</td></tr>';});if(!todayTrans.length)html+='<tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Sem movimentos</td></tr>';html+='</tbody></table></div>';}document.getElementById('appContent').innerHTML=html;}
+
+async function loadCash(){
+    var cr = DB.cache.cash_register || {};
+    var t = await DB.get('transactions');
+    var cu = getCurrency();
+    var hoje = getTodayStr();
+    var isOldCashOpen = cr.status === 'open' && cr.openedAt && !cr.openedAt.startsWith(hoje);
+    var tHoje = t.filter(function(x){return x.date === hoje;});
+    var incHoje = tHoje.filter(function(x){return x.type==='income';}).reduce(function(a,b){return safeAdd(a,b.val);},0);
+    var expHoje = tHoje.filter(function(x){return x.type==='expense_payment'||x.type==='expense';}).reduce(function(a,b){return safeAdd(a,b.val);},0);
+    var isOpen = cr.status==='open' && !isOldCashOpen;
+    var html = '<h2>💰 Caixa</h2>';
+    if (isOldCashOpen) {
+        html += '<div class="card" style="border:2px solid var(--danger); text-align:center;"><h3 style="color:var(--danger)">⚠️ Caixa de Dia Anterior Aberta!</h3><p>A caixa foi aberta em: '+cr.openedAt+'</p><p>Não podes operar hoje sem fechar a caixa anterior.</p><button class="btn btn-warning" onclick="closeCashRegister()">🔒 Fechar Caixa Anterior Agora</button></div>';
+    } else {
+        html += '<div class="kpi-grid"><div class="kpi-card" style="background:rgba(0,180,216,.05);border-color:var(--primary)"><div class="kpi-label">Estado</div><div class="kpi-value" style="color:'+(isOpen?'var(--success)':'var(--danger)')+'">'+(isOpen?'ABERTA':'FECHADA')+'</div></div><div class="kpi-card" style="background:rgba(0,255,136,.05);border-color:var(--success)"><div class="kpi-label">Entradas Hoje</div><div class="kpi-value" style="color:var(--success)">'+fmt(incHoje)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-color:var(--danger)"><div class="kpi-label">Saídas Hoje</div><div class="kpi-value" style="color:var(--danger)">'+fmt(expHoje)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,195,0,.05);border-color:var(--warning)"><div class="kpi-label">Saldo Hoje</div><div class="kpi-value" style="color:var(--primary)">'+fmt(safeSub(incHoje,expHoje))+' '+cu+'</div></div></div>';
+        html += '<div class="card">';
+        if(isOpen){
+            html += '<p><strong>Aberto por:</strong> '+(cr.openedBy||'-')+' em '+cr.openedAt+' | <strong>Fundo:</strong> '+fmt(cr.openingFund||0)+' '+cu+'</p><div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap"><button class="btn btn-success" onclick="addCashMov(\'in\')">➕ Entrada</button><button class="btn btn-danger" onclick="addCashMov(\'out\')">➖ Saída</button><button class="btn btn-warning" onclick="closeCashRegister()">🔒 Fechar</button><button class="btn btn-primary" onclick="printCashReport()">📄 Relatório</button></div>';
+        } else {
+            html += '<div class="form-row" style="max-width:300px"><div><label>Fundo Inicial ('+cu+')</label><input type="number" id="cashOpenFund" value="0"></div></div><button class="btn btn-success" onclick="openCashRegister()">🔓 Abrir Caixa</button>';
+        }
+        html += '</div>';
+    }
+    document.getElementById('appContent').innerHTML = html;
+}
 async function openCashRegister(){var fund=parseFloat(val('cashOpenFund'))||0;var cashId = 'cash_' + currentUser.branchId;await DB.upsert('cash_register',{id:cashId, status:'open', openedAt:new Date().toLocaleString('pt-AO'), openedBy:currentUser.name, openingFund:fund, branchId: currentUser.branchId});await logAction('Abrir Caixa','Fundo: '+fmt(fund));showToast('Caixa Aberta!');loadCash();}
 async function closeCashRegister(){var ok=await showConfirm('Fechar Caixa','Fechar a caixa do dia?','Fechar','btn-warning');if(!ok)return;var cashId = 'cash_' + currentUser.branchId;await DB.upsert('cash_register',{id:cashId, status:'closed', closedAt:new Date().toLocaleString('pt-AO'), closedBy:currentUser.name, branchId: currentUser.branchId});await logAction('Fechar Caixa','');showToast('Caixa Fechada!');loadCash();}
 async function addCashMov(dir){var label=dir==='in'?'Entrada':'Saída';modal(dir==='in'?'➕ Entrada':'➖ Saída','<div class="form-row"><div><label>Valor</label><input type="number" id="cashMovVal"></div><div><label>Descrição</label><input id="cashMovDesc"></div></div>',async function(){var v=parseFloat(val('cashMovVal'));if(!v)return;await DB.insert('transactions',{id:'t'+Date.now(),type:dir==='in'?'income':'expense',val:v,date:getTodayStr(),desc:val('cashMovDesc')||label,status:'paid'});await logAction(label,fmt(v));showToast('Registado!');closeModal();loadCash();},label,dir==='in'?'btn-success':'btn-danger');}
-async function printCashReport(){var t=await DB.get('transactions'),todayStr=getTodayStr(),cu=getCurrency(),cash=DB.cache.cash_register||{},cfg=getActiveBranchConfig();var inc=t.filter(function(tx){return tx.type==='income'&&tx.date===todayStr;}).reduce(function(a,b){return safeAdd(a,b.val);},0);var exp=t.filter(function(tx){return(tx.type==='expense'||tx.type==='expense_payment')&&tx.date===todayStr;}).reduce(function(a,b){return safeAdd(a,b.val);},0);var balance=safeAdd(cash.openingFund||0,safeSub(inc,exp));var html='<div class="invoice-container" id="docContentPrint"><div class="invoice-header"><div style="display:flex;align-items:center;gap:15px"><img crossorigin="anonymous" src="'+LOGO+'" class="invoice-logo"><div><h2 style="margin:0;font-size:16px">'+(cfg.name||'Conex Cass')+'</h2><p style="margin:2px 0;font-size:10px">NIF: '+(cfg.nif||'---')+'</p>'+(cfg.address?'<p style="margin:2px 0;font-size:10px">'+cfg.address+'</p>':'')+'</div></div><div style="text-align:right"><div style="font-size:16px;font-weight:bold">RELATÓRIO DE CAIXA</div><p>Data: '+todayStr+'</p></div></div><div style="margin-top:15px"><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ccc"><span>Abertura</span><span>'+fmt(cash.openingFund||0)+' '+cu+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ccc;color:green"><span>(+) Entradas</span><span>'+fmt(inc)+' '+cu+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ccc;color:red"><span>(-) Saídas</span><span>'+fmt(exp)+' '+cu+'</span></div><div style="display:flex;justify-content:space-between;padding:12px 0;font-size:1.1rem;font-weight:bold;border-top:2px solid #000"><span>SALDO</span><span>'+fmt(balance)+' '+cu+'</span></div></div><div class="invoice-footer">'+(cfg.name||'Conex Cass')+' ERP</div></div>';document.getElementById('docTitle').innerText='Relatório de Caixa';document.getElementById('docBody').innerHTML=html;document.getElementById('modalDocFooter').innerHTML='<button class="btn btn-primary" onclick="printCashPDF()">📄 PDF</button> <button class="btn btn-outline" onclick="closeModalDoc()">Fechar</button>';document.getElementById('modalDoc').classList.add('show');}
+async function printCashReport(){var t=await DB.get('transactions'),todayStr=getTodayStr(),cu=getCurrency(),cash=DB.cache.cash_register||{},cfg=getActiveBranchConfig();var inc=t.filter(function(tx){return tx.type==='income'&&tx.date===todayStr;}).reduce(function(a,b){return safeAdd(a,b.val);},0);var exp=t.filter(function(tx){return(tx.type==='expense'||tx.type==='expense_payment')&&tx.date===todayStr;}).reduce(function(a,b){return safeAdd(a,b.val);},0);var balance=safeAdd(cash.openingFund||0,safeSub(inc,exp));var html='<div class="invoice-container" id="docContentPrint"><div class="invoice-header"><div style="display:flex;align-items:center;gap:15px"><img crossorigin="anonymous" src="'+LOGO+'" class="invoice-logo"><div><h2 style="margin:0;font-size:16px">'+(cfg.name||'Conex Cass')+'</h2><p style="margin:2px 0;font-size:10px">NIF: '+(cfg.nif||'---')+'</p>'+(cfg.address?'<p style="margin:2px 0;font-size:10px">'+cfg.address+'</p>':'')+'</div></div><div style="text-align:right"><div style="font-size:16px;font-weight:bold">RELATÓRIO DE CAIXA</div><p>Data: '+todayStr+'</p></div></div><div style="margin-top:15px"><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ccc"><span>Abertura</span><span>'+fmt(cash.openingFund||0)+' '+cu+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ccc;color:green"><span>(+) Entradas</span><span>'+fmt(inc)+' '+cu+'</span></div><div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ccc;color:red"><span>(-) Saídas</span><span>'+fmt(exp)+' '+cu+'</span></div><div style="display:flex;justify-content:space-between;padding:12px 0;font-size:1.1rem;font-weight:bold;border-top:2px solid #000><span>SALDO</span><span>'+fmt(balance)+' '+cu+'</span></div></div><div class="invoice-footer">'+(cfg.name||'Conex Cass')+' ERP</div></div>';document.getElementById('docTitle').innerText='Relatório de Caixa';document.getElementById('docBody').innerHTML=html;document.getElementById('modalDocFooter').innerHTML='<button class="btn btn-primary" onclick="printCashPDF()">📄 PDF</button> <button class="btn btn-outline" onclick="closeModalDoc()">Fechar</button>';document.getElementById('modalDoc').classList.add('show');}
 async function printCashPDF(){var content=document.querySelector('#docBody .invoice-container');if(!content)return;await html2pdf().from(content).set({margin:[5,5,5,5],filename:'Caixa_'+todayISO()+'.pdf',image:{type:'jpeg',quality:0.98},html2canvas:{scale:2,useCORS:true,allowTaint:true},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'}}).save();showToast('PDF Gerado!','info');}
 async function loadReports(){document.getElementById('appContent').innerHTML='<h2>📈 Relatórios</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px"><div class="card" style="cursor:pointer" onclick="reportRevenue()"><h3>📊 Receitas vs Despesas</h3><p style="color:var(--text-muted);font-size:.85rem">Análise mensal comparativa</p></div><div class="card" style="cursor:pointer" onclick="reportDebt()"><h3>💸 Dívidas</h3><p style="color:var(--text-muted);font-size:.85rem">Clientes inadimplentes</p></div><div class="card" style="cursor:pointer" onclick="reportCashFlow()"><h3>💰 Fluxo de Caixa</h3><p style="color:var(--text-muted);font-size:.85rem">Todos os movimentos</p></div><div class="card" style="cursor:pointer" onclick="reportClientRanking()"><h3>🏆 Ranking</h3><p style="color:var(--text-muted);font-size:.85rem">Maiores pagadores</p></div><div class="card" style="cursor:pointer" onclick="reportStock()"><h3>📦 Posição de Stock</h3><p style="color:var(--text-muted);font-size:.85rem">Inventário actual</p></div><div class="card" style="cursor:pointer;border:2px solid var(--primary)" onclick="reportIVA()"><h3>🧾 Relatório de IVA</h3><p style="color:var(--text-muted);font-size:.85rem">Apuramento para a AGT</p></div><div class="card" style="cursor:pointer;border:2px solid var(--danger)" onclick="exportSAFT()"><h3>📤 Exportar SAF-T (AGT)</h3><p style="color:var(--text-muted);font-size:.85rem">Ficheiro XML para contabilidade</p></div></div>';}
 async function reportIVA(){var docs=await DB.get('documents');var txs=await DB.get('transactions');var cu=getCurrency();var ivaReceitas=docs.filter(function(d){return d.status==='paid';}).reduce(function(a,b){return safeAdd(a,b.tax||0);},0);var totalFaturas=docs.filter(function(d){return d.status==='paid';}).reduce(function(a,b){return safeAdd(a,b.total||0);},0);var despesasComRecibo=txs.filter(function(t){return t.type==='expense'&&t.receiptId;});var totalDespesas=despesasComRecibo.reduce(function(a,b){return safeAdd(a,b.val||0);},0);var ivaDespesas=totalDespesas*0.14; var ivaApurado=safeSub(ivaReceitas,ivaDespesas);var html='<h2>🧾 Apuramento do IVA (14%)</h2><div class="kpi-grid"><div class="kpi-card" style="background:rgba(0,255,136,.05);border-left-color:var(--success)"><div class="kpi-label">IVA Liquidado (Receitas)</div><div class="kpi-value" style="color:var(--success)">'+fmt(ivaReceitas)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-left-color:var(--danger)"><div class="kpi-label">IVA Dedutível (Despesas)</div><div class="kpi-value" style="color:var(--danger)">'+fmt(ivaDespesas)+' '+cu+'</div></div><div class="kpi-card" style="background:rgba(0,180,216,.05);border-left-color:var(--primary)"><div class="kpi-label">IVA a Entregar (Apurado)</div><div class="kpi-value" style="color:var(--primary)">'+fmt(ivaApurado)+' '+cu+'</div></div></div><div class="card"><p style="color:var(--text-muted);font-size:.85rem;margin-bottom:10px">* O IVA Dedutível é calculado a 14% sobre o valor das despesas com recibo emitido.</p><table><thead><tr><th>Total Faturado (c/ IVA)</th><th>IVA Cobrado</th><th>Total Despesas (c/ Recibo)</th><th>IVA Pago</th></tr></thead><tbody><tr><td>'+fmt(totalFaturas)+' '+cu+'</td><td class="text-success">'+fmt(ivaReceitas)+' '+cu+'</td><td>'+fmt(totalDespesas)+' '+cu+'</td><td class="text-danger">'+fmt(ivaDespesas)+' '+cu+'</td></tr></tbody></table></div><button class="btn btn-outline btn-sm" onclick="loadReports()">⬅️ Voltar</button>';document.getElementById('appContent').innerHTML=html;}
@@ -758,15 +934,12 @@ async function importDB(event){var file=event.target.files[0];if(!file)return;va
 function resetCache(){DB.cache={};showToast('Cache limpa! Recarregando...','info');setTimeout(function(){location.reload();},1000);}
 
 /* ==================== FUNÇÕES CORRIGIDAS E ADICIONADAS ==================== */
-
-// 1. PAGAR MENSALIDADE / COBRAR (Admin)
 async function payClientGeneral(clientId) {
     var c = (await DB.get('clients', true)).find(function(x){ return x.id === clientId; });
     if (!c) return showToast('Cliente não encontrado!', 'danger');
     var sp = c.speedId ? (DB.cache.speeds || []).find(function(s){ return s.id === c.speedId; }) : null;
     var cu = getCurrency();
     var defaultVal = c.divida > 0 ? c.divida : (c.mens || 0);
-
     modal('💳 Cobrar Mensalidade - ' + c.name, 
         '<p>Plano atual: <strong>' + (c.pkg || 'N/A') + '</strong><br>Dívida em aberto: <strong>' + fmt(c.divida || 0) + ' ' + cu + '</strong><br>Mensalidade base: <strong>' + fmt(c.mens || 0) + ' ' + cu + '</strong></p>' +
         '<div class="form-row"><div><label>Valor a Pagar *</label><input type="number" id="payGenVal" value="' + defaultVal + '"></div>' +
@@ -774,24 +947,19 @@ async function payClientGeneral(clientId) {
         async function() {
             var v = parseFloat(val('payGenVal'));
             if (!v || v <= 0) return showToast('Insira um valor válido!', 'danger');
-            
             showSpinner('A processar pagamento...');
             var met = val('payGenMet');
             var cfg = DB.cache.settings || {};
             cfg.docSeq = (cfg.docSeq || 0) + 1;
             var docId = 'FR' + new Date().getFullYear() + '/' + String(cfg.docSeq).padStart(4, '0');
             var receiptId = await generateReceiptId();
-            
-            // Atualizar cliente (Zerar dívida e renovar validade)
             var clientUpdates = { divida: Math.max(0, safeSub(c.divida || 0, v)) };
             if (sp && sp.days) {
                 var baseDate = c.validade ? parseDate(c.validade) : new Date();
-                if (daysDiff(new Date(), baseDate) < 0) baseDate = new Date(); // Se já expirou, conta de hoje
+                if (daysDiff(new Date(), baseDate) < 0) baseDate = new Date(); 
                 clientUpdates.validade = fmtISO(addDays(baseDate, sp.days));
             }
             await DB.update('clients', clientId, clientUpdates);
-            
-            // Gerar Fatura
             var docDbId = 'd' + Date.now();
             await DB.insert('documents', {
                 id: docDbId, docId: docId, docType: 'FR', clientId: clientId, clientName: c.name,
@@ -800,49 +968,31 @@ async function payClientGeneral(clientId) {
                 items: [{desc: 'Mensalidade - ' + c.name, qty: 1, price: v, total: v}],
                 subtotal: v, tax: 0, total: v, paidVal: v, status: 'paid', met: met, currency: cu, attendedBy: currentUser.name
             });
-            
             await DB.upsert('settings', {id: 1, docSeq: cfg.docSeq, receiptSeq: (DB.cache.settings.receiptSeq || 0) + 1});
-            
-            // Gerar Transação
             var newTx = await DB.insert('transactions', {
                 id: 't' + Date.now(), docId: docId, type: 'income', val: v, date: getTodayStr(),
                 desc: 'Mensalidade - ' + c.name, status: 'paid', met: met, receiptId: receiptId,
                 receiptType: 'mensalidade', reference: c.pkg || 'Mensalidade', processedBy: currentUser.name, clientId: clientId
             });
-            
             await logAction('Cobrança', c.name + ' - ' + fmt(v) + ' ' + cu);
             hideSpinner();
             showToast('Pagamento registado com sucesso!');
             closeModal();
-            
-            // Abre o recibo automaticamente
             if (newTx) viewClientReceipt(newTx.id, clientId);
         }, 
         'Confirmar Pagamento', 'btn-success'
     );
 }
 
-// 2. GRÁFICO DO DASHBOARD
-function toggleDashChart() {
-    dashChartHidden = !dashChartHidden;
-    loadDashboard();
-}
-
+function toggleDashChart() { dashChartHidden = !dashChartHidden; loadDashboard(); }
 async function renderChart(t) {
     var ctx = document.getElementById('dashChart');
     if (!ctx) return;
-    
-    var hoje = new Date();
-    var labels = [];
-    var incData = [];
-    var expData = [];
-    
-    // Pega os últimos 6 meses
+    var hoje = new Date(); var labels = []; var incData = []; var expData = [];
     for (var i = 5; i >= 0; i--) {
         var d = new Date(hoje.getFullYear(), hoje.getMonth() - i, 1);
         var monthStr = d.toLocaleString('pt-PT', { month: 'short' });
         labels.push(monthStr);
-        
         var inc = 0, exp = 0;
         t.forEach(function(tx) {
             var txDate = parseDate(tx.date);
@@ -851,68 +1001,32 @@ async function renderChart(t) {
                 if (tx.type === 'expense_payment' || tx.type === 'expense') exp = safeAdd(exp, tx.val);
             }
         });
-        incData.push(inc);
-        expData.push(exp);
+        incData.push(inc); expData.push(exp);
     }
-
     if (mainChart) mainChart.destroy();
-    
     mainChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                { label: 'Receitas', data: incData, backgroundColor: 'rgba(0,255,136,0.6)', borderColor: 'rgba(0,255,136,1)', borderWidth: 1 },
-                { label: 'Despesas', data: expData, backgroundColor: 'rgba(255,0,110,0.6)', borderColor: 'rgba(255,0,110,1)', borderWidth: 1 }
-            ]
-        },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false, 
-            scales: { y: { beginAtZero: true, ticks: { color: '#8b9bb4' } }, x: { ticks: { color: '#8b9bb4' } } }, 
-            plugins: { legend: { labels: { color: '#e0e6ed' } } } 
-        }
+        data: { labels: labels, datasets: [
+            { label: 'Receitas', data: incData, backgroundColor: 'rgba(0,255,136,0.6)', borderColor: 'rgba(0,255,136,1)', borderWidth: 1 },
+            { label: 'Despesas', data: expData, backgroundColor: 'rgba(255,0,110,0.6)', borderColor: 'rgba(255,0,110,1)', borderWidth: 1 }
+        ]},
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { color: '#8b9bb4' } }, x: { ticks: { color: '#8b9bb4' } } }, plugins: { legend: { labels: { color: '#e0e6ed' } } } }
     });
 }
 
 /* ==================== SISTEMA DE NOTIFICAÇÕES ==================== */
 async function checkSystemNotifications() {
-    var cl = DB.cache.clients || [];
-    var inv = DB.cache.inventory || [];
-    var txs = DB.cache.transactions || [];
-    var hoje = new Date();
-    var notifs = [];
-
-    // 1. Stock Baixo
+    var cl = DB.cache.clients || []; var inv = DB.cache.inventory || []; var txs = DB.cache.transactions || [];
+    var hoje = new Date(); var notifs = [];
     var lowStock = inv.filter(function(i) { return i.qty > 0 && i.qty <= 5; });
-    lowStock.forEach(function(i) {
-        notifs.push({ type: 'warning', icon: '📦', msg: 'Stock baixo: <strong>'+i.name+'</strong> ('+i.qty+' restantes)' });
-    });
-
-    // 2. Clientes a expirar (próximos 3 dias)
-    var expiring = cl.filter(function(c) {
-        if(!c.validade || !c.speedId) return false;
-        var diff = daysDiff(hoje, parseDate(c.validade));
-        return diff >= 0 && diff <= 3;
-    });
-    expiring.forEach(function(c) {
-        notifs.push({ type: 'danger', icon: '⏳', msg: 'Internet de <strong>'+c.name+'</strong> expira em '+daysDiff(hoje, parseDate(c.validade))+' dia(s).' });
-    });
-
-    // 3. Pagamentos Pendentes no Portal
+    lowStock.forEach(function(i) { notifs.push({ type: 'warning', icon: '📦', msg: 'Stock baixo: <strong>'+i.name+'</strong> ('+i.qty+' restantes)' }); });
+    var expiring = cl.filter(function(c) { if(!c.validade || !c.speedId) return false; var diff = daysDiff(hoje, parseDate(c.validade)); return diff >= 0 && diff <= 3; });
+    expiring.forEach(function(c) { notifs.push({ type: 'danger', icon: '⏳', msg: 'Internet de <strong>'+c.name+'</strong> expira em '+daysDiff(hoje, parseDate(c.validade))+' dia(s).' }); });
     var pending = txs.filter(function(t) { return t.status === 'pending_verification'; });
-    pending.forEach(function(t) {
-        var clientName = (cl.find(c=>c.id===t.clientId)||{}).name || 'Cliente';
-        notifs.push({ type: 'info', icon: '💳', msg: 'Pagamento de <strong>'+fmt(t.val)+' KZ</strong> aguardando confirmação ('+clientName+').' });
-    });
-
-    // Renderizar
-    var countEl = document.getElementById('notifCount');
-    var listEl = document.getElementById('notifList');
-    
+    pending.forEach(function(t) { var clientName = (cl.find(c=>c.id===t.clientId)||{}).name || 'Cliente'; notifs.push({ type: 'info', icon: '💳', msg: 'Pagamento de <strong>'+fmt(t.val)+' KZ</strong> aguardando confirmação ('+clientName+').' }); });
+    var countEl = document.getElementById('notifCount'); var listEl = document.getElementById('notifList');
     if (notifs.length > 0) {
-        countEl.innerText = notifs.length;
-        countEl.style.display = 'flex';
+        countEl.innerText = notifs.length; countEl.style.display = 'flex';
         var html = '';
         notifs.forEach(function(n) {
             var color = n.type === 'danger' ? 'var(--danger)' : n.type === 'warning' ? 'var(--warning)' : 'var(--primary)';
@@ -920,25 +1034,10 @@ async function checkSystemNotifications() {
             html += '<div class="notif-item"><div class="notif-icon" style="background:'+bg+';color:'+color+'">'+n.icon+'</div><div style="flex:1;color:var(--text-main)">'+n.msg+'</div></div>';
         });
         listEl.innerHTML = html;
-    } else {
-        countEl.style.display = 'none';
-        listEl.innerHTML = '<div class="notif-empty">✅ Tudo em dia! Sem alertas.</div>';
-    }
+    } else { countEl.style.display = 'none'; listEl.innerHTML = '<div class="notif-empty">✅ Tudo em dia! Sem alertas.</div>'; }
 }
-
-function toggleNotifications(e) {
-    if(e) e.stopPropagation();
-    document.getElementById('notifDropdown').classList.toggle('show');
-}
-
-// Fechar notificação ao clicar fora
-window.addEventListener('click', function(e) {
-    var dropdown = document.getElementById('notifDropdown');
-    var bell = document.querySelector('.notif-bell');
-    if (dropdown && bell && !bell.contains(e.target)) {
-        dropdown.classList.remove('show');
-    }
-});
+function toggleNotifications(e) { if(e) e.stopPropagation(); document.getElementById('notifDropdown').classList.toggle('show'); }
+window.addEventListener('click', function(e) { var dropdown = document.getElementById('notifDropdown'); var bell = document.querySelector('.notif-bell'); if (dropdown && bell && !bell.contains(e.target)) { dropdown.classList.remove('show'); } });
 
 /* ==================== PWA ==================== */
 let deferredPrompt;window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; var installBtn = document.getElementById('installAppBtn'); if(installBtn) installBtn.style.display = 'inline-flex'; });function installPWA(){ if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then((choiceResult) => { if(choiceResult.outcome === 'accepted') showToast('Aplicação instalada com sucesso!',''); deferredPrompt = null; document.getElementById('installAppBtn').style.display = 'none'; }); } else { showToast('Para instalar, abre o menu do navegador (3 pontinhos) e escolhe "Adicionar ao ecrã principal".','info'); } }
