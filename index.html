@@ -17,6 +17,10 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
 :root{--bg-dark:#050a14;--bg-panel:rgba(10,20,35,0.95);--primary:#00b4d8;--text-main:#e0e6ed;--text-muted:#8b9bb4;--border-light:1px solid rgba(0,180,216,0.3);--success:#00ff88;--danger:#ff006e;--warning:#ffc300;--info:#17a2b8;--purple:#9d4edd;--sidebar-w:250px}
+body.light-mode{--bg-dark:#eef2f7;--bg-panel:rgba(255,255,255,0.96);--primary:#0077b6;--text-main:#1a2332;--text-muted:#5b6b82;--border-light:1px solid rgba(0,119,182,0.25);--success:#0a9b58;--danger:#d10056;--warning:#b3790a;--info:#0f7c94;--purple:#7b2cbf}
+body,.p-header,#publicSite,.card,.sidebar{transition:background-color .3s,color .3s,border-color .3s}
+.theme-toggle{background:var(--bg-panel);border:var(--border-light);color:var(--text-main);width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:.2s}
+.theme-toggle:hover{transform:scale(1.1)}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Rajdhani',sans-serif}
 body{display:flex;min-height:100vh;background:var(--bg-dark);color:var(--text-main);overflow-x:hidden}
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:rgba(0,0,0,.2)}::-webkit-scrollbar-thumb{background:var(--primary);border-radius:3px}
@@ -196,7 +200,16 @@ body.public-mode #publicSite{display:block}
 .p-cart-row .pcinfo span{color:var(--text-muted);font-size:.75rem}
 .p-qty{display:flex;align-items:center;gap:8px}
 .p-qty button{width:24px;height:24px;border-radius:6px;border:var(--border-light);background:var(--bg-dark);color:#fff;cursor:pointer;font-size:.85rem}
-.p-cart-total{display:flex;justify-content:space-between;align-items:center;padding-top:16px;font-family:'Orbitron';color:#fff;font-size:1.05rem}
+.p-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:flex;align-items:center;justify-content:center;cursor:zoom-out;animation:pfade .2s}
+@keyframes pfade{from{opacity:0}to{opacity:1}}
+.p-lightbox img{max-width:92vw;max-height:92vh;border-radius:6px;box-shadow:0 0 40px rgba(0,180,216,.3)}
+.p-lightbox .plb-close{position:absolute;top:20px;right:24px;color:#fff;font-size:1.8rem;cursor:pointer;background:rgba(255,255,255,.1);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.p-detail-main{width:100%;height:340px;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,rgba(0,180,216,.15),rgba(157,78,221,.12));display:flex;align-items:center;justify-content:center;cursor:zoom-in;margin-bottom:10px}
+.p-detail-main img{width:100%;height:100%;object-fit:cover;transition:.3s}
+.p-detail-main:hover img{transform:scale(1.04)}
+.p-detail-thumbs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.p-detail-thumbs img{width:64px;height:64px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid transparent;opacity:.65;transition:.2s;flex:0 0 auto}
+.p-detail-thumbs img:hover,.p-detail-thumbs img.active{opacity:1;border-color:var(--primary)}
 .p-promo-card{background:linear-gradient(135deg,rgba(0,180,216,.12),rgba(157,78,221,.10));border:1px solid rgba(0,180,216,.3);border-radius:12px;padding:26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .p-promo-card h3{color:#fff;font-family:'Orbitron';font-size:1.05rem;margin-bottom:6px}
 .p-promo-card p{color:var(--text-muted);font-size:.85rem}
@@ -231,6 +244,59 @@ body.public-mode #publicSite{display:block}
   .p-hero h1{font-size:1.7rem}
   .p-foot-grid{grid-template-columns:1fr 1fr}
 }
+
+/* ---------- Downloads / TV install ---------- */
+.p-dl-card{background:var(--bg-panel);border:var(--border-light);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:.2s}
+.p-dl-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,180,216,.15)}
+.p-dl-head{display:flex;align-items:center;gap:12px}
+.p-dl-head img{width:52px;height:52px;border-radius:10px;object-fit:cover}
+.p-dl-head .p-dl-icon{width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,rgba(0,180,216,.25),rgba(157,78,221,.2));display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.p-dl-head h4{color:#fff;font-size:1rem}
+.p-dl-head span{color:var(--primary);font-family:'Orbitron';font-size:.85rem}
+.p-dl-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.p-dl-btns a,.p-dl-btns button{font-size:.75rem;padding:8px 6px}
+
+/* ---------- Zoom / precisão nas imagens da loja ---------- */
+.p-prod-img{overflow:hidden}
+.p-prod-img img{transition:transform .35s ease}
+.p-prod:hover .p-prod-img img{transform:scale(1.1)}
+.p-prod:hover{box-shadow:0 14px 34px rgba(0,180,216,.18)}
+.p-plan:hover{box-shadow:0 14px 34px rgba(0,180,216,.2)}
+.p-post:hover .p-post-img img{transform:scale(1.08)}
+.p-post-img{overflow:hidden}
+.p-post-img img{transition:transform .35s ease}
+
+/* Cores variadas nas etiquetas para dar mais vida visual */
+.p-prod:nth-of-type(4n+1) .ptag,.p-post:nth-of-type(4n+1) .ptag{background:rgba(0,180,216,.15);color:var(--primary)}
+.p-prod:nth-of-type(4n+2) .ptag,.p-post:nth-of-type(4n+2) .ptag{background:rgba(157,78,221,.15);color:var(--purple)}
+.p-prod:nth-of-type(4n+3) .ptag,.p-post:nth-of-type(4n+3) .ptag{background:rgba(0,255,136,.15);color:var(--success)}
+.p-prod:nth-of-type(4n+4) .ptag,.p-post:nth-of-type(4n+4) .ptag{background:rgba(255,195,0,.15);color:var(--warning)}
+
+/* ---------- Modo Claro (Light Mode) do Portal Público ---------- */
+body.light-mode .p-header{background:rgba(255,255,255,.92);border-bottom:1px solid rgba(0,120,180,.15)}
+body.light-mode .p-nav{background:#fff}
+body.light-mode .p-scard,body.light-mode .p-plan,body.light-mode .p-prod,body.light-mode .p-post,body.light-mode .p-dl-card{box-shadow:0 3px 14px rgba(20,40,70,.08)}
+body.light-mode .login-bg-grid{opacity:.12}
+body.light-mode .p-footer{background:#fff;border-top:1px solid rgba(0,120,180,.12)}
+body.light-mode .psec-title,body.light-mode .p-scard h3,body.light-mode .p-plan h3,body.light-mode .p-post h4,body.light-mode .p-prod-body h4,body.light-mode .p-dl-head h4,body.light-mode .p-cart-row .pcinfo h5,body.light-mode .p-cart-total,body.light-mode .p-promo-card h3,body.light-mode .p-faq-q,body.light-mode .p-brand span{color:#16202c}
+body.light-mode .p-tab{background:#fff}
+body.light-mode .p-tab.active{color:#000}
+body.light-mode .p-hero h1,body.light-mode .p-foot-grid h4,body.light-mode .p-tab:hover,body.light-mode .p-qty button,body.light-mode .sidebar-header h1,body.light-mode .login-card .logo-area h2,body.light-mode .kpi-value,body.light-mode h1,body.light-mode h2,body.light-mode h3,body.light-mode h4,body.light-mode h5,body.light-mode strong{color:#16202c}
+body.light-mode .p-hero h1 span{color:var(--primary)}
+body.light-mode input,body.light-mode select,body.light-mode textarea{background:#fff;color:#16202c;border:1px solid rgba(0,120,180,.25)}
+body.light-mode input::placeholder,body.light-mode textarea::placeholder{color:#8b9bb4}
+body.light-mode .btn-outline{color:#16202c;border-color:rgba(0,120,180,.3)}
+body.light-mode .p-qty button{background:#fff;color:#16202c}
+body.light-mode .sidebar,body.light-mode .header,body.light-mode .card,body.light-mode table{background:var(--bg-panel);color:var(--text-main)}
+body.light-mode .sidebar nav a{color:var(--text-muted)}
+body.light-mode .sidebar nav a:hover,body.light-mode .sidebar nav a.active{color:var(--primary)}
+body.light-mode th{color:var(--text-muted)}
+body.light-mode td{color:var(--text-main)}
+body.light-mode th,body.light-mode td{border-bottom-color:rgba(0,40,70,.08)}
+body.light-mode [style*="color:#fff"],body.light-mode [style*="color: #fff"],body.light-mode [style*="color:#ffffff"]{color:#16202c!important}
+body.light-mode .modal-box{background:#fff}
+body.light-mode .modal-header,body.light-mode .modal-footer{border-color:rgba(0,120,180,.12)}
+#pThemeToggle{font-size:1rem}
 </style>
 
 <style id="conex-cass-responsive-fix">
@@ -297,15 +363,18 @@ button, .btn { max-width:100%; }
         <a onclick="pScrollTo('pTop')">Início</a>
         <a onclick="pScrollTo('pPlanos')">Internet</a>
         <a onclick="pScrollTo('pLoja')">Loja</a>
+        <a onclick="pScrollTo('pDownloads')">Downloads</a>
         <a onclick="pScrollTo('pPromo')">Promoções</a>
         <a onclick="pScrollTo('pNews')">Notícias</a>
         <a onclick="pScrollTo('pBlog')">Blog</a>
         <a onclick="pScrollTo('pTutoriais')">Tutoriais</a>
         <a onclick="pScrollTo('pFeedback')">Opiniões</a>
         <a onclick="pScrollTo('pFaq')">Ajuda</a>
+        <a onclick="pGoToSupport()">Suporte</a>
       </nav>
       <div class="p-actions">
         <button class="btn btn-outline btn-sm" onclick="pOpenSearch()" title="Pesquisar">🔍</button>
+        <button class="theme-toggle" id="pThemeBtn" onclick="toggleTheme()" title="Alternar tema">🌙</button>
         <button class="btn btn-outline btn-sm p-cart-btn" onclick="pOpenCart()" title="Carrinho">🛒<span class="p-cart-badge" id="pCartBadge" style="display:none">0</span></button>
         <button class="btn btn-outline btn-sm" id="pMenuToggle" onclick="document.getElementById('pNav').classList.toggle('open')">☰</button>
         <button class="btn btn-outline btn-sm" onclick="openAdminLogin()" title="Acesso Administrativo">🔒 Admin</button>
@@ -373,6 +442,14 @@ button, .btn { max-width:100%; }
     </div>
   </section>
 
+  <section id="pDownloads">
+    <div class="pwrap">
+      <h2 class="psec-title">⬇️ Downloads de Aplicações</h2>
+      <p class="psec-sub">Baixa diretamente para o teu telemóvel, iPhone ou Smart TV — sem precisar de conta.</p>
+      <div id="pDownloadsGrid"><p style="color:var(--text-muted)">A carregar aplicações...</p></div>
+    </div>
+  </section>
+
   <section class="p-services" id="pPromo">
     <div class="pwrap">
       <h2 class="psec-title">🔥 Promoções</h2>
@@ -424,6 +501,7 @@ button, .btn { max-width:100%; }
         <div class="p-tab" data-ftab="kb" onclick="pFaqTab('kb')">📚 Base de Conhecimento</div>
       </div>
       <div id="pFaqList"><p style="color:var(--text-muted)">A carregar...</p></div>
+      <div style="text-align:center;margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08)"><p style="color:var(--text-muted);font-size:.85rem;margin-bottom:10px">Não encontraste o que procuravas?</p><button class="btn btn-primary btn-sm" onclick="pGoToSupport()">🎧 Abrir Apoio Técnico</button></div>
     </div>
   </section>
 
@@ -435,8 +513,8 @@ button, .btn { max-width:100%; }
           <div class="p-brand" style="margin-bottom:12px"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg"><span>CONEX CASS</span></div>
           <p style="color:var(--text-muted);font-size:.82rem;line-height:1.6;max-width:320px">Provedor de internet focado em ligações estáveis, suporte próximo e um portal completo para o cliente gerir tudo num só lugar.</p>
         </div>
-        <div><h4>Navegação</h4><a onclick="pScrollTo('pPlanos')">Internet</a><a onclick="pScrollTo('pLoja')">Loja</a><a onclick="pScrollTo('pPromo')">Promoções</a><a onclick="pScrollTo('pNews')">Notícias</a><a onclick="pScrollTo('pBlog')">Blog</a><a onclick="pScrollTo('pTutoriais')">Tutoriais</a></div>
-        <div><h4>Suporte</h4><a onclick="pScrollTo('pFaq')">FAQ</a><a onclick="pWhatsapp('Olá! Preciso de ajuda com o meu serviço.')">Falar no WhatsApp</a><a onclick="openClientLogin()">Área do Cliente</a></div>
+        <div><h4>Navegação</h4><a onclick="pScrollTo('pPlanos')">Internet</a><a onclick="pScrollTo('pLoja')">Loja</a><a onclick="pScrollTo('pDownloads')">Downloads</a><a onclick="pScrollTo('pPromo')">Promoções</a><a onclick="pScrollTo('pNews')">Notícias</a><a onclick="pScrollTo('pBlog')">Blog</a><a onclick="pScrollTo('pTutoriais')">Tutoriais</a></div>
+        <div><h4>Suporte</h4><a onclick="pScrollTo('pFaq')">FAQ</a><a onclick="pGoToSupport()">Abrir Apoio Técnico</a><a onclick="pWhatsapp('Olá! Preciso de ajuda com o meu serviço.')">Falar no WhatsApp</a><a onclick="openClientLogin()">Área do Cliente</a></div>
         <div><h4>Contacto</h4><a onclick="pWhatsapp('Olá!')">📱 WhatsApp</a><a style="cursor:default">📍 Luanda, Angola</a><p style="color:var(--text-muted);font-size:.78rem;margin:14px 0 8px">Recebe novidades e promoções por email:</p><div style="display:flex;gap:6px"><input type="email" id="pNewsletterEmail" placeholder="O teu email" style="flex:1;min-width:0;padding:8px 10px;font-size:.78rem"><button class="btn btn-primary btn-sm" onclick="pSubscribeNewsletter()">OK</button></div></div>
       </div>
       <div class="p-foot-bottom">
@@ -463,6 +541,7 @@ button, .btn { max-width:100%; }
         </div>
         <div class="header-actions">
             <button class="btn btn-outline btn-sm" onclick="openGlobalSearch()" title="Pesquisa Global">🔍</button>
+            <button class="theme-toggle" id="erpThemeBtn" onclick="toggleTheme()" title="Alternar tema" style="margin-right:5px">🌙</button>
             <button class="btn btn-outline btn-sm" onclick="forceRefreshData()" title="Sincronizar Dados" style="margin-right:5px;">🔄 Atualizar</button>
             <button class="btn btn-success btn-sm" id="installAppBtn" style="display:none" onclick="installPWA()">📥 Instalar App</button>
             <div class="notif-bell" onclick="toggleNotifications(event)">🔔 <span class="notif-badge" id="notifCount" style="display:none">0</span><div class="notif-dropdown" id="notifDropdown"><h3 style="font-size:.9rem; color:var(--primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Alertas do Sistema</h3><div id="notifList"></div></div></div>
@@ -690,7 +769,7 @@ function showPublicSite(){
     renderPublicPlans();
     renderPublicNews();
     renderPublicBlog();
-    renderPublicStore();
+    renderPublicStore().then(renderPublicDownloads);
     pUpdateCartBadge();
     renderPublicFaq();
     renderPublicTutorials();
@@ -846,6 +925,13 @@ function pOpenNews(id){
 
 /* ==================== LOJA ONLINE (PÚBLICO) ==================== */
 var pCart=[];
+var pPendingClientTab=null;
+function pGoToSupport(){
+    if(currentClient){ renderClientTab('support'); window.scrollTo({top:0,behavior:'smooth'}); return; }
+    pPendingClientTab='support';
+    showToast('Inicia sessão para acederes à tua área de suporte.','info');
+    openClientLogin();
+}
 var pStoreActiveTab='equip';
 var pStoreData={equip:[],internet:[],stream:[]};
 function pStoreTab(tab){
@@ -883,14 +969,18 @@ function pProductDetails(type,id){
     if(!p) return;
     var gallery=(p.gallery||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
     var imgs=[p.image].concat(gallery).filter(Boolean);
-    var b=imgs.length?'<div style="display:flex;gap:8px;overflow-x:auto;margin-bottom:16px">'+imgs.map(function(u){return '<img src="'+u+'" style="height:160px;border-radius:8px;flex:0 0 auto">';}).join('')+'</div>':'';
-    b+='<div class="p-prod-price" style="font-size:1.3rem;margin-bottom:10px">'+fmt(p.price)+' <small>'+p.unit+'</small></div>';
+    var b='';
+    if(imgs.length){
+        b+='<div class="p-detail-main" id="pDetailMain" onclick="pOpenLightbox(\''+imgs[0].replace(/'/g,"\\'")+'\')"><img src="'+imgs[0]+'" id="pDetailMainImg"></div>';
+        if(imgs.length>1) b+='<div class="p-detail-thumbs">'+imgs.map(function(u,i){return '<img src="'+u+'" class="'+(i===0?'active':'')+'" onclick="pSwitchDetailImg(this,\''+u.replace(/'/g,"\\'")+'\')">';}).join('')+'</div>';
+    }
+    b+='<div class="p-prod-price" style="font-size:1.3rem;margin:14px 0 6px">'+fmt(p.price)+' <small>'+p.unit+'</small></div>';
     if(p.description) b+='<p style="color:var(--text-muted);line-height:1.6">'+p.description+'</p>';
     if(type==='stream'){
         var apps='';
-        if(p.android_url) apps+='<a href="'+p.android_url+'" target="_blank" rel="noopener" class="btn btn-info btn-sm">🤖 Android</a> ';
-        if(p.ios_url) apps+='<a href="'+p.ios_url+'" target="_blank" rel="noopener" class="btn btn-info btn-sm">🍎 iPhone</a> ';
-        if(p.tv_url) apps+='<a href="'+p.tv_url+'" target="_blank" rel="noopener" class="btn btn-info btn-sm">📺 Smart TV</a> ';
+        if(p.android_url) apps+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.android_url.replace(/'/g,"\\'")+'\',\'Android (telemóvel/tablet)\')">🤖 Android</button> ';
+        if(p.ios_url) apps+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.ios_url.replace(/'/g,"\\'")+'\',\'iPhone/iPad\')">🍎 iPhone</button> ';
+        if(p.tv_url||p.android_url) apps+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+(p.tv_url||p.android_url).replace(/'/g,"\\'")+'\',\'Smart TV\')">📺 Smart TV</button> ';
         if(p.website_url) apps+='<a href="'+p.website_url+'" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🌐 Site Oficial</a>';
         if(apps) b+='<div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">'+apps+'</div>';
     }
@@ -899,6 +989,53 @@ function pProductDetails(type,id){
     document.getElementById('modalFooter').innerHTML='<button class="btn btn-primary" onclick="closeModal();pAddToCart(\''+type+'\',\''+id+'\')">🛒 Adicionar ao Carrinho</button> <button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
     document.getElementById('modalGeneric').classList.add('show');
 }
+function pSwitchDetailImg(el,url){
+    document.getElementById('pDetailMainImg').src=url;
+    document.getElementById('pDetailMain').setAttribute('onclick',"pOpenLightbox('"+url.replace(/'/g,"\\'")+"')");
+    document.querySelectorAll('.p-detail-thumbs img').forEach(function(t){t.classList.remove('active');});
+    el.classList.add('active');
+}
+function pOpenLightbox(url){
+    var d=document.createElement('div');
+    d.className='p-lightbox';
+    d.onclick=function(){d.remove();};
+    d.innerHTML='<span class="plb-close">✕</span><img src="'+url+'">';
+    document.body.appendChild(d);
+}
+/* ==================== DOWNLOAD DE APLICAÇÕES (INCLUINDO SMART TV) ==================== */
+function pOpenAppDownload(name,url,platform){
+    var isTv=platform.indexOf('TV')>=0;
+    var qr='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='+encodeURIComponent(url);
+    var b='<div style="text-align:center"><img src="'+qr+'" style="width:180px;height:180px;border-radius:10px;background:#fff;padding:8px;margin-bottom:16px"><p style="color:var(--text-muted);font-size:.85rem;margin-bottom:14px">Aponta a câmara do teu telemóvel para o código QR, ou usa o link abaixo.</p></div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:16px"><input type="text" readonly value="'+url+'" style="flex:1;font-size:.75rem" onclick="this.select()"><button class="btn btn-outline btn-sm" onclick="pCopyLink(\''+url.replace(/'/g,"\\'")+'\')">📋 Copiar</button></div>';
+    if(isTv){
+        b+='<div style="background:rgba(0,180,216,.08);border-radius:8px;padding:14px;font-size:.83rem;color:var(--text-muted);line-height:1.7"><strong style="color:#fff">Como instalar na Smart TV:</strong><br>1. Na tua TV, abre a app <strong>Downloader</strong> (disponível na loja de apps da TV) ou o browser.<br>2. Introduz o link acima, ou o código gerado pela app Downloader a partir deste link.<br>3. Segue as instruções no ecrã para instalar o "'+name+'".<br>4. Se a tua TV não tiver a app Downloader, podes instalar via pen USB: baixa o ficheiro no computador e transfere para a TV.</div>';
+    }
+    document.getElementById('modalTitle').innerText='⬇️ Baixar '+name+' — '+platform;
+    document.getElementById('modalBody').innerHTML=b;
+    document.getElementById('modalFooter').innerHTML='<a href="'+url+'" target="_blank" rel="noopener" class="btn btn-primary">⬇️ Baixar Agora</a> <button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
+    document.getElementById('modalGeneric').classList.add('show');
+    pTrackEvent('app_download',name,platform);
+}
+function pCopyLink(url){
+    navigator.clipboard.writeText(url).then(function(){showToast('Link copiado!');}).catch(function(){showToast('Não foi possível copiar. Seleciona o texto manualmente.','danger');});
+}
+async function renderPublicDownloads(){
+    var grid=document.getElementById('pDownloadsGrid');
+    if(!grid) return;
+    var apps=(pStoreData.stream||[]).filter(function(p){return p.android_url||p.ios_url||p.tv_url;});
+    if(!apps.length){grid.innerHTML='<p style="color:var(--text-muted)">Ainda sem aplicações disponíveis para download. Fala connosco no WhatsApp.</p>';return;}
+    grid.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">'+apps.map(function(p){
+        var head=p.image?'<img src="'+p.image+'" alt="">':'<div class="p-dl-icon">📺</div>';
+        var btns='';
+        if(p.android_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.android_url.replace(/'/g,"\\'")+'\',\'Android (telemóvel/tablet)\')">🤖 Android</button>';
+        if(p.ios_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.ios_url.replace(/'/g,"\\'")+'\',\'iPhone/iPad\')">🍎 iPhone</button>';
+        if(p.tv_url||p.android_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+(p.tv_url||p.android_url).replace(/'/g,"\\'")+'\',\'Smart TV\')">📺 Smart TV</button>';
+        if(p.website_url) btns+='<a href="'+p.website_url+'" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🌐 Site</a>';
+        return '<div class="p-dl-card"><div class="p-dl-head">'+head+'<div><h4>'+p.name+'</h4><span>'+fmt(p.price)+' '+p.unit+'</span></div></div><div class="p-dl-btns">'+btns+'</div></div>';
+    }).join('')+'</div>';
+}
+
 function pAddToCart(type,id){
     var item=(pStoreData[type]||[]).find(function(x){return x.id===id;});
     if(!item) return;
@@ -1173,7 +1310,9 @@ function showClientApp(){
     document.querySelector('.notif-bell').style.display='none'; 
     document.getElementById('currentUserName').innerText=currentClient.name;
     document.getElementById('pageTitle').innerText='Meu Perfil';
-    loadClientPortal();
+    loadClientPortal().then(function(){
+        if(pPendingClientTab){ renderClientTab(pPendingClientTab); pPendingClientTab=null; }
+    });
 }
 function clientLogout(){
     if(syncInterval) clearInterval(syncInterval); 
@@ -1368,6 +1507,19 @@ async function viewProof(txId){
 /* ==================== INIT & SIDEBAR ==================== */
 async function seedData(){var users=await DB.get('users');if(!users.find(function(x){return x.user==='cassoca';}))await DB.upsert('users',{id:'u1',name:'Cassoca',user:'cassoca',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});if(!users.find(function(x){return x.user==='admin';}))await DB.upsert('users',{id:'u0',name:'Admin',user:'admin',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});var br=await DB.get('branches');if(!br.length)await DB.insert('branches',{id:'b1',name:'Matriz',loc:'Luanda',nif:'003982940LA041',phone:'+244 923 000 000',iban:'000600000083984030135',express:'945740125',mgr:'Cassoca',active:true});var sp=await DB.get('speeds');if(!sp.length){await DB.insert('speeds',{id:'s1',nome:'5 MB',preco:25000,period:'Mensal',days:30});await DB.insert('speeds',{id:'s2',nome:'10 MB',preco:35000,period:'Mensal',days:30});}var pl=await DB.get('plans');if(!pl.length)await DB.insert('plans',{id:'p1',nome:'NETFLIX',preco:7000});var st=await DB.get('settings');if(!st||!st.id)await DB.upsert('settings',{id:1,name:'Conex Cass',nif:'003982940LA041',taxRate:14,currency:'AKZ',docSeq:0,receiptSeq:0,displacementFee:5000,damagePenaltyPct:100,cutoffGraceDays:3});var emp=await DB.get('employees');if(!emp.length)await DB.insert('employees',{id:'e1',name:'Técnico A',role:'Instalador',department:'Rede',salary:0,contact:'',startDate:'',status:'Activo'});var inv=await DB.get('inventory');if(!inv.find(function(i){return i.name==='Roteador TP-Link';}))await DB.insert('inventory',{id:'i1',name:'Roteador TP-Link',cat:'Equipamento',val:15000,qty:50,branchId:'all',status:'Em Stock'});}
 async function syncLegacyBranchData() {if (!currentUser || currentUser.role !== 'admin') return; var tablesToSync = ['clients','transactions','documents','inventory','suppliers','tickets','installations','advances'];for (var i=0; i<tablesToSync.length; i++) {var t = tablesToSync[i];try {var raw = await sb.from(t).select('id').is('branchId', null).limit(50000);if (raw.data && raw.data.length > 0) {showToast('A organizar dados antigos...','info');for (var j=0; j<raw.data.length; j++) { await sb.from(t).update({ branchId: 'all' }).eq('id', raw.data[j].id); }DB.clearCache(t); }} catch(e) {}}}
+function applyTheme(){
+    var t=localStorage.getItem('cx_theme')||'dark';
+    document.body.classList.toggle('light-mode',t==='light');
+    var icon=t==='light'?'☀️':'🌙';
+    var b1=document.getElementById('pThemeBtn'); if(b1) b1.innerText=icon;
+    var b2=document.getElementById('erpThemeBtn'); if(b2) b2.innerText=icon;
+}
+function toggleTheme(){
+    var isLight=document.body.classList.contains('light-mode');
+    localStorage.setItem('cx_theme',isLight?'dark':'light');
+    applyTheme();
+}
+applyTheme();
 async function init(){showSpinner('A inicializar sistema...');await DB.loadAll();await seedData();hideSpinner();var sid=localStorage.getItem('cx_session');if(sid){var u=await DB.get('users');var f=u.find(function(x){return x.id===sid;});if(f){currentUser=f;await syncLegacyBranchData();showApp();return;}}showPublicSite();}
 async function run(){
     await loadSidebar();
