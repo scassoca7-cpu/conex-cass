@@ -247,6 +247,7 @@ body.public-mode #publicSite{display:block}
         <a onclick="pScrollTo('pNews')">Notícias</a>
         <a onclick="pScrollTo('pBlog')">Blog</a>
         <a onclick="pScrollTo('pTutoriais')">Tutoriais</a>
+        <a onclick="pScrollTo('pFeedback')">Opiniões</a>
         <a onclick="pScrollTo('pFaq')">Ajuda</a>
       </nav>
       <div class="p-actions">
@@ -338,12 +339,17 @@ body.public-mode #publicSite{display:block}
   <section class="p-services" id="pTutoriais">
     <div class="pwrap">
       <h2 class="psec-title">🎓 Tutoriais</h2>
-      <p class="psec-sub">Passo a passo para resolveres o básico sem esperar por suporte.</p>
-      <div class="p-grid3">
-        <div class="p-post"><div class="p-post-img">📶</div><div class="p-post-body"><span class="ptag">Em breve</span><h4>Como configurar o router</h4><p>Guia passo a passo para configurar a tua rede Wi-Fi em casa.</p></div></div>
-        <div class="p-post"><div class="p-post-img">🔑</div><div class="p-post-body"><span class="ptag">Em breve</span><h4>Como alterar a palavra-passe</h4><p>Aprende a proteger a tua rede alterando a senha do Wi-Fi.</p></div></div>
-        <div class="p-post"><div class="p-post-img">📺</div><div class="p-post-body"><span class="ptag">Em breve</span><h4>Como instalar o IPTV</h4><p>Configuração das aplicações de streaming incluídas no teu plano.</p></div></div>
-      </div>
+      <p class="psec-sub">Guias, vídeos e passos práticos publicados pela equipa Conex Cass.</p>
+      <div class="p-grid3" id="pTutorialGrid"><p style="color:var(--text-muted)">A carregar tutoriais...</p></div>
+    </div>
+  </section>
+
+  <section class="p-services" id="pFeedback">
+    <div class="pwrap">
+      <h2 class="psec-title">⭐ Opiniões dos Clientes</h2>
+      <p class="psec-sub">Partilha a tua experiência com a Conex Cass.</p>
+      <div class="p-grid3" id="pFeedbackGrid"><p style="color:var(--text-muted)">A carregar opiniões...</p></div>
+      <div style="margin-top:20px;text-align:center"><button class="btn btn-primary" onclick="pOpenFeedbackForm()">⭐ Deixar o meu feedback</button></div>
     </div>
   </section>
 
@@ -433,7 +439,7 @@ var DB={
 cache:{},
 applyBranchFilter: function(data, t) {
     if (!Array.isArray(data)) return data;
-    if (['settings','branches','speeds','plans','ip_pool','users','posts','news','faq','comments','promotions','newsletter','analytics'].includes(t)) return data;
+    if (['settings','branches','speeds','plans','ip_pool','users','posts','news','faq','comments','promotions','newsletter','analytics','tutorials','feedback','media_library'].includes(t)) return data;
     if (!currentUser || currentUser.branchId === 'all') return data;
     return data.filter(function(item) { return item.branchId === currentUser.branchId; });
 },
@@ -459,7 +465,7 @@ update:async function(t,id,d){try{var res=await sb.from(t).update(d).eq('id',id)
 upsert:async function(t,r){try{var res=await sb.from(t).upsert(r,{onConflict:'id'}).select();if(res.error)throw res.error;if(!res.data||!res.data.length)throw new Error("Sem retorno");if(t==='settings'){this.cache[t]=res.data[0];}else if(t==='cash_register'){this.cache[t]=res.data[0];}else{if(Array.isArray(this.cache[t])){var d=res.data[0];var i=this.cache[t].findIndex(function(x){return x.id===d.id;});if(i>=0)this.cache[t][i]=d;else this.cache[t].push(d);}else{this.cache[t]=res.data[0];}}return res.data[0];}catch(e){showToast("Erro Upsert: "+e.message,'danger');return null;}},
 del:async function(t,id){try{var res=await sb.from(t).delete().eq('id',id);if(res.error)throw res.error;if(this.cache[t]&&Array.isArray(this.cache[t]))this.cache[t]=this.cache[t].filter(function(x){return x.id!==id;});return true;}catch(e){showToast("Erro BD: "+e.message,'danger');return false;}},
 loadAll: async function(forceRemote) {
-    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances','posts','news','faq','comments','promotions','newsletter','analytics'];
+    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances','posts','news','faq','comments','promotions','newsletter','analytics','tutorials','feedback','media_library'];
     var promises = ks.map(k => { if (forceRemote || this.cache[k] === undefined) return this.get(k, true); return Promise.resolve(); });
     await Promise.all(promises);
 },
@@ -623,6 +629,8 @@ function showPublicSite(){
     renderPublicStore();
     pUpdateCartBadge();
     renderPublicFaq();
+    renderPublicTutorials();
+    renderPublicFeedback();
     renderPublicPromo();
     if(!sessionStorage.getItem('cx_visit_tracked')){ sessionStorage.setItem('cx_visit_tracked','1'); pTrackEvent('site_visit'); }
 }
@@ -707,7 +715,7 @@ async function renderPublicNews(){
         if(!all.length){grid.innerHTML='<p style="color:var(--text-muted)">Sem notícias publicadas no momento.</p>';return;}
         var icons={'Cobertura':'📡','Manutenção':'🛠️','Interrupção':'⚠️','Novidade':'🗞️'};
         grid.innerHTML=all.map(function(n){
-            return '<div class="p-post" style="cursor:pointer" onclick="pOpenNews(\''+n.id+'\')"><div class="p-post-img">'+(icons[n.type]||'🗞️')+'</div><div class="p-post-body"><span class="ptag">'+(n.type||'Novidade')+'</span><h4>'+n.title+'</h4><p>'+pExcerpt(n.content,100)+'</p></div></div>';
+            return '<div class="p-post" style="cursor:pointer" onclick="pOpenNews(\''+n.id+'\')">'+(n.image?'<img src="'+n.image+'" style="width:100%;height:170px;object-fit:cover;border-radius:10px 10px 0 0">':'<div class="p-post-img">'+(icons[n.type]||'🗞️')+'</div>')+'<div class="p-post-body"><span class="ptag">'+(n.type||'Novidade')+'</span><h4>'+n.title+'</h4><p>'+pExcerpt(n.content,100)+'</p></div></div>';
         }).join('');
     }catch(e){grid.innerHTML='<p style="color:var(--text-muted)">Não foi possível carregar as notícias agora.</p>';}
 }
@@ -736,7 +744,7 @@ function pOpenPost(id){
 }
 function pOpenNews(id){
     var n=(DB.cache.news||[]).find(function(x){return x.id===id;});if(!n)return;
-    var b='<span class="ptag" style="margin-bottom:10px">'+(n.type||'Novidade')+'</span><p style="color:var(--text-muted);font-size:.8rem;margin-bottom:14px">'+fmtPT(n.date)+'</p><div style="color:var(--text-main);line-height:1.7;white-space:pre-wrap">'+n.content+'</div><div id="pCommentsBox"></div>';
+    var b=(n.image?'<img src="'+n.image+'" style="width:100%;max-height:280px;object-fit:cover;border-radius:10px;margin-bottom:14px">':'')+'<span class="ptag" style="margin-bottom:10px">'+(n.type||'Novidade')+'\</span><p style="color:var(--text-muted);font-size:.8rem;margin-bottom:14px">'+fmtPT(n.date)+'</p><div style="color:var(--text-main);line-height:1.7;white-space:pre-wrap">'+n.content+'</div><div id="pCommentsBox"></div>';
     document.getElementById('modalTitle').innerText=n.title;
     document.getElementById('modalBody').innerHTML=b;
     document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
@@ -881,6 +889,63 @@ async function pSubmitComment(type,id){
     document.getElementById('pCName').value='';document.getElementById('pCContact').value='';document.getElementById('pCText').value='';
 }
 
+/* ==================== TUTORIAIS / FEEDBACK / MEDIA PORTAL ==================== */
+var pTutorialDefaults=[
+ {id:'t1',title:'Como configurar o router',category:'Internet',status:'Publicado',image:'',content:'Guia passo a passo para configurar a tua rede Wi-Fi em casa.',video_url:'',date:todayISO()},
+ {id:'t2',title:'Como alterar a palavra-passe do Wi-Fi',category:'Segurança',status:'Publicado',image:'',content:'Aprende a proteger a tua rede alterando a palavra-passe do Wi-Fi.',video_url:'',date:todayISO()},
+ {id:'t3',title:'Como instalar uma aplicação de streaming',category:'Streaming',status:'Publicado',image:'',content:'Consulta o tutorial e instala a aplicação indicada para o teu equipamento.',video_url:'',date:todayISO()}
+];
+async function renderPublicTutorials(){
+ var box=document.getElementById('pTutorialGrid'); if(!box)return;
+ var data=[]; try{data=(await DB.get('tutorials')).filter(function(x){return x.status==='Publicado';}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});}catch(e){data=[];}
+ if(!data.length)data=pTutorialDefaults;
+ box.innerHTML=data.slice(0,12).map(function(t){
+   var img=t.image?'<img src="'+t.image+'" alt="" style="width:100%;height:170px;object-fit:cover;border-radius:10px 10px 0 0">':'<div class="p-post-img">🎓</div>';
+   return '<div class="p-post" style="cursor:pointer" onclick="pOpenTutorial(\''+t.id+'\')">'+img+'<div class="p-post-body"><span class="ptag">'+(t.category||'Tutorial')+'</span><h4>'+t.title+'</h4><p>'+((t.content||'').slice(0,120))+'</p></div></div>';
+ }).join('');
+}
+function pOpenTutorial(id){
+ var t=(DB.cache.tutorials||[]).find(function(x){return x.id===id;}) || pTutorialDefaults.find(function(x){return x.id===id;}); if(!t)return;
+ var media=t.image?'<img src="'+t.image+'" style="width:100%;max-height:300px;object-fit:cover;border-radius:10px;margin-bottom:14px">':'';
+ var video=t.video_url?'<div style="margin-top:14px"><a class="btn btn-info btn-sm" href="'+t.video_url+'" target="_blank">▶️ Ver vídeo</a></div>':'';
+ document.getElementById('modalTitle').innerText=t.title;
+ document.getElementById('modalBody').innerHTML=media+'<span class="ptag">'+(t.category||'Tutorial')+'</span><div style="color:var(--text-main);line-height:1.7;white-space:pre-wrap;margin-top:10px">'+(t.content||'')+'</div>'+video;
+ document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
+ document.getElementById('modalGeneric').classList.add('show');
+ pTrackEvent('view_tutorial',id,t.title);
+}
+async function renderPublicFeedback(){
+ var box=document.getElementById('pFeedbackGrid'); if(!box)return;
+ var data=[]; try{data=(await DB.get('feedback')).filter(function(x){return x.status==='Publicado';}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});}catch(e){data=[];}
+ if(!data.length){box.innerHTML='<p style="color:var(--text-muted)">Ainda não há opiniões publicadas. Sê o primeiro!</p>';return;}
+ box.innerHTML=data.slice(0,9).map(function(f){var stars='★★★★★'.slice(0,Math.max(0,Math.min(5,parseInt(f.rating)||0)));return '<div class="p-post"><div class="p-post-body"><div style="color:#ffc107;font-size:1rem">'+stars+'</div><h4>'+f.name+'</h4><p>“'+f.message+'”</p><span class="ptag">'+(f.role||'Cliente')+'</span></div></div>';}).join('');
+}
+function pOpenFeedbackForm(){
+ var b='<div class="form-group"><label>Nome</label><input id="pFbName" placeholder="O teu nome"></div><div class="form-row"><div><label>Avaliação</label><select id="pFbRating"><option value="5">★★★★★ — Excelente</option><option value="4">★★★★☆ — Muito bom</option><option value="3">★★★☆☆ — Bom</option><option value="2">★★☆☆☆ — Pode melhorar</option><option value="1">★☆☆☆☆ — Fraco</option></select></div><div><label>Tipo</label><input id="pFbRole" placeholder="Ex.: Cliente residencial"></div></div><div class="form-group"><label>Feedback</label><textarea id="pFbMessage" rows="5" placeholder="Conta-nos como foi a tua experiência..."></textarea></div>';
+ modal('⭐ Deixar feedback',b,async function(){var name=val('pFbName'),msg=val('pFbMessage');if(!name||!msg)return showToast('Preenche o nome e o feedback.','danger');await DB.insert('feedback',{id:'fb'+Date.now(),name:name,rating:parseInt(val('pFbRating'))||5,role:val('pFbRole'),message:msg,status:'Pendente',date:todayISO()});closeModal();showToast('Obrigado! O teu feedback foi enviado para moderação.');},'Enviar Feedback','btn-success');
+}
+function readPortalImage(input,callback){var f=input&&input.files&&input.files[0];if(!f)return callback('');if(f.size>3*1024*1024)return showToast('A imagem deve ter no máximo 3 MB.','danger');var r=new FileReader();r.onload=function(e){callback(e.target.result);};r.readAsDataURL(f);}
+
+async function loadTutorials(){
+ var data=(await DB.get('tutorials')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+ var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><div><h2>🎓 Tutoriais</h2><p style="color:var(--text-muted);font-size:.85rem">Adiciona guias, imagens e vídeos para o portal.</p></div><button class="btn btn-danger btn-sm" onclick="openTutorialModal()">➕ Novo Tutorial</button></div><div class="card"><table><thead><tr><th>Título</th><th>Categoria</th><th>Imagem</th><th>Vídeo</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+ if(!data.length)html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum tutorial criado ainda.</td></tr>';
+ data.forEach(function(t){var pub=t.status==='Publicado';html+='<tr><td><strong>'+t.title+'</strong></td><td>'+((t.category)||'-')+'</td><td>'+(t.image?'🖼️ Sim':'-')+'</td><td>'+(t.video_url?'▶️ Sim':'-')+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(t.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openTutorialModal(\''+t.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="toggleTutorialStatus(\''+t.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delTutorial(\''+t.id+'\')">🗑️</button></td></tr>';});
+ html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;
+}
+function openTutorialModal(id){var t=id?DB.cache.tutorials.find(function(x){return x.id===id;}):null;var b='<div class="form-row"><div class="form-group"><label>Título</label><input id="fTutTitle" value="'+(t?(t.title||'').replace(/"/g,'&quot;'):'')+'" placeholder="Título do tutorial"></div><div class="form-group"><label>Categoria</label><input id="fTutCat" value="'+(t?(t.category||''):'')+'" placeholder="Internet, Streaming..."></div></div><div class="form-row"><div class="form-group"><label>Imagem (URL)</label><input id="fTutImg" value="'+(t?(t.image||''):'')+'" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="fTutFile" accept="image/*"></div></div><div class="form-group"><label>Vídeo / Tutorial externo</label><input id="fTutVideo" value="'+(t?(t.video_url||''):'')+'" placeholder="https://youtube.com/... ou outro link"></div><div class="form-group"><label>Conteúdo</label><textarea id="fTutContent" rows="8" placeholder="Passo a passo...">'+(t?(t.content||''):'')+'</textarea></div><div class="form-group"><label>Estado</label><select id="fTutStatus"><option value="Rascunho"'+(t&&t.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(t&&t.status==='Publicado'?' selected':'')+'>Publicado</option></select></div>';modal(t?'Editar Tutorial':'Novo Tutorial',b,function(){saveTutorial(id);},'Salvar');}
+async function saveTutorial(id){var title=val('fTutTitle');if(!title)return showToast('Indica o título.','danger');var finish=function(img){var rec={title:title,category:val('fTutCat'),image:img||val('fTutImg'),video_url:val('fTutVideo'),content:val('fTutContent'),status:val('fTutStatus')};(async function(){if(id)await DB.update('tutorials',id,rec);else{rec.id='t'+Date.now();rec.date=todayISO();rec.author=currentUser.name||'Equipa Conex Cass';await DB.insert('tutorials',rec);}closeModal();showToast('Tutorial guardado!');loadTutorials();})();};var file=document.getElementById('fTutFile');if(file&&file.files&&file.files[0])readPortalImage(file,finish);else finish('');}
+async function toggleTutorialStatus(id){var t=DB.cache.tutorials.find(function(x){return x.id===id;});if(!t)return;await DB.update('tutorials',id,{status:t.status==='Publicado'?'Rascunho':'Publicado'});loadTutorials();}
+async function delTutorial(id){if(!(await showConfirm('Eliminar Tutorial','Eliminar este tutorial?','Eliminar','btn-danger')))return;await DB.del('tutorials',id);showToast('Eliminado!');loadTutorials();}
+
+async function loadFeedback(){var data=(await DB.get('feedback')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});var html='<div style="margin-bottom:15px"><h2>⭐ Feedbacks</h2><p style="color:var(--text-muted);font-size:.85rem">Modera opiniões, responde e publica os melhores testemunhos.</p></div><div class="card"><table><thead><tr><th>Nome</th><th>Avaliação</th><th>Feedback</th><th>Data</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';if(!data.length)html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum feedback recebido.</td></tr>';data.forEach(function(f){var pub=f.status==='Publicado';html+='<tr><td><strong>'+f.name+'</strong><br><small>'+((f.role)||'Cliente')+'</small></td><td>'+('★★★★★'.slice(0,Math.max(0,Math.min(5,parseInt(f.rating)||0))))+'</td><td style="max-width:320px">'+f.message+'</td><td>'+fmtPT(f.date)+'</td><td><span class="badge '+(pub?'bg-success':f.status==='Rejeitado'?'bg-danger':'bg-warning')+'">'+(f.status||'Pendente')+'</span></td><td style="white-space:nowrap">'+(pub?'':'<button class="btn btn-success btn-sm" onclick="moderateFeedback(\''+f.id+'\',\'Publicado\')">✅</button> ')+'<button class="btn btn-warning btn-sm" onclick="moderateFeedback(\''+f.id+'\',\'Rejeitado\')">🚫</button> <button class="btn btn-danger btn-sm" onclick="delFeedback(\''+f.id+'\')">🗑️</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
+async function moderateFeedback(id,status){await DB.update('feedback',id,{status:status});showToast('Feedback atualizado!');loadFeedback();}
+async function delFeedback(id){if(!(await showConfirm('Eliminar Feedback','Eliminar este feedback?','Eliminar','btn-danger')))return;await DB.del('feedback',id);loadFeedback();}
+async function loadMedia(){var data=(await DB.get('media_library')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px"><div><h2>🖼️ Imagens / Media</h2><p style="color:var(--text-muted);font-size:.85rem">Biblioteca simples para reutilizar imagens no portal.</p></div><button class="btn btn-danger btn-sm" onclick="openMediaModal()">➕ Adicionar Imagem</button></div><div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:15px">';if(!data.length)html+='<div class="card">Nenhuma imagem adicionada.</div>';data.forEach(function(m){html+='<div class="card"><img src="'+m.url+'" style="width:100%;height:150px;object-fit:cover;border-radius:8px"><h4 style="margin-top:10px">'+(m.title||'Imagem')+'</h4><button class="btn btn-danger btn-sm" onclick="delMedia(\''+m.id+'\')">🗑️ Eliminar</button></div>';});html+='</div>';document.getElementById('appContent').innerHTML=html;}
+function openMediaModal(){var b='<div class="form-group"><label>Título</label><input id="fMediaTitle" placeholder="Ex.: Banner da campanha"></div><div class="form-group"><label>Imagem por URL</label><input id="fMediaUrl" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="fMediaFile" accept="image/*"></div>';modal('🖼️ Adicionar Imagem',b,saveMedia,'Guardar','btn-success');}
+function saveMedia(){var title=val('fMediaTitle'),url=val('fMediaUrl'),file=document.getElementById('fMediaFile');var done=function(u){if(!u)return showToast('Indica uma URL ou escolhe uma imagem.','danger');(async function(){await DB.insert('media_library',{id:'m'+Date.now(),title:title,url:u,date:todayISO()});closeModal();showToast('Imagem adicionada!');loadMedia();})();};if(file&&file.files&&file.files[0])readPortalImage(file,done);else done(url);}
+async function delMedia(id){if(!(await showConfirm('Eliminar Imagem','Eliminar esta imagem da biblioteca?','Eliminar','btn-danger')))return;await DB.del('media_library',id);loadMedia();}
+
 /* ==================== PESQUISA GLOBAL ==================== */
 function pOpenSearch(){
     var b='<input type="text" id="pSearchInput" placeholder="Pesquisar planos, blog, notícias, ajuda..." oninput="pDoSearch(this.value)" style="width:100%;margin-bottom:14px">'+
@@ -958,10 +1023,10 @@ function clientLogout(){
 /* ==================== PORTAL CLIENTE ==================== */
 var clientCart = [];
 var STREAMING_APPS = [
-    { name: 'Unitv', price: 8000, url: 'http://aftv.news/3651689' },
-    { name: 'New ONE P2P', price: 5000, url: 'https://p2p.onetv.plus/new_one_2.0.1.apk' },
-    { name: 'Angotela', price: 5000, url: 'https://aftv.news/3784617' },
-    { name: 'WS Top', price: 5000, url: 'https://wstop.org/' }
+    { name: 'Unitv', price: 8000, android: 'http://aftv.news/3651689', ios: '', tv: '', icon:'📺' },
+    { name: 'New ONE P2P', price: 5000, android: 'https://p2p.onetv.plus/new_one_2.0.1.apk', ios: '', tv: '', icon:'🎬' },
+    { name: 'Angotela', price: 5000, android: 'https://aftv.news/3784617', ios: '', tv: '', icon:'📺' },
+    { name: 'WS Top', price: 5000, android: 'https://wstop.org/', ios: '', tv: '', icon:'▶️' }
 ];
 
 async function loadClientPortal(){
@@ -1021,7 +1086,8 @@ async function renderClientTab(tab){
     else if(tab==='streaming'){
         var streamHtml = '<h3>Aplicações de Streaming</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:10px">Ative o serviço ou baixe o aplicativo diretamente.</p>';
         STREAMING_APPS.forEach(function(app){ 
-            streamHtml += '<div class="plan-card"><span>'+app.name+'</span><div style="display:flex;gap:5px;align-items:center"><strong>'+fmt(app.price)+' '+cu+'</strong><a href="'+app.url+'" target="_blank" class="btn btn-info btn-sm">⬇ Baixar</a><button class="btn btn-success btn-sm" onclick="addCartStream(\''+app.name+'\','+app.price+')">➕ Ativar</button></div></div>'; 
+            var downloads=(app.android?'<a href="'+app.android+'" target="_blank" rel="noopener" class="btn btn-info btn-sm">🤖 Android</a>':'')+(app.ios?'<a href="'+app.ios+'" target="_blank" rel="noopener" class="btn btn-info btn-sm"> iPhone</a>':'')+(app.tv?'<a href="'+app.tv+'" target="_blank" rel="noopener" class="btn btn-info btn-sm">📺 Smart TV</a>':'');
+            streamHtml += '<div class="plan-card"><div><span>'+app.icon+' '+app.name+'</span><small style="display:block;color:var(--text-muted);margin-top:4px">Instalação e downloads</small></div><div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end"><strong>'+fmt(app.price)+' '+cu+'</strong>'+downloads+'<button class="btn btn-success btn-sm" onclick="addCartStream(\''+app.name+'\','+app.price+')">➕ Ativar</button></div></div>'; 
         });
         content.innerHTML = streamHtml;
     } 
@@ -1190,8 +1256,8 @@ async function runDailyAutomations() {
     if(blocked > 0 || genInv > 0) showToast('Automação: '+genInv+' faturas geradas, '+blocked+' clientes bloqueados.', 'info');
 }
 
-var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config','blog','news','faq','comments','promotions','newsletter','stats'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports','blog','news','faq','comments','promotions','newsletter','stats'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
-async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'blog',i:'📰',t:'Blog'},{id:'news',i:'📢',t:'Notícias'},{id:'promotions',i:'🔥',t:'Promoções'},{id:'newsletter',i:'📧',t:'Newsletter'},{id:'faq',i:'❓',t:'FAQ'},{id:'comments',i:'💬',t:'Comentários'},{id:'stats',i:'📊',t:'Estatísticas Portal'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
+var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config','blog','news','faq','comments','promotions','newsletter','stats','tutorials','feedback','media'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports','blog','news','faq','comments','promotions','newsletter','stats','tutorials','feedback','media'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
+async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'blog',i:'📰',t:'Blog'},{id:'news',i:'📢',t:'Notícias'},{id:'promotions',i:'🔥',t:'Promoções'},{id:'newsletter',i:'📧',t:'Newsletter'},{id:'faq',i:'❓',t:'FAQ'},{id:'comments',i:'💬',t:'Comentários'},{id:'stats',i:'📊',t:'Estatísticas Portal'},{id:'tutorials',i:'🎓',t:'Tutoriais'},{id:'feedback',i:'⭐',t:'Feedbacks'},{id:'media',i:'🖼️',t:'Imagens / Media'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
 function navigate(id){
     if(currentClient) { showToast('Acesso restrito ao portal do cliente.','warning'); return loadClientPortal(); }
     var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];
@@ -1200,7 +1266,7 @@ function navigate(id){
     var a=document.querySelector('.sidebar nav a[onclick*="'+id+'"]');if(a)a.classList.add('active');
     document.getElementById('pageTitle').innerText=id.charAt(0).toUpperCase()+id.slice(1);
     currentPageId = id; 
-    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,blog:loadBlog,news:loadNews,faq:loadFaq,comments:loadComments,promotions:loadPromotions,newsletter:loadNewsletter,stats:loadStats,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
+    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,blog:loadBlog,news:loadNews,faq:loadFaq,comments:loadComments,promotions:loadPromotions,newsletter:loadNewsletter,stats:loadStats,tutorials:loadTutorials,feedback:loadFeedback,media:loadMedia,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
     if(actions[id])actions[id]();
     document.getElementById('mainSidebar').classList.remove('open');
 }
@@ -1543,7 +1609,7 @@ function openPostModal(id){
     var b='<div class="form-group"><label>Título</label><input type="text" id="fPostTitle" value="'+(p?p.title.replace(/"/g,'&quot;'):'')+'" placeholder="Título do artigo"></div>'+
     '<div class="form-row"><div class="form-group"><label>Categoria</label><input type="text" id="fPostCat" value="'+(p?(p.category||''):'')+'" placeholder="Ex: Dicas, Rede, Empresa"></div>'+
     '<div class="form-group"><label>Estado</label><select id="fPostStatus"><option value="Rascunho"'+(p&&p.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(p&&p.status==='Publicado'?' selected':'')+'>Publicado</option></select></div></div>'+
-    '<div class="form-group"><label>Imagem (URL, opcional)</label><input type="text" id="fPostImg" value="'+(p?(p.image||''):'')+'" placeholder="https://..."></div>'+
+    '<div class="form-row"><div class="form-group"><label>Imagem (URL, opcional)</label><input type="text" id="fPostImg" value="'+(p?(p.image||''):'')+'" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="fPostFile" accept="image/*"></div></div>'+
     '<div class="form-group"><label>Resumo</label><textarea id="fPostExcerpt" rows="2" placeholder="Resumo curto que aparece no site">'+(p?(p.excerpt||''):'')+'</textarea></div>'+
     '<div class="form-group"><label>Conteúdo</label><textarea id="fPostContent" rows="8" placeholder="Conteúdo completo do artigo">'+(p?(p.content||''):'')+'</textarea></div>';
     modal(p?'Editar Artigo':'Novo Artigo', b, function(){savePost(id);}, 'Salvar');
@@ -1551,10 +1617,9 @@ function openPostModal(id){
 async function savePost(id){
     var title=document.getElementById('fPostTitle').value.trim();
     if(!title) return showToast('Indica o título do artigo.','danger');
-    var rec={title:title,category:document.getElementById('fPostCat').value.trim(),status:document.getElementById('fPostStatus').value,image:document.getElementById('fPostImg').value.trim(),excerpt:document.getElementById('fPostExcerpt').value.trim(),content:document.getElementById('fPostContent').value.trim(),slug:pSlug(title)};
-    if(id){await DB.update('posts',id,rec);}
-    else{rec.date=todayISO();rec.author=currentUser.name||'Equipa Conex Cass';await DB.insert('posts',rec);}
-    closeModal();showToast('Artigo guardado!');loadBlog();
+    var finish=async function(img){var rec={title:title,category:document.getElementById('fPostCat').value.trim(),status:document.getElementById('fPostStatus').value,image:img||document.getElementById('fPostImg').value.trim(),excerpt:document.getElementById('fPostExcerpt').value.trim(),content:document.getElementById('fPostContent').value.trim(),slug:pSlug(title)};if(id){await DB.update('posts',id,rec);}else{rec.date=todayISO();rec.author=currentUser.name||'Equipa Conex Cass';await DB.insert('posts',rec);}closeModal();showToast('Artigo guardado!');loadBlog();};
+    var file=document.getElementById('fPostFile'); if(file&&file.files&&file.files[0]) return readPortalImage(file,function(img){finish(img);});
+    return finish('');
 }
 async function togglePostStatus(id){var p=DB.cache.posts.find(function(x){return x.id===id;});if(!p)return;await DB.update('posts',id,{status:p.status==='Publicado'?'Rascunho':'Publicado'});loadBlog();}
 async function delPost(id){var ok=await showConfirm('Eliminar Artigo','Eliminar este artigo do blog?','Eliminar','btn-danger');if(!ok)return;await DB.del('posts',id);showToast('Eliminado!');loadBlog();}
@@ -1576,6 +1641,7 @@ function openNewsModal(id){
     var b='<div class="form-group"><label>Título</label><input type="text" id="fNewsTitle" value="'+(n?n.title.replace(/"/g,'&quot;'):'')+'" placeholder="Título da notícia"></div>'+
     '<div class="form-row"><div class="form-group"><label>Tipo</label><select id="fNewsType">'+types.map(function(t){return '<option value="'+t+'"'+(n&&n.type===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div>'+
     '<div class="form-group"><label>Estado</label><select id="fNewsStatus"><option value="Rascunho"'+(n&&n.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(n&&n.status==='Publicado'?' selected':'')+'>Publicado</option></select></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Imagem (URL)</label><input type="text" id="fNewsImg" value="'+(n?(n.image||''):'')+'" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="fNewsFile" accept="image/*"></div></div>'+
     '<div class="form-group"><label>Conteúdo</label><textarea id="fNewsContent" rows="6" placeholder="Detalhes da notícia">'+(n?(n.content||''):'')+'</textarea></div>'+
     '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="fNewsNotify" style="width:auto" '+(n&&n.notify?'checked':'')+'> Notificar clientes ao publicar</label></div>';
     modal(n?'Editar Notícia':'Nova Notícia', b, function(){saveNews(id);}, 'Salvar');
@@ -1583,10 +1649,7 @@ function openNewsModal(id){
 async function saveNews(id){
     var title=document.getElementById('fNewsTitle').value.trim();
     if(!title) return showToast('Indica o título da notícia.','danger');
-    var rec={title:title,type:document.getElementById('fNewsType').value,status:document.getElementById('fNewsStatus').value,content:document.getElementById('fNewsContent').value.trim(),notify:document.getElementById('fNewsNotify').checked};
-    if(id){await DB.update('news',id,rec);}
-    else{rec.date=todayISO();await DB.insert('news',rec);}
-    closeModal();showToast('Notícia guardada!'+(rec.notify&&rec.status==='Publicado'?' (notificação de clientes ainda não está ativa nesta fase)':''));loadNews();
+    var finish=async function(img){var rec={title:title,type:document.getElementById('fNewsType').value,status:document.getElementById('fNewsStatus').value,content:document.getElementById('fNewsContent').value.trim(),image:img||val('fNewsImg'),notify:document.getElementById('fNewsNotify').checked};if(id){await DB.update('news',id,rec);}else{rec.date=todayISO();await DB.insert('news',rec);}closeModal();showToast('Notícia guardada!');loadNews();};var file=document.getElementById('fNewsFile');if(file&&file.files&&file.files[0])return readPortalImage(file,function(img){finish(img);});return finish('');
 }
 async function toggleNewsStatus(id){var n=DB.cache.news.find(function(x){return x.id===id;});if(!n)return;await DB.update('news',id,{status:n.status==='Publicado'?'Rascunho':'Publicado'});loadNews();}
 async function delNews(id){var ok=await showConfirm('Eliminar Notícia','Eliminar esta notícia?','Eliminar','btn-danger');if(!ok)return;await DB.del('news',id);showToast('Eliminado!');loadNews();}
