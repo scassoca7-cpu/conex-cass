@@ -232,6 +232,60 @@ body.public-mode #publicSite{display:block}
   .p-foot-grid{grid-template-columns:1fr 1fr}
 }
 </style>
+
+<style id="conex-cass-responsive-fix">
+*, *::before, *::after { box-sizing: border-box; }
+html, body { width:100%; max-width:100%; overflow-x:hidden; }
+img, video, iframe, embed { max-width:100%; height:auto; }
+table { max-width:100%; }
+td, th { overflow-wrap:anywhere; }
+
+.pwrap { width:min(1200px, calc(100% - 32px)); margin-inline:auto; }
+.p-grid3 { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.p-grid4 { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.p-prod-grid, .p-plans { grid-template-columns:repeat(3,minmax(0,1fr)); }
+
+.form-row { min-width:0; }
+.form-row > * { min-width:0; }
+
+.card:has(table) { max-width:100%; overflow-x:auto; }
+.card:has(table) table { width:100%; min-width:620px; }
+
+.modal-content { width:min(760px,calc(100vw - 24px)); max-width:calc(100vw - 24px); max-height:calc(100vh - 24px); overflow-y:auto; }
+input, select, textarea { max-width:100%; min-width:0; }
+button, .btn { max-width:100%; }
+
+@media (max-width:900px){
+  .p-grid4 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .p-grid3, .p-prod-grid, .p-plans { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .form-row { grid-template-columns:1fr !important; }
+  .kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  .pwrap { width:calc(100% - 24px); }
+  .sidebar { max-width:85vw; }
+  .main, .main-content, .content, .app-main, #appContent { min-width:0; max-width:100%; }
+}
+
+@media (max-width:700px){
+  .p-grid4, .p-grid3, .p-prod-grid, .p-plans { grid-template-columns:1fr !important; }
+  .kpi-grid { grid-template-columns:1fr !important; }
+  .pwrap { width:calc(100% - 20px); }
+  .p-tabs { display:flex; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .p-tabs .p-tab { flex:0 0 auto; white-space:nowrap; }
+  .card:has(table) { padding-inline:10px; }
+  .card:has(table) table { min-width:560px; }
+  .modal-content { width:calc(100vw - 16px); max-width:calc(100vw - 16px); margin:8px; }
+  #clientCartBar { flex-wrap:wrap; gap:8px; padding:10px; }
+}
+
+@media (max-width:480px){
+  .pwrap { width:calc(100% - 16px); }
+  .p-hero-stats { grid-template-columns:1fr !important; }
+  .psec-title { font-size:1.35rem !important; }
+  .modal-content { width:calc(100vw - 10px); max-width:calc(100vw - 10px); margin:5px; }
+  .card:has(table) table { min-width:520px; }
+}
+</style>
+
 </head>
 <body>
 
