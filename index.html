@@ -127,9 +127,257 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
 .notif-empty { text-align:center; color:var(--text-muted); padding:20px; font-size:.85rem; }
 @media(max-width:768px){.sidebar{transform:translateX(-100%)}.sidebar.open{transform:translateX(0)}.main{margin-left:0}#menuToggle{display:inline-flex!important}.form-row{grid-template-columns:1fr}.grid{grid-template-columns:1fr!important}.kpi-grid{grid-template-columns:1fr 1fr}.header{padding:10px 15px}}
 @media(max-width:480px){.kpi-grid{grid-template-columns:1fr}}
+
+/* ==================== PORTAL PÚBLICO (SITE) ==================== */
+body.public-mode{display:block}
+body.public-mode .sidebar,body.public-mode .main{display:none}
+#publicSite{display:none}
+body.public-mode #publicSite{display:block}
+#publicSite{background:var(--bg-dark);color:var(--text-main);min-height:100vh}
+#publicSite .pwrap{max-width:1180px;margin:0 auto;padding:0 24px}
+#publicSite section{padding:70px 0}
+#publicSite h2.psec-title{font-family:'Orbitron';font-size:1.5rem;color:#fff;margin-bottom:6px}
+#publicSite p.psec-sub{color:var(--text-muted);margin-bottom:32px;font-size:.95rem;max-width:600px}
+.p-header{position:fixed;top:0;left:0;right:0;z-index:500;background:rgba(5,10,20,.85);backdrop-filter:blur(10px);border-bottom:1px solid rgba(0,180,216,.15);transition:.2s}
+.p-header .pwrap{display:flex;align-items:center;justify-content:space-between;height:68px}
+.p-brand{display:flex;align-items:center;gap:10px;cursor:pointer}
+.p-brand img{width:36px;height:36px;border-radius:50%;border:2px solid var(--primary);background:#fff;padding:2px}
+.p-brand span{font-family:'Orbitron';font-size:.85rem;color:#fff;letter-spacing:.5px}
+.p-nav{display:flex;align-items:center;gap:26px}
+.p-nav a{color:var(--text-muted);text-decoration:none;font-weight:600;font-size:.85rem;cursor:pointer;transition:.2s}
+.p-nav a:hover{color:var(--primary)}
+.p-actions{display:flex;align-items:center;gap:10px}
+#pMenuToggle{display:none}
+.p-hero{padding:150px 0 90px;position:relative;overflow:hidden;text-align:center}
+.p-hero .login-bg-grid{position:absolute;inset:0}
+.p-hero-inner{position:relative;z-index:1}
+.p-hero h1{font-family:'Orbitron';font-size:2.4rem;color:#fff;line-height:1.25;margin-bottom:16px}
+.p-hero h1 span{color:var(--primary)}
+.p-hero p{color:var(--text-muted);font-size:1.05rem;max-width:560px;margin:0 auto 30px}
+.p-hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.p-hero-stats{display:flex;gap:40px;justify-content:center;margin-top:55px;flex-wrap:wrap}
+.p-hero-stats div{text-align:center}
+.p-hero-stats strong{display:block;font-family:'Orbitron';font-size:1.4rem;color:var(--primary)}
+.p-hero-stats span{font-size:.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px}
+.p-services{background:rgba(255,255,255,.015)}
+.p-grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.p-scard{background:var(--bg-panel);border:var(--border-light);border-radius:10px;padding:24px;transition:.2s}
+.p-scard:hover{transform:translateY(-4px);border-color:rgba(0,180,216,.5)}
+.p-scard .pico{font-size:1.8rem;margin-bottom:12px;display:block}
+.p-scard h3{color:#fff;font-size:1rem;margin-bottom:8px}
+.p-scard p{color:var(--text-muted);font-size:.83rem;line-height:1.5}
+.p-plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px}
+.p-plan{background:var(--bg-panel);border:1px solid rgba(0,180,216,.25);border-radius:12px;padding:26px 22px;text-align:center;position:relative;transition:.2s}
+.p-plan:hover{border-color:var(--primary);transform:translateY(-4px)}
+.p-plan.pop{border-color:var(--primary);box-shadow:0 0 0 1px var(--primary),0 10px 30px rgba(0,180,216,.15)}
+.p-plan .pbadge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--primary);color:#000;font-size:.62rem;font-weight:700;padding:3px 12px;border-radius:12px;text-transform:uppercase;letter-spacing:.5px}
+.p-plan h3{font-family:'Orbitron';color:#fff;font-size:1.1rem;margin-bottom:10px}
+.p-plan .pprice{font-size:1.7rem;font-weight:700;color:var(--primary);font-family:'Orbitron'}
+.p-plan .pprice small{font-size:.7rem;color:var(--text-muted);font-weight:500}
+.p-plan .btn{width:100%;margin-top:16px;justify-content:center}
+.p-cart-btn{position:relative}
+.p-cart-badge{position:absolute;top:-6px;right:-6px;background:var(--primary);color:#000;font-size:.62rem;font-weight:700;min-width:17px;height:17px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0 3px}
+.p-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.p-tab{background:var(--bg-panel);border:var(--border-light);color:var(--text-muted);padding:8px 18px;border-radius:20px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.2s}
+.p-tab:hover{color:#fff}
+.p-tab.active{background:var(--primary);color:#000;border-color:var(--primary)}
+.p-prod-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px}
+.p-prod{background:var(--bg-panel);border:var(--border-light);border-radius:10px;overflow:hidden;transition:.2s;display:flex;flex-direction:column}
+.p-prod:hover{transform:translateY(-4px);border-color:rgba(0,180,216,.4)}
+.p-prod-img{height:130px;background:linear-gradient(135deg,rgba(0,180,216,.2),rgba(157,78,221,.15));display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+.p-prod-body{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.p-prod-body h4{color:#fff;font-size:.9rem}
+.p-prod-body .ptag{display:inline-block;background:rgba(0,180,216,.12);color:var(--primary);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 9px;border-radius:10px;width:fit-content}
+.p-prod-price{font-family:'Orbitron';color:var(--primary);font-weight:700;font-size:1.05rem;margin-top:auto}
+.p-prod-price small{color:var(--text-muted);font-size:.65rem;font-weight:500}
+.p-cart-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.p-cart-row .pcinfo{flex:1}
+.p-cart-row .pcinfo h5{color:#fff;font-size:.85rem;margin-bottom:2px}
+.p-cart-row .pcinfo span{color:var(--text-muted);font-size:.75rem}
+.p-qty{display:flex;align-items:center;gap:8px}
+.p-qty button{width:24px;height:24px;border-radius:6px;border:var(--border-light);background:var(--bg-dark);color:#fff;cursor:pointer;font-size:.85rem}
+.p-cart-total{display:flex;justify-content:space-between;align-items:center;padding-top:16px;font-family:'Orbitron';color:#fff;font-size:1.05rem}
+.p-promo-card{background:linear-gradient(135deg,rgba(0,180,216,.12),rgba(157,78,221,.10));border:1px solid rgba(0,180,216,.3);border-radius:12px;padding:26px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.p-promo-card h3{color:#fff;font-family:'Orbitron';font-size:1.05rem;margin-bottom:6px}
+.p-promo-card p{color:var(--text-muted);font-size:.85rem}
+.p-grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.p-post{background:var(--bg-panel);border:var(--border-light);border-radius:10px;overflow:hidden;transition:.2s}
+.p-post:hover{transform:translateY(-4px)}
+.p-post-img{height:120px;background:linear-gradient(135deg,rgba(0,180,216,.25),rgba(157,78,221,.2));display:flex;align-items:center;justify-content:center;font-size:2rem}
+.p-post-body{padding:16px 18px}
+.p-post h4{color:#fff;font-size:.92rem;margin-bottom:6px}
+.p-post p{color:var(--text-muted);font-size:.8rem;line-height:1.5}
+.p-post .ptag{display:inline-block;background:rgba(0,180,216,.12);color:var(--primary);font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:2px 9px;border-radius:10px;margin-bottom:8px}
+.p-faq-item{border-bottom:1px solid rgba(255,255,255,.08);padding:16px 0}
+.p-faq-q{display:flex;justify-content:space-between;align-items:center;cursor:pointer;color:#fff;font-weight:600;font-size:.9rem}
+.p-faq-q .parr{color:var(--primary);transition:.25s;font-size:.8rem}
+.p-faq-item.open .parr{transform:rotate(180deg)}
+.p-faq-a{max-height:0;overflow:hidden;transition:.25s;color:var(--text-muted);font-size:.85rem;line-height:1.6}
+.p-faq-item.open .p-faq-a{max-height:200px;padding-top:12px}
+.p-footer{background:var(--bg-panel);border-top:var(--border-light);padding:50px 0 20px}
+.p-foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;margin-bottom:30px}
+.p-foot-grid h4{color:#fff;font-size:.85rem;margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.p-foot-grid a{display:block;color:var(--text-muted);text-decoration:none;font-size:.82rem;margin-bottom:9px;cursor:pointer;transition:.2s}
+.p-foot-grid a:hover{color:var(--primary)}
+.p-foot-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;color:var(--text-muted);font-size:.75rem}
+.p-foot-bottom a{color:var(--text-muted);text-decoration:none}
+.p-foot-bottom a:hover{color:var(--primary)}
+@media(max-width:820px){.p-foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){
+  .p-nav{position:fixed;top:68px;left:0;right:0;background:var(--bg-panel);flex-direction:column;align-items:flex-start;padding:16px 24px;border-bottom:var(--border-light);gap:0;transform:translateY(-130%);opacity:0;transition:.25s;pointer-events:none}
+  .p-nav.open{transform:translateY(0);opacity:1;pointer-events:auto}
+  .p-nav a{padding:10px 0;width:100%;border-bottom:1px solid rgba(255,255,255,.05)}
+  #pMenuToggle{display:inline-flex}
+  .p-hero h1{font-size:1.7rem}
+  .p-foot-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
+
+<div id="publicSite">
+  <header class="p-header">
+    <div class="pwrap">
+      <div class="p-brand" onclick="pScrollTo('pTop')"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg" alt="Conex Cass"><span>CONEX CASS</span></div>
+      <nav class="p-nav" id="pNav">
+        <a onclick="pScrollTo('pTop')">Início</a>
+        <a onclick="pScrollTo('pPlanos')">Internet</a>
+        <a onclick="pScrollTo('pLoja')">Loja</a>
+        <a onclick="pScrollTo('pPromo')">Promoções</a>
+        <a onclick="pScrollTo('pNews')">Notícias</a>
+        <a onclick="pScrollTo('pBlog')">Blog</a>
+        <a onclick="pScrollTo('pTutoriais')">Tutoriais</a>
+        <a onclick="pScrollTo('pFaq')">Ajuda</a>
+      </nav>
+      <div class="p-actions">
+        <button class="btn btn-outline btn-sm" onclick="pOpenSearch()" title="Pesquisar">🔍</button>
+        <button class="btn btn-outline btn-sm p-cart-btn" onclick="pOpenCart()" title="Carrinho">🛒<span class="p-cart-badge" id="pCartBadge" style="display:none">0</span></button>
+        <button class="btn btn-outline btn-sm" id="pMenuToggle" onclick="document.getElementById('pNav').classList.toggle('open')">☰</button>
+        <button class="btn btn-outline btn-sm" onclick="openAdminLogin()" title="Acesso Administrativo">🔒 Admin</button>
+        <button class="btn btn-primary btn-sm" onclick="openClientLogin()">👤 Área do Cliente</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="p-hero" id="pTop">
+    <div class="login-bg-grid"></div>
+    <div class="pwrap p-hero-inner">
+      <h1>Internet rápida, estável<br>e feita para <span>o teu dia a dia</span></h1>
+      <p>Fibra, TV, streaming e videovigilância com suporte técnico próximo de ti. A Conex Cass liga a tua casa e o teu negócio ao que importa.</p>
+      <div class="p-hero-cta">
+        <button class="btn btn-primary" onclick="pScrollTo('pPlanos')">📡 Ver Planos de Internet</button>
+        <button class="btn btn-outline" onclick="pWhatsapp('Olá! Gostaria de saber mais sobre os planos de internet da Conex Cass.')">💬 Falar no WhatsApp</button>
+      </div>
+      <div class="p-hero-stats">
+        <div><strong id="pStatPlans">-</strong><span>Planos Disponíveis</span></div>
+        <div><strong>24/7</strong><span>Suporte Técnico</span></div>
+        <div><strong>100%</strong><span>Cobertura Local</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-services" id="pServicos">
+    <div class="pwrap">
+      <h2 class="psec-title">🌐 Os nossos serviços</h2>
+      <p class="psec-sub">Tudo o que precisas para estar sempre conectado, num só fornecedor.</p>
+      <div class="p-grid4">
+        <div class="p-scard"><span class="pico">📶</span><h3>Internet Fibra</h3><p>Ligação estável de alta velocidade para casa e empresa, com planos semanais, quinzenais e mensais.</p></div>
+        <div class="p-scard"><span class="pico">📺</span><h3>TV & Streaming</h3><p>Acesso a aplicações de streaming e pacotes de TV para toda a família.</p></div>
+        <div class="p-scard"><span class="pico">🎥</span><h3>CCTV / Câmaras</h3><p>Instalação e monitorização de câmaras de videovigilância para a tua segurança.</p></div>
+        <div class="p-scard"><span class="pico">🎧</span><h3>Suporte Técnico</h3><p>Equipa própria de instalação e assistência, com acompanhamento via tickets.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pPlanos">
+    <div class="pwrap">
+      <h2 class="psec-title">📡 Planos de Internet</h2>
+      <p class="psec-sub">Escolhe a velocidade ideal para ti. Pagamento mensal, sem fidelização forçada.</p>
+      <div class="p-plans" id="pPlansGrid"><p style="color:var(--text-muted)">A carregar planos...</p></div>
+    </div>
+  </section>
+
+  <section class="p-services" id="pLoja">
+    <div class="pwrap">
+      <h2 class="psec-title">🛒 Loja Online</h2>
+      <p class="psec-sub">Equipamentos, internet, streaming e serviços — tudo num só lugar.</p>
+      <div class="p-tabs" id="pStoreTabs">
+        <div class="p-tab active" data-tab="equip" onclick="pStoreTab('equip')">📦 Equipamentos</div>
+        <div class="p-tab" data-tab="internet" onclick="pStoreTab('internet')">📡 Internet</div>
+        <div class="p-tab" data-tab="stream" onclick="pStoreTab('stream')">🎬 Streaming & Serviços</div>
+      </div>
+      <div class="p-prod-grid" id="pStoreGrid"><p style="color:var(--text-muted)">A carregar produtos...</p></div>
+    </div>
+  </section>
+
+  <section class="p-services" id="pPromo">
+    <div class="pwrap">
+      <h2 class="psec-title">🔥 Promoções</h2>
+      <p class="psec-sub">Fica atento às nossas campanhas.</p>
+      <div id="pPromoGrid"><p style="color:var(--text-muted)">A carregar...</p></div>
+    </div>
+  </section>
+
+  <section id="pNews" class="p-services">
+    <div class="pwrap">
+      <h2 class="psec-title">📢 Últimas Notícias</h2>
+      <p class="psec-sub">Coberturas, manutenções e novidades da rede.</p>
+      <div class="p-grid3" id="pNewsGrid"><p style="color:var(--text-muted)">A carregar notícias...</p></div>
+    </div>
+  </section>
+
+  <section id="pBlog">
+    <div class="pwrap">
+      <h2 class="psec-title">📰 Blog</h2>
+      <p class="psec-sub">Dicas, artigos e conteúdos da Conex Cass.</p>
+      <div class="p-grid3" id="pBlogGrid"><p style="color:var(--text-muted)">A carregar artigos...</p></div>
+    </div>
+  </section>
+
+
+  <section class="p-services" id="pTutoriais">
+    <div class="pwrap">
+      <h2 class="psec-title">🎓 Tutoriais</h2>
+      <p class="psec-sub">Passo a passo para resolveres o básico sem esperar por suporte.</p>
+      <div class="p-grid3">
+        <div class="p-post"><div class="p-post-img">📶</div><div class="p-post-body"><span class="ptag">Em breve</span><h4>Como configurar o router</h4><p>Guia passo a passo para configurar a tua rede Wi-Fi em casa.</p></div></div>
+        <div class="p-post"><div class="p-post-img">🔑</div><div class="p-post-body"><span class="ptag">Em breve</span><h4>Como alterar a palavra-passe</h4><p>Aprende a proteger a tua rede alterando a senha do Wi-Fi.</p></div></div>
+        <div class="p-post"><div class="p-post-img">📺</div><div class="p-post-body"><span class="ptag">Em breve</span><h4>Como instalar o IPTV</h4><p>Configuração das aplicações de streaming incluídas no teu plano.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pFaq">
+    <div class="pwrap" style="max-width:800px">
+      <h2 class="psec-title">❓ Ajuda</h2>
+      <p class="psec-sub">Perguntas frequentes e base de conhecimento técnica.</p>
+      <div class="p-tabs">
+        <div class="p-tab active" data-ftab="faq" onclick="pFaqTab('faq')">❓ Perguntas Frequentes</div>
+        <div class="p-tab" data-ftab="kb" onclick="pFaqTab('kb')">📚 Base de Conhecimento</div>
+      </div>
+      <div id="pFaqList"><p style="color:var(--text-muted)">A carregar...</p></div>
+    </div>
+  </section>
+
+
+  <footer class="p-footer">
+    <div class="pwrap">
+      <div class="p-foot-grid">
+        <div>
+          <div class="p-brand" style="margin-bottom:12px"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg"><span>CONEX CASS</span></div>
+          <p style="color:var(--text-muted);font-size:.82rem;line-height:1.6;max-width:320px">Provedor de internet focado em ligações estáveis, suporte próximo e um portal completo para o cliente gerir tudo num só lugar.</p>
+        </div>
+        <div><h4>Navegação</h4><a onclick="pScrollTo('pPlanos')">Internet</a><a onclick="pScrollTo('pLoja')">Loja</a><a onclick="pScrollTo('pPromo')">Promoções</a><a onclick="pScrollTo('pNews')">Notícias</a><a onclick="pScrollTo('pBlog')">Blog</a><a onclick="pScrollTo('pTutoriais')">Tutoriais</a></div>
+        <div><h4>Suporte</h4><a onclick="pScrollTo('pFaq')">FAQ</a><a onclick="pWhatsapp('Olá! Preciso de ajuda com o meu serviço.')">Falar no WhatsApp</a><a onclick="openClientLogin()">Área do Cliente</a></div>
+        <div><h4>Contacto</h4><a onclick="pWhatsapp('Olá!')">📱 WhatsApp</a><a style="cursor:default">📍 Luanda, Angola</a><p style="color:var(--text-muted);font-size:.78rem;margin:14px 0 8px">Recebe novidades e promoções por email:</p><div style="display:flex;gap:6px"><input type="email" id="pNewsletterEmail" placeholder="O teu email" style="flex:1;min-width:0;padding:8px 10px;font-size:.78rem"><button class="btn btn-primary btn-sm" onclick="pSubscribeNewsletter()">OK</button></div></div>
+      </div>
+      <div class="p-foot-bottom">
+        <span>© <span id="pYear"></span> Conex Cass. Todos os direitos reservados.</span>
+        <a onclick="openAdminLogin()">Acesso Administrativo</a>
+      </div>
+    </div>
+  </footer>
+</div>
 
 <div id="loginOverlay"><div class="login-bg-grid"></div><div class="login-card"><div class="logo-area"><img src="https://i.postimg.cc/62VWfvdQ/logotipo-conex-cass-novo.jpg" alt="Logo"><h2>CONEX CASS</h2><p style="font-size:.7rem;color:var(--primary)">ERP Enterprise</p></div><div class="login-tabs"><div class="login-tab active" onclick="switchTab('login')">Admin</div><div class="login-tab" onclick="switchTab('client')">Cliente</div></div><form id="loginForm" class="login-form active" onsubmit="return handleLogin(event)"><div id="loginError" class="login-error"></div><div class="form-group"><label>Utilizador</label><input type="text" id="loginUser" required autocomplete="username"></div><div class="form-group"><label>Senha</label><input type="password" id="loginPass" required autocomplete="current-password"></div><button type="submit" class="login-btn login-btn-primary">Entrar</button></form><form id="clientLoginForm" class="login-form" onsubmit="return handleClientLogin(event)"><div id="clientLoginError" class="login-error"></div><p style="color:var(--text-muted);font-size:.82rem;margin-bottom:12px;text-align:center">Aceda ao seu perfil para ver estado, pagar e tirar faturas.</p><div class="form-group"><label>Número de Telefone</label><input type="tel" id="clientPhoneInput" required placeholder="Ex: 923000000"></div><div class="form-group"><label>Código de Acesso</label><input type="password" id="clientPassInput" required placeholder="Insira o seu código"></div><a href="#" onclick="recoverCode(); return false;" style="font-size:.8rem; color:var(--primary); float:right; margin-bottom:15px; text-decoration:none;">Esqueceu o código?</a><button type="submit" class="login-btn login-btn-primary">Entrar como Cliente</button></form></div></div>
 
@@ -146,6 +394,7 @@ th{color:var(--primary);font-size:.72rem;text-transform:uppercase;background:rgb
             <h1 style="font-family:'Orbitron';font-size:.95rem"><span id="pageTitle">Dashboard</span></h1>
         </div>
         <div class="header-actions">
+            <button class="btn btn-outline btn-sm" onclick="openGlobalSearch()" title="Pesquisa Global">🔍</button>
             <button class="btn btn-outline btn-sm" onclick="forceRefreshData()" title="Sincronizar Dados" style="margin-right:5px;">🔄 Atualizar</button>
             <button class="btn btn-success btn-sm" id="installAppBtn" style="display:none" onclick="installPWA()">📥 Instalar App</button>
             <div class="notif-bell" onclick="toggleNotifications(event)">🔔 <span class="notif-badge" id="notifCount" style="display:none">0</span><div class="notif-dropdown" id="notifDropdown"><h3 style="font-size:.9rem; color:var(--primary); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Alertas do Sistema</h3><div id="notifList"></div></div></div>
@@ -184,7 +433,7 @@ var DB={
 cache:{},
 applyBranchFilter: function(data, t) {
     if (!Array.isArray(data)) return data;
-    if (['settings','branches','speeds','plans','ip_pool','users'].includes(t)) return data;
+    if (['settings','branches','speeds','plans','ip_pool','users','posts','news','faq','comments','promotions','newsletter','analytics'].includes(t)) return data;
     if (!currentUser || currentUser.branchId === 'all') return data;
     return data.filter(function(item) { return item.branchId === currentUser.branchId; });
 },
@@ -210,7 +459,7 @@ update:async function(t,id,d){try{var res=await sb.from(t).update(d).eq('id',id)
 upsert:async function(t,r){try{var res=await sb.from(t).upsert(r,{onConflict:'id'}).select();if(res.error)throw res.error;if(!res.data||!res.data.length)throw new Error("Sem retorno");if(t==='settings'){this.cache[t]=res.data[0];}else if(t==='cash_register'){this.cache[t]=res.data[0];}else{if(Array.isArray(this.cache[t])){var d=res.data[0];var i=this.cache[t].findIndex(function(x){return x.id===d.id;});if(i>=0)this.cache[t][i]=d;else this.cache[t].push(d);}else{this.cache[t]=res.data[0];}}return res.data[0];}catch(e){showToast("Erro Upsert: "+e.message,'danger');return null;}},
 del:async function(t,id){try{var res=await sb.from(t).delete().eq('id',id);if(res.error)throw res.error;if(this.cache[t]&&Array.isArray(this.cache[t]))this.cache[t]=this.cache[t].filter(function(x){return x.id!==id;});return true;}catch(e){showToast("Erro BD: "+e.message,'danger');return false;}},
 loadAll: async function(forceRemote) {
-    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances'];
+    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances','posts','news','faq','comments','promotions','newsletter','analytics'];
     var promises = ks.map(k => { if (forceRemote || this.cache[k] === undefined) return this.get(k, true); return Promise.resolve(); });
     await Promise.all(promises);
 },
@@ -360,15 +609,333 @@ async function recoverCode() {
 }
 
 function showLoginScreen(){document.getElementById('loginOverlay').classList.remove('hidden');}
-function showApp(){document.getElementById('loginOverlay').classList.add('hidden');run();}
+function showApp(){hidePublicSite();document.getElementById('loginOverlay').classList.add('hidden');run();}
+
+/* ==================== PORTAL PÚBLICO (SITE) ==================== */
+function showPublicSite(){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.body.classList.add('public-mode');
+    document.getElementById('publicSite').style.display='block';
+    var y=document.getElementById('pYear'); if(y) y.innerText=new Date().getFullYear();
+    renderPublicPlans();
+    renderPublicNews();
+    renderPublicBlog();
+    renderPublicStore();
+    pUpdateCartBadge();
+    renderPublicFaq();
+    renderPublicPromo();
+    if(!sessionStorage.getItem('cx_visit_tracked')){ sessionStorage.setItem('cx_visit_tracked','1'); pTrackEvent('site_visit'); }
+}
+function hidePublicSite(){
+    document.body.classList.remove('public-mode');
+    document.getElementById('publicSite').style.display='none';
+}
+function pScrollTo(id){
+    document.getElementById('pNav').classList.remove('open');
+    var el=document.getElementById(id);
+    if(el) window.scrollTo({top: el.offsetTop-60, behavior:'smooth'});
+}
+function pWhatsapp(msg){
+    window.open('https://api.whatsapp.com/send?phone='+ADMIN_WHATSAPP+'&text='+encodeURIComponent(msg),'_blank');
+}
+function openClientLogin(){
+    switchTab('client');
+    document.getElementById('loginOverlay').classList.remove('hidden');
+}
+function openAdminLogin(){
+    switchTab('login');
+    document.getElementById('loginOverlay').classList.remove('hidden');
+}
+function pToggleFaq(el){
+    var item=el.parentElement;
+    var wasOpen=item.classList.contains('open');
+    document.querySelectorAll('#pFaqList .p-faq-item').forEach(function(i){i.classList.remove('open');});
+    if(!wasOpen) item.classList.add('open');
+}
+async function renderPublicPlans(){
+    var grid=document.getElementById('pPlansGrid');
+    if(!grid) return;
+    try{
+        var sp=await DB.get('speeds');
+        var cu=getCurrency();
+        var mensal=(sp||[]).filter(function(s){return s.period==='Mensal'||!s.period;}).sort(function(a,b){return (a.preco||0)-(b.preco||0);});
+        var stat=document.getElementById('pStatPlans'); if(stat) stat.innerText=mensal.length||'-';
+        if(!mensal.length){grid.innerHTML='<p style="color:var(--text-muted)">Planos a ser atualizados. Fala connosco no WhatsApp.</p>';return;}
+        var mid=Math.floor(mensal.length/2);
+        grid.innerHTML=mensal.map(function(s,i){
+            var pop=(i===mid&&mensal.length>2);
+            return '<div class="p-plan'+(pop?' pop':'')+'">'+(pop?'<span class="pbadge">Mais Popular</span>':'')+
+                '<h3>'+s.nome+'</h3>'+
+                '<div class="pprice">'+fmt(s.preco)+' <small>'+cu+'/mês</small></div>'+
+                '<button class="btn '+(pop?'btn-primary':'btn-outline')+'" onclick="pWhatsapp(\'Olá! Quero contratar o plano '+s.nome+' de internet.\')">Contratar Agora</button>'+
+                '</div>';
+        }).join('');
+    }catch(e){grid.innerHTML='<p style="color:var(--text-muted)">Não foi possível carregar os planos agora.</p>';}
+}
+function pStripHtml(s){return (s||'').replace(/<[^>]*>/g,'');}
+function pExcerpt(s,n){s=pStripHtml(s);return s.length>n?s.slice(0,n).trim()+'…':s;}
+/* ==================== ANALYTICS (TRACKING SILENCIOSO) ==================== */
+function pTrackEvent(type,refId,refName){
+    try{ DB.insert('analytics',{type:type,ref_id:refId||null,ref_name:refName||null,date:todayISO()}); }catch(e){}
+}
+async function renderPublicPromo(){
+    var grid=document.getElementById('pPromoGrid');
+    if(!grid) return;
+    try{
+        var today=todayISO();
+        var promos=(await DB.get('promotions')).filter(function(p){return p.status==='Publicado'&&(!p.valid_until||p.valid_until>=today);});
+        if(!promos.length){grid.innerHTML='<div class="p-promo-card"><div><h3>Sem promoções ativas de momento</h3><p>Fica atento — assim que houver uma campanha nova, ela aparece aqui automaticamente.</p></div><button class="btn btn-primary btn-sm" onclick="pWhatsapp(\'Olá! Há alguma promoção de internet disponível neste momento?\')">Perguntar no WhatsApp</button></div>';return;}
+        grid.innerHTML=promos.map(function(p){
+            return '<div class="p-promo-card" style="margin-bottom:14px"><div><h3>'+p.title+'</h3><p>'+(p.discount_text?'<strong style="color:var(--primary)">'+p.discount_text+'</strong><br>':'')+(p.description||'')+(p.valid_until?'<br><span style="font-size:.7rem;color:var(--text-muted)">Válido até '+fmtPT(p.valid_until)+'</span>':'')+'</p></div><button class="btn btn-primary btn-sm" onclick="pWhatsapp(\'Olá! Tenho interesse na promoção: '+p.title.replace(/'/g,"\\'")+'\')">Aproveitar Agora</button></div>';
+        }).join('');
+    }catch(e){grid.innerHTML='<p style="color:var(--text-muted)">Não foi possível carregar as promoções agora.</p>';}
+}
+async function pSubscribeNewsletter(){
+    var email=document.getElementById('pNewsletterEmail').value.trim();
+    if(!email||!email.includes('@')) return showToast('Indica um email válido.','danger');
+    var existing=(DB.cache.newsletter||[]).find(function(n){return n.email.toLowerCase()===email.toLowerCase();});
+    if(existing) return showToast('Este email já está subscrito!','info');
+    await DB.insert('newsletter',{email:email,date:todayISO()});
+    document.getElementById('pNewsletterEmail').value='';
+    showToast('Subscrito com sucesso! 🎉');
+}
+async function renderPublicNews(){
+    var grid=document.getElementById('pNewsGrid');
+    if(!grid) return;
+    try{
+        var all=(await DB.get('news')).filter(function(n){return n.status==='Publicado';}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,6);
+        if(!all.length){grid.innerHTML='<p style="color:var(--text-muted)">Sem notícias publicadas no momento.</p>';return;}
+        var icons={'Cobertura':'📡','Manutenção':'🛠️','Interrupção':'⚠️','Novidade':'🗞️'};
+        grid.innerHTML=all.map(function(n){
+            return '<div class="p-post" style="cursor:pointer" onclick="pOpenNews(\''+n.id+'\')"><div class="p-post-img">'+(icons[n.type]||'🗞️')+'</div><div class="p-post-body"><span class="ptag">'+(n.type||'Novidade')+'</span><h4>'+n.title+'</h4><p>'+pExcerpt(n.content,100)+'</p></div></div>';
+        }).join('');
+    }catch(e){grid.innerHTML='<p style="color:var(--text-muted)">Não foi possível carregar as notícias agora.</p>';}
+}
+async function renderPublicBlog(){
+    var grid=document.getElementById('pBlogGrid');
+    if(!grid) return;
+    try{
+        var all=(await DB.get('posts')).filter(function(p){return p.status==='Publicado';}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,6);
+        if(!all.length){grid.innerHTML='<p style="color:var(--text-muted)">Sem artigos publicados no momento.</p>';return;}
+        grid.innerHTML=all.map(function(p){
+            var img=p.image?'<img src="'+p.image+'" style="width:100%;height:100%;object-fit:cover">':'✍️';
+            return '<div class="p-post" style="cursor:pointer" onclick="pOpenPost(\''+p.id+'\')"><div class="p-post-img">'+img+'</div><div class="p-post-body"><span class="ptag">'+(p.category||'Blog')+'</span><h4>'+p.title+'</h4><p>'+pExcerpt(p.excerpt||p.content,100)+'</p></div></div>';
+        }).join('');
+    }catch(e){grid.innerHTML='<p style="color:var(--text-muted)">Não foi possível carregar os artigos agora.</p>';}
+}
+function pOpenPost(id){
+    var p=(DB.cache.posts||[]).find(function(x){return x.id===id;});if(!p)return;
+    var img=p.image?'<img src="'+p.image+'" style="width:100%;border-radius:10px;margin-bottom:16px;max-height:280px;object-fit:cover">':'';
+    var b=img+'<span class="ptag" style="margin-bottom:10px">'+(p.category||'Blog')+'</span><p style="color:var(--text-muted);font-size:.8rem;margin-bottom:14px">'+fmtPT(p.date)+' · '+(p.author||'Conex Cass')+'</p><div style="color:var(--text-main);line-height:1.7;white-space:pre-wrap">'+p.content+'</div><div id="pCommentsBox"></div>';
+    document.getElementById('modalTitle').innerText=p.title;
+    document.getElementById('modalBody').innerHTML=b;
+    document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
+    document.getElementById('modalGeneric').classList.add('show');
+    pRenderComments('post',id);
+    pTrackEvent('view_post',id,p.title);
+}
+function pOpenNews(id){
+    var n=(DB.cache.news||[]).find(function(x){return x.id===id;});if(!n)return;
+    var b='<span class="ptag" style="margin-bottom:10px">'+(n.type||'Novidade')+'</span><p style="color:var(--text-muted);font-size:.8rem;margin-bottom:14px">'+fmtPT(n.date)+'</p><div style="color:var(--text-main);line-height:1.7;white-space:pre-wrap">'+n.content+'</div><div id="pCommentsBox"></div>';
+    document.getElementById('modalTitle').innerText=n.title;
+    document.getElementById('modalBody').innerHTML=b;
+    document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
+    document.getElementById('modalGeneric').classList.add('show');
+    pRenderComments('news',id);
+    pTrackEvent('view_news',id,n.title);
+}
+
+/* ==================== LOJA ONLINE (PÚBLICO) ==================== */
+var pCart=[];
+var pStoreActiveTab='equip';
+var pStoreData={equip:[],internet:[],stream:[]};
+function pStoreTab(tab){
+    pStoreActiveTab=tab;
+    document.querySelectorAll('#pStoreTabs .p-tab').forEach(function(t){t.classList.toggle('active',t.dataset.tab===tab);});
+    pRenderStoreGrid();
+}
+async function renderPublicStore(){
+    var grid=document.getElementById('pStoreGrid');
+    if(!grid) return;
+    try{
+        var cu=getCurrency();
+        var inv=(await DB.get('inventory')).filter(function(i){return i.status==='Em Stock'&&(i.qty||0)>0&&i.cat!=='Consumível';});
+        pStoreData.equip=inv.map(function(i){return {id:i.id,type:'equip',name:i.name,tag:i.cat||'Equipamento',price:i.val||0,unit:cu,icon:'📦'};});
+        var sp=(await DB.get('speeds')).filter(function(s){return s.period==='Mensal'||!s.period;}).sort(function(a,b){return (a.preco||0)-(b.preco||0);});
+        pStoreData.internet=sp.map(function(s){return {id:s.id,type:'internet',name:s.nome,tag:'Internet Mensal',price:s.preco||0,unit:cu+'/mês',icon:'📡'};});
+        var pl=await DB.get('plans');
+        pStoreData.stream=pl.map(function(p){return {id:p.id,type:'stream',name:p.nome,tag:'Streaming/Serviço',price:p.preco||0,unit:cu+'/mês',icon:'🎬'};});
+    }catch(e){}
+    pRenderStoreGrid();
+}
+function pRenderStoreGrid(){
+    var grid=document.getElementById('pStoreGrid');
+    if(!grid) return;
+    var items=pStoreData[pStoreActiveTab]||[];
+    if(!items.length){grid.innerHTML='<p style="color:var(--text-muted)">Sem produtos disponíveis nesta categoria de momento.</p>';return;}
+    grid.innerHTML=items.map(function(p){
+        return '<div class="p-prod"><div class="p-prod-img">'+p.icon+'</div><div class="p-prod-body"><span class="ptag">'+p.tag+'</span><h4>'+p.name+'</h4><div class="p-prod-price">'+fmt(p.price)+' <small>'+p.unit+'</small></div><button class="btn btn-primary btn-sm" onclick="pAddToCart(\''+p.type+'\',\''+p.id+'\')">🛒 Adicionar</button></div></div>';
+    }).join('');
+}
+function pAddToCart(type,id){
+    var item=(pStoreData[type]||[]).find(function(x){return x.id===id;});
+    if(!item) return;
+    var existing=pCart.find(function(c){return c.type===type&&c.id===id;});
+    if(existing) existing.qty+=1; else pCart.push({type:type,id:id,name:item.name,price:item.price,unit:item.unit,qty:1});
+    pUpdateCartBadge();
+    showToast(item.name+' adicionado ao carrinho!');
+}
+function pUpdateCartBadge(){
+    var count=pCart.reduce(function(s,c){return s+c.qty;},0);
+    var b=document.getElementById('pCartBadge');
+    if(!b) return;
+    b.innerText=count;
+    b.style.display=count>0?'flex':'none';
+}
+function pChangeQty(idx,delta){
+    pCart[idx].qty+=delta;
+    if(pCart[idx].qty<=0) pCart.splice(idx,1);
+    pUpdateCartBadge();
+    pOpenCart();
+}
+function pRemoveFromCart(idx){pCart.splice(idx,1);pUpdateCartBadge();pOpenCart();}
+function pOpenCart(){
+    var total=pCart.reduce(function(s,c){return s+c.price*c.qty;},0);
+    var cu=getCurrency();
+    var b;
+    if(!pCart.length){
+        b='<p style="color:var(--text-muted);text-align:center;padding:20px 0">O teu carrinho está vazio.</p>';
+    }else{
+        b=pCart.map(function(c,idx){
+            return '<div class="p-cart-row"><div class="pcinfo"><h5>'+c.name+'</h5><span>'+fmt(c.price)+' '+c.unit+'</span></div><div class="p-qty"><button onclick="pChangeQty('+idx+',-1)">−</button><span>'+c.qty+'</span><button onclick="pChangeQty('+idx+',1)">+</button></div><button class="btn btn-outline btn-sm" onclick="pRemoveFromCart('+idx+')">🗑️</button></div>';
+        }).join('')+'<div class="p-cart-total"><span>Total</span><span>'+fmt(total)+' '+cu+'</span></div>';
+    }
+    document.getElementById('modalTitle').innerText='🛒 O meu Carrinho';
+    document.getElementById('modalBody').innerHTML=b;
+    document.getElementById('modalFooter').innerHTML=pCart.length?'<button class="btn btn-primary" onclick="pCheckout()">✅ Finalizar no WhatsApp</button> <button class="btn btn-outline" onclick="closeModal()">Continuar a comprar</button>':'<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
+    document.getElementById('modalGeneric').classList.add('show');
+}
+function pCheckout(){
+    if(!pCart.length) return;
+    var cu=getCurrency();
+    var total=pCart.reduce(function(s,c){return s+c.price*c.qty;},0);
+    var lines=pCart.map(function(c){return '• '+c.qty+'x '+c.name+' — '+fmt(c.price*c.qty)+' '+cu;}).join('\n');
+    var msg='Olá! Gostaria de finalizar este pedido na Loja Conex Cass:\n\n'+lines+'\n\nTotal: '+fmt(total)+' '+cu;
+    pCart.forEach(function(c){pTrackEvent('product_interest',c.id,c.name);});
+    pWhatsapp(msg);
+}
+
+/* ==================== FAQ / BASE DE CONHECIMENTO (PÚBLICO) ==================== */
+var pFaqActiveTab='faq';
+var pFaqDefault=[
+    {type:'faq',question:'Quanto tempo demora a instalação?',answer:'Normalmente entre 24 a 72 horas após a confirmação do pagamento, dependendo da cobertura na tua zona.'},
+    {type:'faq',question:'Como posso pagar a minha mensalidade?',answer:'Podes pagar via Express, transferência bancária ou diretamente na área do cliente.'},
+    {type:'faq',question:'Posso mudar de plano depois de instalado?',answer:'Sim, podes solicitar upgrade ou downgrade de velocidade a qualquer momento através do suporte.'},
+    {type:'faq',question:'Como acompanho os meus tickets de suporte?',answer:'Através da Área do Cliente, onde podes ver o estado de cada pedido e falar diretamente com o suporte.'},
+    {type:'kb',question:'A internet funciona em caso de falta de energia?',answer:'Depende do teu equipamento. Recomendamos uma UPS para o router e ONU manterem a ligação em pequenos cortes.'}
+];
+function pFaqTab(tab){
+    pFaqActiveTab=tab;
+    document.querySelectorAll('#pFaq .p-tab').forEach(function(t){t.classList.toggle('active',t.dataset.ftab===tab);});
+    pRenderFaqList();
+}
+async function renderPublicFaq(){
+    try{ pStoreFaqData=(await DB.get('faq')).filter(function(f){return f.status==='Publicado';}); }
+    catch(e){ pStoreFaqData=[]; }
+    pRenderFaqList();
+}
+var pStoreFaqData=[];
+function pRenderFaqList(){
+    var list=document.getElementById('pFaqList');
+    if(!list) return;
+    var items=pStoreFaqData.filter(function(f){return f.type===pFaqActiveTab;});
+    if(!items.length) items=pFaqDefault.filter(function(f){return f.type===pFaqActiveTab;});
+    if(!items.length){list.innerHTML='<p style="color:var(--text-muted)">Sem conteúdo nesta categoria de momento.</p>';return;}
+    var byCat={};
+    items.forEach(function(f){var c=f.category||'Geral';if(!byCat[c])byCat[c]=[];byCat[c].push(f);});
+    var html='';
+    Object.keys(byCat).forEach(function(cat){
+        if(Object.keys(byCat).length>1) html+='<h4 style="color:var(--primary);font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;margin:18px 0 6px">'+cat+'</h4>';
+        html+=byCat[cat].map(function(f){
+            return '<div class="p-faq-item"><div class="p-faq-q" onclick="pToggleFaq(this)"><span>'+f.question+'</span><span class="parr">▾</span></div><div class="p-faq-a">'+f.answer+'</div></div>';
+        }).join('');
+    });
+    list.innerHTML=html;
+}
+
+/* ==================== COMENTÁRIOS (PÚBLICO) ==================== */
+async function pRenderComments(type,id){
+    var box=document.getElementById('pCommentsBox');
+    if(!box) return;
+    var all=(await DB.get('comments')).filter(function(c){return c.target_type===type&&c.target_id===id&&c.status==='Aprovado';}).sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+    box.innerHTML='<h3 style="color:#fff;font-size:.95rem;margin:22px 0 12px">💬 Comentários ('+all.length+')</h3>'+
+        (all.length?all.map(function(c){return '<div style="border-bottom:1px solid rgba(255,255,255,.08);padding:10px 0"><strong style="color:#fff;font-size:.85rem">'+c.name+'</strong><span style="color:var(--text-muted);font-size:.72rem;margin-left:8px">'+fmtPT(c.date)+'</span><p style="color:var(--text-muted);font-size:.83rem;margin-top:4px">'+c.comment+'</p>'+(c.reply?'<div style="margin-top:6px;padding:8px 10px;background:rgba(0,180,216,.08);border-radius:6px;font-size:.8rem;color:var(--primary)"><strong>Conex Cass:</strong> '+c.reply+'</div>':'')+'</div>';}).join(''):'<p style="color:var(--text-muted);font-size:.83rem">Sê o primeiro a comentar.</p>')+
+        '<div style="margin-top:16px"><div class="form-row"><input type="text" id="pCName" placeholder="O teu nome"><input type="text" id="pCContact" placeholder="Contacto (opcional)"></div><textarea id="pCText" rows="3" placeholder="Escreve o teu comentário..." style="margin-top:8px"></textarea><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="pSubmitComment(\''+type+'\',\''+id+'\')">Enviar Comentário</button></div>';
+}
+async function pSubmitComment(type,id){
+    var name=document.getElementById('pCName').value.trim();
+    var text=document.getElementById('pCText').value.trim();
+    if(!name||!text) return showToast('Preenche o nome e o comentário.','danger');
+    await DB.insert('comments',{target_type:type,target_id:id,name:name,contact:document.getElementById('pCContact').value.trim(),comment:text,status:'Pendente',date:todayISO()});
+    showToast('Comentário enviado! Será visível após moderação.');
+    document.getElementById('pCName').value='';document.getElementById('pCContact').value='';document.getElementById('pCText').value='';
+}
+
+/* ==================== PESQUISA GLOBAL ==================== */
+function pOpenSearch(){
+    var b='<input type="text" id="pSearchInput" placeholder="Pesquisar planos, blog, notícias, ajuda..." oninput="pDoSearch(this.value)" style="width:100%;margin-bottom:14px">'+
+    '<div id="pSearchResults"><p style="color:var(--text-muted);font-size:.85rem">Escreve para pesquisar em todo o site.</p></div>';
+    document.getElementById('modalTitle').innerText='🔍 Pesquisar';
+    document.getElementById('modalBody').innerHTML=b;
+    document.getElementById('modalFooter').innerHTML='<button class="btn btn-outline" onclick="closeModal()">Fechar</button>';
+    document.getElementById('modalGeneric').classList.add('show');
+    setTimeout(function(){var i=document.getElementById('pSearchInput');if(i)i.focus();},150);
+}
+async function pDoSearch(q){
+    var box=document.getElementById('pSearchResults');
+    q=(q||'').trim().toLowerCase();
+    if(q.length<2){box.innerHTML='<p style="color:var(--text-muted);font-size:.85rem">Escreve pelo menos 2 letras.</p>';return;}
+    var res=[];
+    (DB.cache.posts||[]).forEach(function(p){if(p.status==='Publicado'&&(p.title||'').toLowerCase().includes(q))res.push({label:p.title,tag:'Blog',fn:"closeModal();pOpenPost('"+p.id+"')"});});
+    (DB.cache.news||[]).forEach(function(n){if(n.status==='Publicado'&&(n.title||'').toLowerCase().includes(q))res.push({label:n.title,tag:'Notícia',fn:"closeModal();pOpenNews('"+n.id+"')"});});
+    (DB.cache.faq||[]).forEach(function(f){if(f.status==='Publicado'&&(f.question||'').toLowerCase().includes(q))res.push({label:f.question,tag:'Ajuda',fn:"closeModal();pScrollTo('pFaq')"});});
+    (pStoreData.equip||[]).concat(pStoreData.internet||[]).concat(pStoreData.stream||[]).forEach(function(p){if((p.name||'').toLowerCase().includes(q))res.push({label:p.name,tag:'Loja',fn:"closeModal();pScrollTo('pLoja')"});});
+    if(!res.length){box.innerHTML='<p style="color:var(--text-muted);font-size:.85rem">Sem resultados para "'+q+'".</p>';return;}
+    box.innerHTML=res.slice(0,15).map(function(r){return '<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer" onclick="'+r.fn+'"><span class="ptag">'+r.tag+'</span><div style="color:#fff;font-size:.85rem;margin-top:4px">'+r.label+'</div></div>';}).join('');
+}
+
+/* ==================== PESQUISA GLOBAL (ERP) ==================== */
+function openGlobalSearch(){
+    var b='<input type="text" id="gSearchInput" placeholder="Pesquisar clientes, tickets, stock, blog..." oninput="gDoSearch(this.value)" style="width:100%;margin-bottom:14px">'+
+    '<div id="gSearchResults"><p style="color:var(--text-muted);font-size:.85rem">Escreve para pesquisar em todo o sistema.</p></div>';
+    modal('🔍 Pesquisa Global', b);
+    setTimeout(function(){var i=document.getElementById('gSearchInput');if(i)i.focus();},150);
+}
+async function gDoSearch(q){
+    var box=document.getElementById('gSearchResults');
+    q=(q||'').trim().toLowerCase();
+    if(q.length<2){box.innerHTML='<p style="color:var(--text-muted);font-size:.85rem">Escreve pelo menos 2 letras.</p>';return;}
+    var res=[];
+    (DB.cache.clients||[]).forEach(function(c){if((c.name||'').toLowerCase().includes(q)||(c.contact||'').includes(q))res.push({label:c.name,sub:c.contact||'',tag:'Cliente',fn:"closeModal();navigate('clients');setTimeout(function(){viewClient360('"+c.id+"');},300);"});});
+    (DB.cache.tickets||[]).forEach(function(t){if((t.subject||'').toLowerCase().includes(q)||(t.clientName||'').toLowerCase().includes(q))res.push({label:t.subject||'Ticket',sub:t.clientName||'',tag:'Suporte',fn:"closeModal();navigate('tickets');"});});
+    (DB.cache.inventory||[]).forEach(function(i){if((i.name||'').toLowerCase().includes(q))res.push({label:i.name,sub:i.status||'',tag:'Stock',fn:"closeModal();navigate('stock');"});});
+    (DB.cache.posts||[]).forEach(function(p){if((p.title||'').toLowerCase().includes(q))res.push({label:p.title,sub:p.status||'',tag:'Blog',fn:"closeModal();navigate('blog');"});});
+    (DB.cache.news||[]).forEach(function(n){if((n.title||'').toLowerCase().includes(q))res.push({label:n.title,sub:n.status||'',tag:'Notícia',fn:"closeModal();navigate('news');"});});
+    (DB.cache.faq||[]).forEach(function(f){if((f.question||'').toLowerCase().includes(q))res.push({label:f.question,sub:f.category||'',tag:'FAQ',fn:"closeModal();navigate('faq');"});});
+    if(!res.length){box.innerHTML='<p style="color:var(--text-muted);font-size:.85rem">Sem resultados para "'+q+'".</p>';return;}
+    box.innerHTML=res.slice(0,20).map(function(r){return '<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer" onclick="'+r.fn+'"><span class="badge bg-info">'+r.tag+'</span><div style="color:#fff;font-size:.85rem;margin-top:4px">'+r.label+'</div>'+(r.sub?'<div style="color:var(--text-muted);font-size:.72rem">'+r.sub+'</div>':'')+'</div>';}).join('');
+}
+
+
 function doLogout(){
     if(syncInterval) clearInterval(syncInterval); 
     currentUser=null;currentClient=null;localStorage.removeItem('cx_session');DB.clearCache();
     document.getElementById('mainSidebar').style.display='';document.getElementById('menuToggle').style.display='';
     document.querySelector('.notif-bell').style.display='';document.getElementById('notifCount').style.display='none';
-    showLoginScreen();
+    showPublicSite();
 }
 function showClientApp(){
+    hidePublicSite();
     document.getElementById('loginOverlay').classList.add('hidden');
     document.getElementById('mainSidebar').style.display='none';
     document.getElementById('menuToggle').style.display='none';
@@ -384,7 +951,7 @@ function clientLogout(){
     document.getElementById('menuToggle').style.display='';
     document.querySelector('.notif-bell').style.display=''; 
     document.getElementById('notifCount').style.display='none'; 
-    showLoginScreen();
+    showPublicSite();
     switchTab('client');
 }
 
@@ -420,11 +987,18 @@ async function loadClientPortal(){
         html+='<div class="card" style="border:2px solid var(--warning); margin-bottom:20px;"><h3 style="color:var(--warning)">⏳ Pagamento a Aguardar Confirmação</h3><p>Recebemos o seu aviso de pagamento de <strong>'+fmt(pendingTx.val)+' '+cu+'</strong>.</p><ul style="font-size:0.85rem; color:var(--text-muted); margin-left:20px;">'+itemsHtml+'</ul><p>A sua fatura estará disponível assim que a administração confirmar.</p></div>';
     }
     html+='<div class="kpi-grid" style="margin-bottom:20px"><div class="kpi-card" style="background:rgba(0,180,216,.05);border-left-color:var(--primary)"><div class="kpi-label">O meu Plano</div><div class="kpi-value" style="color:var(--primary);font-size:1.1rem">'+(c.pkg||'N/A')+'</div></div><div class="kpi-card" style="background:rgba(0,255,136,.05);border-left-color:'+statusCor+'"><div class="kpi-label">Estado do Serviço</div><div class="kpi-value" style="color:'+statusCor+';font-size:1.1rem">'+statusTxt+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-left-color:'+(c.divida>0?'var(--danger)':'var(--success)')+'"><div class="kpi-label">Dívida em Aberto</div><div class="kpi-value" style="color:'+(c.divida>0?'var(--danger)':'var(--success)')+'">'+fmt(Math.max(0, c.divida||0))+' '+cu+'</div></div></div>';
-    html+='<div class="card"><div style="display:flex;gap:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:15px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="renderClientTab(\'home\')">Início</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'plans\')">Planos</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'streaming\')">Streaming</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'shop\')">Loja</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'support\')">Apoio Técnico</button></div><div id="clientTabContent"></div></div>';
+    html+='<div class="card"><div style="display:flex;gap:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:15px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="renderClientTab(\'home\')">Início</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'plans\')">Planos</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'streaming\')">Streaming</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'shop\')">Loja</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'support\')">Apoio Técnico</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'news\')">Notícias<span id="clientNewsBadge"></span></button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'history\')">Histórico</button></div><div id="clientTabContent"></div></div>';
     html+='<div id="clientCartBar" style="position:fixed;bottom:0;left:0;right:0;background:var(--bg-panel);border-top:1px solid var(--primary);padding:10px 20px;display:none;justify-content:space-between;align-items:center;z-index:100;"><div><strong>Carrinho: <span id="cartTotal">0.00</span> '+cu+'</strong></div><button class="btn btn-success btn-sm" onclick="openCartCheckout()">💳 Finalizar Compra</button></div>';
     html+='<div class="card" style="margin-top:20px"><h3>As Minhas Faturas</h3>'+(docs.length?'<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Doc</th><th>Valor</th><th>Estado</th><th>Ações</th></tr></thead><tbody>'+docs.map(function(d){return '<tr><td>'+d.date+'</td><td>'+d.docId+'</td><td>'+fmt(d.total)+'</td><td><span class="badge '+(d.status==='paid'?'bg-success':'bg-warning')+'">'+(d.status==='paid'?'PAGO':'PEND.')+'</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="viewDoc(\''+d.id+'\')">👁️ Ver</button> <button class="btn btn-sm btn-primary" onclick="downloadClientInvoice(\''+d.id+'\')">📄 PDF</button></td></tr>';}).join('')+'</tbody></table></div>':'<p style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma fatura encontrada.</p>')+'</div>';
     document.getElementById('appContent').innerHTML=html;
     renderClientTab('home');
+    updateClientNewsBadge();
+}
+function updateClientNewsBadge(){
+    var lastSeen=localStorage.getItem('cx_client_lastseen_'+currentClient.id)||'2000-01-01';
+    var unread=(DB.cache.news||[]).filter(function(n){return n.status==='Publicado'&&(n.date||'')>lastSeen;}).length;
+    var b=document.getElementById('clientNewsBadge');
+    if(b) b.innerHTML=unread>0?' <span class="badge bg-danger" style="padding:1px 6px;font-size:.6rem">'+unread+'</span>':'';
 }
 
 async function renderClientTab(tab){
@@ -472,6 +1046,16 @@ async function renderClientTab(tab){
     else if(tab==='support'){
         var supportFee = 5000;
         content.innerHTML = '<h3>Agendar Apoio Técnico</h3><p style="font-size:.85rem;color:var(--warning);margin-bottom:10px">A taxa de apoio técnico é fixa de <strong>'+fmt(supportFee)+' '+cu+'</strong>. O técnico só é despachado após a confirmação do pagamento pela administração.</p><div class="form-group"><label>Descreva o problema</label><textarea id="supProblem" rows="3" placeholder="Ex: Sem internet, lentidão..."></textarea></div><button class="btn btn-warning" onclick="addCartSupport()"><strong>Agendar e Pagar '+fmt(supportFee)+' '+cu+'</strong></button>';
+    }
+    else if(tab==='news'){
+        localStorage.setItem('cx_client_lastseen_'+c.id,todayISO());
+        updateClientNewsBadge();
+        var allNews=(await DB.get('news')).filter(function(n){return n.status==='Publicado';}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,10);
+        content.innerHTML='<h3>📢 Notícias da Rede</h3>'+(allNews.length?allNews.map(function(n){return '<div style="border-bottom:1px solid rgba(255,255,255,.08);padding:10px 0"><span class="badge bg-info">'+(n.type||'Novidade')+'</span> <strong style="color:#fff">'+n.title+'</strong><p style="color:var(--text-muted);font-size:.82rem;margin-top:4px">'+fmtPT(n.date)+'</p></div>';}).join(''):'<p style="color:var(--text-muted)">Sem notícias no momento.</p>');
+    }
+    else if(tab==='history'){
+        var allTx=(await DB.get('transactions')).filter(function(t){return t.clientId===c.id;}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+        content.innerHTML='<h3>🧾 Histórico de Pagamentos</h3>'+(allTx.length?'<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th>Método</th></tr></thead><tbody>'+allTx.map(function(t){return '<tr><td>'+(t.date||'-')+'</td><td>'+(t.desc||t.reference||'-')+'</td><td>'+fmt(t.val)+' '+cu+'</td><td>'+(t.met||'-')+'</td></tr>';}).join('')+'</tbody></table></div>':'<p style="color:var(--text-muted)">Sem histórico de pagamentos.</p>');
     }
 }
 
@@ -552,7 +1136,7 @@ async function viewProof(txId){
 /* ==================== INIT & SIDEBAR ==================== */
 async function seedData(){var users=await DB.get('users');if(!users.find(function(x){return x.user==='cassoca';}))await DB.upsert('users',{id:'u1',name:'Cassoca',user:'cassoca',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});if(!users.find(function(x){return x.user==='admin';}))await DB.upsert('users',{id:'u0',name:'Admin',user:'admin',pass:await hashPassword('0579'),role:'admin',branchId:'all',commission:0});var br=await DB.get('branches');if(!br.length)await DB.insert('branches',{id:'b1',name:'Matriz',loc:'Luanda',nif:'003982940LA041',phone:'+244 923 000 000',iban:'000600000083984030135',express:'945740125',mgr:'Cassoca',active:true});var sp=await DB.get('speeds');if(!sp.length){await DB.insert('speeds',{id:'s1',nome:'5 MB',preco:25000,period:'Mensal',days:30});await DB.insert('speeds',{id:'s2',nome:'10 MB',preco:35000,period:'Mensal',days:30});}var pl=await DB.get('plans');if(!pl.length)await DB.insert('plans',{id:'p1',nome:'NETFLIX',preco:7000});var st=await DB.get('settings');if(!st||!st.id)await DB.upsert('settings',{id:1,name:'Conex Cass',nif:'003982940LA041',taxRate:14,currency:'AKZ',docSeq:0,receiptSeq:0,displacementFee:5000,damagePenaltyPct:100,cutoffGraceDays:3});var emp=await DB.get('employees');if(!emp.length)await DB.insert('employees',{id:'e1',name:'Técnico A',role:'Instalador',department:'Rede',salary:0,contact:'',startDate:'',status:'Activo'});var inv=await DB.get('inventory');if(!inv.find(function(i){return i.name==='Roteador TP-Link';}))await DB.insert('inventory',{id:'i1',name:'Roteador TP-Link',cat:'Equipamento',val:15000,qty:50,branchId:'all',status:'Em Stock'});}
 async function syncLegacyBranchData() {if (!currentUser || currentUser.role !== 'admin') return; var tablesToSync = ['clients','transactions','documents','inventory','suppliers','tickets','installations','advances'];for (var i=0; i<tablesToSync.length; i++) {var t = tablesToSync[i];try {var raw = await sb.from(t).select('id').is('branchId', null).limit(50000);if (raw.data && raw.data.length > 0) {showToast('A organizar dados antigos...','info');for (var j=0; j<raw.data.length; j++) { await sb.from(t).update({ branchId: 'all' }).eq('id', raw.data[j].id); }DB.clearCache(t); }} catch(e) {}}}
-async function init(){showSpinner('A inicializar sistema...');await DB.loadAll();await seedData();hideSpinner();var sid=localStorage.getItem('cx_session');if(sid){var u=await DB.get('users');var f=u.find(function(x){return x.id===sid;});if(f){currentUser=f;await syncLegacyBranchData();showApp();return;}}showLoginScreen();}
+async function init(){showSpinner('A inicializar sistema...');await DB.loadAll();await seedData();hideSpinner();var sid=localStorage.getItem('cx_session');if(sid){var u=await DB.get('users');var f=u.find(function(x){return x.id===sid;});if(f){currentUser=f;await syncLegacyBranchData();showApp();return;}}showPublicSite();}
 async function run(){
     await loadSidebar();
     document.querySelector('.notif-bell').style.display = ''; 
@@ -606,8 +1190,8 @@ async function runDailyAutomations() {
     if(blocked > 0 || genInv > 0) showToast('Automação: '+genInv+' faturas geradas, '+blocked+' clientes bloqueados.', 'info');
 }
 
-var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
-async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
+var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config','blog','news','faq','comments','promotions','newsletter','stats'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports','blog','news','faq','comments','promotions','newsletter','stats'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
+async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'blog',i:'📰',t:'Blog'},{id:'news',i:'📢',t:'Notícias'},{id:'promotions',i:'🔥',t:'Promoções'},{id:'newsletter',i:'📧',t:'Newsletter'},{id:'faq',i:'❓',t:'FAQ'},{id:'comments',i:'💬',t:'Comentários'},{id:'stats',i:'📊',t:'Estatísticas Portal'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
 function navigate(id){
     if(currentClient) { showToast('Acesso restrito ao portal do cliente.','warning'); return loadClientPortal(); }
     var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];
@@ -616,7 +1200,7 @@ function navigate(id){
     var a=document.querySelector('.sidebar nav a[onclick*="'+id+'"]');if(a)a.classList.add('active');
     document.getElementById('pageTitle').innerText=id.charAt(0).toUpperCase()+id.slice(1);
     currentPageId = id; 
-    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
+    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,blog:loadBlog,news:loadNews,faq:loadFaq,comments:loadComments,promotions:loadPromotions,newsletter:loadNewsletter,stats:loadStats,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
     if(actions[id])actions[id]();
     document.getElementById('mainSidebar').classList.remove('open');
 }
@@ -940,6 +1524,198 @@ async function delSupplier(id){var ok=await showConfirm('Eliminar Fornecedor','E
 async function loadTickets(){var data=(await DB.get('tickets')).slice().reverse();var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px"><h2>🎧 Suporte</h2><button class="btn btn-info" onclick="openModalTicket()">➕ Novo</button></div><div class="card"><table><thead><tr><th>Data</th><th>Cliente</th><th>Assunto</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';data.forEach(function(r){var sc=r.status==='Aberto'?'bg-danger':r.status==='Em Atendimento'?'bg-warning':'bg-success';html+='<tr><td>'+(r.dateCreated||'-')+'</td><td>'+(r.clientName||'-')+'</td><td>'+(r.subject||'-')+'</td><td><span class="badge '+sc+'">'+(r.status||'-')+'</span></td><td><button class="btn btn-outline btn-sm" onclick="openModalTicket(\''+r.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" onclick="delTicket(\''+r.id+'\')">🗑️</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
 async function openModalTicket(id){var data=await DB.get('tickets');var r=id?data.find(function(x){return x.id===id;}):{};var cl=await DB.get('clients');var emps=(await DB.get('employees')).filter(function(e){return e.role==='Instalador';});var clOpts=cl.map(function(c){return'<option value="'+c.name+'" '+(r.clientName===c.name?'selected':'')+'>'+c.name+'</option>';}).join('');var techOpts=emps.map(function(e){return'<option value="'+e.name+'" '+(r.tech===e.name?'selected':'')+'>'+e.name+'</option>';}).join('');modal('🎧 Ticket','<div class="form-row"><div><label>Cliente</label><select id="tClient"><option value="">--</option>'+clOpts+'</select></div><div><label>Técnico</label><select id="tTech"><option value="">--</option>'+techOpts+'</select></div></div><div class="form-row"><div><label>Assunto</label><input id="tSubject" value="'+(r.subject||'')+'"></div><div><label>Estado</label><select id="tStatus"><option '+(r.status==='Aberto'?'selected':'')+'>Aberto</option><option '+(r.status==='Em Atendimento'?'selected':'')+'>Em Atendimento</option><option '+(r.status==='Resolvido'?'selected':'')+'>Resolvido</option></select></div></div><div><label>Descrição</label><textarea id="tDesc" rows="3">'+(r.description||'')+'</textarea></div>',async function(){var obj={id:id||'tk'+Date.now(),clientName:val('tClient'),tech:val('tTech'),subject:val('tSubject'),status:val('tStatus'),description:val('tDesc'),dateCreated:id?r.dateCreated:getTodayStr()};if(id)await DB.update('tickets',id,obj);else await DB.insert('tickets',obj);await logAction('Ticket',obj.subject);showToast('Salvo!');closeModal();loadTickets();});}
 async function delTicket(id){var ok=await showConfirm('Eliminar Ticket','Eliminar este ticket de suporte?','Eliminar','btn-danger');if(!ok)return;await DB.del('tickets',id);showToast('Eliminado!');loadTickets();}
+
+/* ==================== BLOG / NOTÍCIAS (CMS) ==================== */
+function pSlug(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');}
+async function loadBlog(){
+    var data=(await DB.get('posts')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📰 Blog</h2><button class="btn btn-danger btn-sm" onclick="openPostModal()">➕ Novo Artigo</button></div><div class="card"><table><thead><tr><th>Título</th><th>Categoria</th><th>Autor</th><th>Data</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum artigo criado ainda.</td></tr>';
+    data.forEach(function(p){
+        var pub=p.status==='Publicado';
+        html+='<tr><td><strong>'+p.title+'</strong></td><td>'+(p.category||'-')+'</td><td>'+(p.author||'-')+'</td><td>'+fmtPT(p.date)+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(p.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openPostModal(\''+p.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="togglePostStatus(\''+p.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delPost(\''+p.id+'\')">🗑️</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function openPostModal(id){
+    var p=id?DB.cache.posts.find(function(x){return x.id===id;}):null;
+    var b='<div class="form-group"><label>Título</label><input type="text" id="fPostTitle" value="'+(p?p.title.replace(/"/g,'&quot;'):'')+'" placeholder="Título do artigo"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Categoria</label><input type="text" id="fPostCat" value="'+(p?(p.category||''):'')+'" placeholder="Ex: Dicas, Rede, Empresa"></div>'+
+    '<div class="form-group"><label>Estado</label><select id="fPostStatus"><option value="Rascunho"'+(p&&p.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(p&&p.status==='Publicado'?' selected':'')+'>Publicado</option></select></div></div>'+
+    '<div class="form-group"><label>Imagem (URL, opcional)</label><input type="text" id="fPostImg" value="'+(p?(p.image||''):'')+'" placeholder="https://..."></div>'+
+    '<div class="form-group"><label>Resumo</label><textarea id="fPostExcerpt" rows="2" placeholder="Resumo curto que aparece no site">'+(p?(p.excerpt||''):'')+'</textarea></div>'+
+    '<div class="form-group"><label>Conteúdo</label><textarea id="fPostContent" rows="8" placeholder="Conteúdo completo do artigo">'+(p?(p.content||''):'')+'</textarea></div>';
+    modal(p?'Editar Artigo':'Novo Artigo', b, function(){savePost(id);}, 'Salvar');
+}
+async function savePost(id){
+    var title=document.getElementById('fPostTitle').value.trim();
+    if(!title) return showToast('Indica o título do artigo.','danger');
+    var rec={title:title,category:document.getElementById('fPostCat').value.trim(),status:document.getElementById('fPostStatus').value,image:document.getElementById('fPostImg').value.trim(),excerpt:document.getElementById('fPostExcerpt').value.trim(),content:document.getElementById('fPostContent').value.trim(),slug:pSlug(title)};
+    if(id){await DB.update('posts',id,rec);}
+    else{rec.date=todayISO();rec.author=currentUser.name||'Equipa Conex Cass';await DB.insert('posts',rec);}
+    closeModal();showToast('Artigo guardado!');loadBlog();
+}
+async function togglePostStatus(id){var p=DB.cache.posts.find(function(x){return x.id===id;});if(!p)return;await DB.update('posts',id,{status:p.status==='Publicado'?'Rascunho':'Publicado'});loadBlog();}
+async function delPost(id){var ok=await showConfirm('Eliminar Artigo','Eliminar este artigo do blog?','Eliminar','btn-danger');if(!ok)return;await DB.del('posts',id);showToast('Eliminado!');loadBlog();}
+
+async function loadNews(){
+    var data=(await DB.get('news')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📢 Notícias</h2><button class="btn btn-danger btn-sm" onclick="openNewsModal()">➕ Nova Notícia</button></div><div class="card"><table><thead><tr><th>Título</th><th>Tipo</th><th>Data</th><th>Notificar</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhuma notícia criada ainda.</td></tr>';
+    data.forEach(function(n){
+        var pub=n.status==='Publicado';
+        html+='<tr><td><strong>'+n.title+'</strong></td><td><span class="badge bg-info">'+(n.type||'Novidade')+'</span></td><td>'+fmtPT(n.date)+'</td><td>'+(n.notify?'🔔 Sim':'-')+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(n.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openNewsModal(\''+n.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="toggleNewsStatus(\''+n.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delNews(\''+n.id+'\')">🗑️</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function openNewsModal(id){
+    var n=id?DB.cache.news.find(function(x){return x.id===id;}):null;
+    var types=['Novidade','Cobertura','Manutenção','Interrupção'];
+    var b='<div class="form-group"><label>Título</label><input type="text" id="fNewsTitle" value="'+(n?n.title.replace(/"/g,'&quot;'):'')+'" placeholder="Título da notícia"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Tipo</label><select id="fNewsType">'+types.map(function(t){return '<option value="'+t+'"'+(n&&n.type===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div>'+
+    '<div class="form-group"><label>Estado</label><select id="fNewsStatus"><option value="Rascunho"'+(n&&n.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(n&&n.status==='Publicado'?' selected':'')+'>Publicado</option></select></div></div>'+
+    '<div class="form-group"><label>Conteúdo</label><textarea id="fNewsContent" rows="6" placeholder="Detalhes da notícia">'+(n?(n.content||''):'')+'</textarea></div>'+
+    '<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="fNewsNotify" style="width:auto" '+(n&&n.notify?'checked':'')+'> Notificar clientes ao publicar</label></div>';
+    modal(n?'Editar Notícia':'Nova Notícia', b, function(){saveNews(id);}, 'Salvar');
+}
+async function saveNews(id){
+    var title=document.getElementById('fNewsTitle').value.trim();
+    if(!title) return showToast('Indica o título da notícia.','danger');
+    var rec={title:title,type:document.getElementById('fNewsType').value,status:document.getElementById('fNewsStatus').value,content:document.getElementById('fNewsContent').value.trim(),notify:document.getElementById('fNewsNotify').checked};
+    if(id){await DB.update('news',id,rec);}
+    else{rec.date=todayISO();await DB.insert('news',rec);}
+    closeModal();showToast('Notícia guardada!'+(rec.notify&&rec.status==='Publicado'?' (notificação de clientes ainda não está ativa nesta fase)':''));loadNews();
+}
+async function toggleNewsStatus(id){var n=DB.cache.news.find(function(x){return x.id===id;});if(!n)return;await DB.update('news',id,{status:n.status==='Publicado'?'Rascunho':'Publicado'});loadNews();}
+async function delNews(id){var ok=await showConfirm('Eliminar Notícia','Eliminar esta notícia?','Eliminar','btn-danger');if(!ok)return;await DB.del('news',id);showToast('Eliminado!');loadNews();}
+
+/* ==================== FAQ / BASE DE CONHECIMENTO ==================== */
+async function loadFaq(){
+    var data=(await DB.get('faq')).slice().sort(function(a,b){return (a.category||'').localeCompare(b.category||'');});
+    var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>❓ FAQ / Base de Conhecimento</h2><button class="btn btn-danger btn-sm" onclick="openFaqModal()">➕ Nova Entrada</button></div><div class="card"><table><thead><tr><th>Pergunta</th><th>Tipo</th><th>Categoria</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Nenhuma entrada criada ainda.</td></tr>';
+    data.forEach(function(f){
+        var pub=f.status==='Publicado';
+        html+='<tr><td><strong>'+f.question+'</strong></td><td><span class="badge bg-info">'+(f.type==='kb'?'Base Conhecimento':'FAQ')+'</span></td><td>'+(f.category||'-')+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(f.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openFaqModal(\''+f.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="toggleFaqStatus(\''+f.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delFaq(\''+f.id+'\')">🗑️</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function openFaqModal(id){
+    var f=id?DB.cache.faq.find(function(x){return x.id===id;}):null;
+    var b='<div class="form-row"><div class="form-group"><label>Tipo</label><select id="fFaqType"><option value="faq"'+(f&&f.type==='faq'?' selected':'')+'>FAQ (Perguntas Frequentes)</option><option value="kb"'+(f&&f.type==='kb'?' selected':'')+'>Base de Conhecimento (Técnico)</option></select></div>'+
+    '<div class="form-group"><label>Categoria</label><input type="text" id="fFaqCat" value="'+(f?(f.category||''):'')+'" placeholder="Ex: Internet, Pagamentos, Mikrotik, ONU"></div></div>'+
+    '<div class="form-group"><label>Pergunta / Título</label><input type="text" id="fFaqQ" value="'+(f?f.question.replace(/"/g,'&quot;'):'')+'" placeholder="Ex: Como configurar o router?"></div>'+
+    '<div class="form-group"><label>Resposta / Conteúdo</label><textarea id="fFaqA" rows="6" placeholder="Resposta completa">'+(f?(f.answer||''):'')+'</textarea></div>'+
+    '<div class="form-group"><label>Estado</label><select id="fFaqStatus"><option value="Rascunho"'+(f&&f.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(f&&f.status==='Publicado'?' selected':'')+'>Publicado</option></select></div>';
+    modal(f?'Editar Entrada':'Nova Entrada FAQ/KB', b, function(){saveFaq(id);}, 'Salvar');
+}
+async function saveFaq(id){
+    var q=document.getElementById('fFaqQ').value.trim();
+    if(!q) return showToast('Indica a pergunta/título.','danger');
+    var rec={type:document.getElementById('fFaqType').value,category:document.getElementById('fFaqCat').value.trim(),question:q,answer:document.getElementById('fFaqA').value.trim(),status:document.getElementById('fFaqStatus').value};
+    if(id){await DB.update('faq',id,rec);}else{await DB.insert('faq',rec);}
+    closeModal();showToast('Guardado!');loadFaq();
+}
+async function toggleFaqStatus(id){var f=DB.cache.faq.find(function(x){return x.id===id;});if(!f)return;await DB.update('faq',id,{status:f.status==='Publicado'?'Rascunho':'Publicado'});loadFaq();}
+async function delFaq(id){var ok=await showConfirm('Eliminar Entrada','Eliminar esta entrada de FAQ/Base de Conhecimento?','Eliminar','btn-danger');if(!ok)return;await DB.del('faq',id);showToast('Eliminado!');loadFaq();}
+
+/* ==================== SISTEMA DE COMENTÁRIOS ==================== */
+async function loadComments(){
+    var data=(await DB.get('comments')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var html='<div style="margin-bottom:15px"><h2>💬 Comentários</h2><p style="color:var(--text-muted);font-size:.85rem">Modera os comentários deixados pelos visitantes no Blog e Notícias.</p></div><div class="card"><table><thead><tr><th>Nome</th><th>Origem</th><th>Comentário</th><th>Data</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum comentário recebido ainda.</td></tr>';
+    data.forEach(function(c){
+        var origin=(c.target_type==='post'?'📰 Blog: ':'📢 Notícia: ')+pCommentTargetName(c.target_type,c.target_id);
+        var sc=c.status==='Aprovado'?'bg-success':c.status==='Rejeitado'?'bg-danger':'bg-warning';
+        html+='<tr><td><strong>'+c.name+'</strong>'+(c.contact?'<br><span style="font-size:.7rem;color:var(--text-muted)">'+c.contact+'</span>':'')+'</td><td style="font-size:.78rem">'+origin+'</td><td style="font-size:.82rem;max-width:260px">'+c.comment+(c.reply?'<br><em style="color:var(--primary);font-size:.75rem">↳ Resposta: '+c.reply+'</em>':'')+'</td><td>'+fmtPT(c.date)+'</td><td><span class="badge '+sc+'">'+c.status+'</span></td><td style="white-space:nowrap">'+(c.status!=='Aprovado'?'<button class="btn btn-success btn-sm" onclick="moderateComment(\''+c.id+'\',\'Aprovado\')">✅</button> ':'')+(c.status!=='Rejeitado'?'<button class="btn btn-warning btn-sm" onclick="moderateComment(\''+c.id+'\',\'Rejeitado\')">🚫</button> ':'')+'<button class="btn btn-info btn-sm" onclick="openReplyModal(\''+c.id+'\')">↩️</button> <button class="btn btn-danger btn-sm" onclick="delComment(\''+c.id+'\')">🗑️</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function pCommentTargetName(type,id){
+    var list=type==='post'?(DB.cache.posts||[]):(DB.cache.news||[]);
+    var t=list.find(function(x){return x.id===id;});
+    return t?t.title:'(removido)';
+}
+async function moderateComment(id,status){await DB.update('comments',id,{status:status});showToast('Comentário '+status.toLowerCase()+'!');loadComments();}
+function openReplyModal(id){
+    var c=DB.cache.comments.find(function(x){return x.id===id;});if(!c)return;
+    modal('Responder Comentário','<p style="color:var(--text-muted);font-size:.85rem;margin-bottom:10px">'+c.comment+'</p><div class="form-group"><label>Resposta</label><textarea id="fReply" rows="4">'+(c.reply||'')+'</textarea></div>',async function(){var r=document.getElementById('fReply').value.trim();await DB.update('comments',id,{reply:r,status:'Aprovado'});closeModal();showToast('Resposta enviada!');loadComments();},'Enviar');
+}
+async function delComment(id){var ok=await showConfirm('Eliminar Comentário','Eliminar este comentário?','Eliminar','btn-danger');if(!ok)return;await DB.del('comments',id);showToast('Eliminado!');loadComments();}
+
+/* ==================== PROMOÇÕES ==================== */
+async function loadPromotions(){
+    var data=(await DB.get('promotions')).slice().sort(function(a,b){return (b.id||'').localeCompare(a.id||'');});
+    var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>🔥 Promoções</h2><button class="btn btn-danger btn-sm" onclick="openPromoModal()">➕ Nova Promoção</button></div><div class="card"><table><thead><tr><th>Título</th><th>Oferta</th><th>Válido até</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Nenhuma promoção criada ainda.</td></tr>';
+    data.forEach(function(p){
+        var pub=p.status==='Publicado';
+        html+='<tr><td><strong>'+p.title+'</strong></td><td>'+(p.discount_text||'-')+'</td><td>'+(p.valid_until?fmtPT(p.valid_until):'Sem limite')+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(p.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openPromoModal(\''+p.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="togglePromoStatus(\''+p.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delPromo(\''+p.id+'\')">🗑️</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function openPromoModal(id){
+    var p=id?DB.cache.promotions.find(function(x){return x.id===id;}):null;
+    var b='<div class="form-group"><label>Título</label><input type="text" id="fPromoTitle" value="'+(p?p.title.replace(/"/g,'&quot;'):'')+'" placeholder="Ex: Plano 20MB em promoção"></div>'+
+    '<div class="form-row"><div class="form-group"><label>Texto da Oferta</label><input type="text" id="fPromoDisc" value="'+(p?(p.discount_text||''):'')+'" placeholder="Ex: De 18.000 por 15.000 Kz"></div>'+
+    '<div class="form-group"><label>Válido até (opcional)</label><input type="date" id="fPromoUntil" value="'+(p?(p.valid_until||''):'')+'"></div></div>'+
+    '<div class="form-group"><label>Descrição</label><textarea id="fPromoDesc" rows="3" placeholder="Detalhes da promoção">'+(p?(p.description||''):'')+'</textarea></div>'+
+    '<div class="form-group"><label>Estado</label><select id="fPromoStatus"><option value="Rascunho"'+(p&&p.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(p&&p.status==='Publicado'?' selected':'')+'>Publicado</option></select></div>';
+    modal(p?'Editar Promoção':'Nova Promoção', b, function(){savePromo(id);}, 'Salvar');
+}
+async function savePromo(id){
+    var title=document.getElementById('fPromoTitle').value.trim();
+    if(!title) return showToast('Indica o título da promoção.','danger');
+    var rec={title:title,discount_text:document.getElementById('fPromoDisc').value.trim(),valid_until:document.getElementById('fPromoUntil').value||null,description:document.getElementById('fPromoDesc').value.trim(),status:document.getElementById('fPromoStatus').value};
+    if(id){await DB.update('promotions',id,rec);}else{await DB.insert('promotions',rec);}
+    closeModal();showToast('Promoção guardada!');loadPromotions();
+}
+async function togglePromoStatus(id){var p=DB.cache.promotions.find(function(x){return x.id===id;});if(!p)return;await DB.update('promotions',id,{status:p.status==='Publicado'?'Rascunho':'Publicado'});loadPromotions();}
+async function delPromo(id){var ok=await showConfirm('Eliminar Promoção','Eliminar esta promoção?','Eliminar','btn-danger');if(!ok)return;await DB.del('promotions',id);showToast('Eliminado!');loadPromotions();}
+
+/* ==================== NEWSLETTER ==================== */
+async function loadNewsletter(){
+    var data=(await DB.get('newsletter')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📧 Newsletter ('+data.length+' subscritores)</h2><button class="btn btn-primary btn-sm" onclick="exportNewsletterCsv()">📤 Exportar CSV</button></div><div class="card"><table><thead><tr><th>Email</th><th>Data de Subscrição</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Ainda sem subscritores.</td></tr>';
+    data.forEach(function(n){html+='<tr><td>'+n.email+'</td><td>'+fmtPT(n.date)+'</td><td><button class="btn btn-danger btn-sm" onclick="delNewsletter(\''+n.id+'\')">🗑️</button></td></tr>';});
+    html+='</tbody></table></div><p style="color:var(--text-muted);font-size:.8rem;margin-top:10px">💡 Este módulo recolhe emails; o envio de campanhas exige ligação a um serviço de email (ex: Brevo, Mailgun) — posso ajudar a configurar isso à parte.</p>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function exportNewsletterCsv(){
+    var data=DB.cache.newsletter||[];
+    var csv='Email,Data\n'+data.map(function(n){return n.email+','+(n.date||'');}).join('\n');
+    var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='newsletter_'+todayISO()+'.csv';a.click();
+}
+async function delNewsletter(id){var ok=await showConfirm('Remover Subscritor','Remover este email da newsletter?','Remover','btn-danger');if(!ok)return;await DB.del('newsletter',id);showToast('Removido!');loadNewsletter();}
+
+/* ==================== ESTATÍSTICAS DO PORTAL ==================== */
+async function loadStats(){
+    var data=await DB.get('analytics');
+    var count=function(type){return data.filter(function(a){return a.type===type;}).length;};
+    var top=function(type,n){
+        var m={};data.filter(function(a){return a.type===type;}).forEach(function(a){var k=a.ref_id||a.ref_name;if(!m[k])m[k]={name:a.ref_name||'-',count:0};m[k].count++;});
+        return Object.values(m).sort(function(a,b){return b.count-a.count;}).slice(0,n);
+    };
+    var visits=count('site_visit'),views=count('view_post')+count('view_news');
+    var topPosts=top('view_post',5),topNews=top('view_news',5),topProd=top('product_interest',5);
+    var html='<h2 style="margin-bottom:15px">📊 Estatísticas do Portal</h2>';
+    html+='<div class="kpi-grid" style="margin-bottom:20px"><div class="kpi-card"><div class="kpi-label">Visitas ao Site</div><div class="kpi-value">'+visits+'</div></div><div class="kpi-card"><div class="kpi-label">Leituras (Blog+Notícias)</div><div class="kpi-value">'+views+'</div></div><div class="kpi-card"><div class="kpi-label">Newsletter</div><div class="kpi-value">'+((DB.cache.newsletter||[]).length)+'</div></div><div class="kpi-card"><div class="kpi-label">Comentários</div><div class="kpi-value">'+((DB.cache.comments||[]).length)+'</div></div></div>';
+    html+='<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px">';
+    html+='<div class="card"><h3>📰 Artigos Mais Lidos</h3>'+(topPosts.length?topPosts.map(function(t){return '<div class="plan-card"><span>'+t.name+'</span><strong>'+t.count+'</strong></div>';}).join(''):'<p style="color:var(--text-muted)">Sem dados ainda.</p>')+'</div>';
+    html+='<div class="card"><h3>📢 Notícias Mais Lidas</h3>'+(topNews.length?topNews.map(function(t){return '<div class="plan-card"><span>'+t.name+'</span><strong>'+t.count+'</strong></div>';}).join(''):'<p style="color:var(--text-muted)">Sem dados ainda.</p>')+'</div>';
+    html+='<div class="card"><h3>🛒 Produtos com Mais Interesse</h3>'+(topProd.length?topProd.map(function(t){return '<div class="plan-card"><span>'+t.name+'</span><strong>'+t.count+'</strong></div>';}).join(''):'<p style="color:var(--text-muted)">Sem dados ainda.</p>')+'</div>';
+    html+='</div><p style="color:var(--text-muted);font-size:.8rem;margin-top:15px">💡 "Produtos com mais interesse" conta itens adicionados ao carrinho e enviados por WhatsApp — não há registo de vendas confirmadas automaticamente, pois o pagamento final é feito por ti.</p>';
+    document.getElementById('appContent').innerHTML=html;
+}
+
+
+
 
 /* ==================== GESTÃO DE ATIVOS / STOCK ==================== */
 async function loadStock(){
