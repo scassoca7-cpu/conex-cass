@@ -614,7 +614,7 @@ var DB={
 cache:{},
 applyBranchFilter: function(data, t) {
     if (!Array.isArray(data)) return data;
-    if (['settings','branches','speeds','plans','ip_pool','users','posts','news','faq','comments','promotions','newsletter','analytics','tutorials','feedback','media_library','content_blocks'].includes(t)) return data;
+    if (['settings','branches','speeds','plans','ip_pool','users','posts','news','faq','comments','promotions','newsletter','analytics','tutorials','feedback','media_library','content_blocks','apps'].includes(t)) return data;
     if (!currentUser || currentUser.branchId === 'all') return data;
     return data.filter(function(item) { return item.branchId === currentUser.branchId; });
 },
@@ -640,7 +640,7 @@ update:async function(t,id,d){try{var res=await sb.from(t).update(d).eq('id',id)
 upsert:async function(t,r){try{var res=await sb.from(t).upsert(r,{onConflict:'id'}).select();if(res.error)throw res.error;if(!res.data||!res.data.length)throw new Error("Sem retorno");if(t==='settings'){this.cache[t]=res.data[0];}else if(t==='cash_register'){this.cache[t]=res.data[0];}else{if(Array.isArray(this.cache[t])){var d=res.data[0];var i=this.cache[t].findIndex(function(x){return x.id===d.id;});if(i>=0)this.cache[t][i]=d;else this.cache[t].push(d);}else{this.cache[t]=res.data[0];}}return res.data[0];}catch(e){showToast("Erro Upsert: "+e.message,'danger');return null;}},
 del:async function(t,id){try{var res=await sb.from(t).delete().eq('id',id);if(res.error)throw res.error;if(this.cache[t]&&Array.isArray(this.cache[t]))this.cache[t]=this.cache[t].filter(function(x){return x.id!==id;});return true;}catch(e){showToast("Erro BD: "+e.message,'danger');return false;}},
 loadAll: async function(forceRemote) {
-    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances','posts','news','faq','comments','promotions','newsletter','analytics','tutorials','feedback','media_library','content_blocks'];
+    var ks = ['users','branches','settings','clients','suppliers','transactions','documents','inventory','speeds','plans','ip_pool','contracts','installations','audit_logs','cash_register','employees','tickets','stock_movements','advances','posts','news','faq','comments','promotions','newsletter','analytics','tutorials','feedback','media_library','content_blocks','apps'];
     var promises = ks.map(k => { if (forceRemote || this.cache[k] === undefined) return this.get(k, true); return Promise.resolve(); });
     await Promise.all(promises);
 },
@@ -824,8 +824,16 @@ function pWhatsapp(msg){
     window.open('https://api.whatsapp.com/send?phone='+ADMIN_WHATSAPP+'&text='+encodeURIComponent(msg),'_blank');
 }
 function openClientLogin(){
+    if(currentClient){ showClientApp(); return; }
     switchTab('client');
     document.getElementById('loginOverlay').classList.remove('hidden');
+}
+function pBackToSiteFromClient(){
+    document.getElementById('mainSidebar').style.display='';
+    document.getElementById('menuToggle').style.display='';
+    document.querySelector('.notif-bell').style.display='';
+    document.getElementById('notifCount').style.display='none';
+    showPublicSite();
 }
 function openAdminLogin(){
     switchTab('login');
@@ -849,7 +857,8 @@ async function renderPublicPlans(){
         var mid=Math.floor(mensal.length/2);
         grid.innerHTML=mensal.map(function(s,i){
             var pop=(i===mid&&mensal.length>2);
-            return '<div class="p-plan'+(pop?' pop':'')+'">'+(pop?'<span class="pbadge">Mais Popular</span>':'')+
+            var img=s.image?'<img src="'+s.image+'" alt="" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:12px">':'';
+            return '<div class="p-plan'+(pop?' pop':'')+'">'+(pop?'<span class="pbadge">Mais Popular</span>':'')+img+
                 '<h3>'+s.nome+'</h3>'+
                 '<div class="pprice">'+fmt(s.preco)+' <small>'+cu+'/mês</small></div>'+
                 '<button class="btn '+(pop?'btn-primary':'btn-outline')+'" onclick="pWhatsapp(\'Olá! Quero contratar o plano '+s.nome+' de internet.\')">Contratar Agora</button>'+
@@ -981,7 +990,7 @@ async function renderPublicStore(){
         var inv=(await DB.get('inventory')).filter(function(i){return i.status==='Em Stock'&&(i.qty||0)>0&&i.cat!=='Consumível';});
         pStoreData.equip=inv.map(function(i){return {id:i.id,type:'equip',name:i.name,tag:i.cat||'Equipamento',price:i.val||0,unit:cu,icon:'📦',image:i.image||'',gallery:i.gallery||''};});
         var sp=(await DB.get('speeds')).filter(function(s){return s.period==='Mensal'||!s.period;}).sort(function(a,b){return (a.preco||0)-(b.preco||0);});
-        pStoreData.internet=sp.map(function(s){return {id:s.id,type:'internet',name:s.nome,tag:'Internet Mensal',price:s.preco||0,unit:cu+'/mês',icon:'📡'};});
+        pStoreData.internet=sp.map(function(s){return {id:s.id,type:'internet',name:s.nome,tag:'Internet Mensal',price:s.preco||0,unit:cu+'/mês',icon:'📡',image:s.image||''};});
         var pl=await DB.get('plans');
         pStoreData.stream=pl.map(function(p){return {id:p.id,type:'stream',name:p.nome,tag:'Streaming/Serviço',price:p.preco||0,unit:cu+'/mês',icon:'🎬',image:p.image||'',description:p.description||'',android_url:p.android_url||'',ios_url:p.ios_url||'',tv_url:p.tv_url||'',website_url:p.website_url||''};});
     }catch(e){}
@@ -994,8 +1003,10 @@ function pRenderStoreGrid(){
     if(!items.length){grid.innerHTML='<p style="color:var(--text-muted)">Sem produtos disponíveis nesta categoria de momento.</p>';return;}
     grid.innerHTML=items.map(function(p){
         var img=p.image?'<img src="'+p.image+'" alt="" style="width:100%;height:100%;object-fit:cover">':p.icon;
-        var detailsBtn=(p.type==='equip'||p.type==='stream')?'<button class="btn btn-outline btn-sm" onclick="pProductDetails(\''+p.type+'\',\''+p.id+'\')">👁️ Detalhes</button> ':'';
-        return '<div class="p-prod"><div class="p-prod-img">'+img+'</div><div class="p-prod-body"><span class="ptag">'+p.tag+'</span><h4>'+p.name+'</h4><div class="p-prod-price">'+fmt(p.price)+' <small>'+p.unit+'</small></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+detailsBtn+'<button class="btn btn-primary btn-sm" onclick="pAddToCart(\''+p.type+'\',\''+p.id+'\')">🛒 Adicionar</button></div></div></div>';
+        var hasDetails=(p.type==='equip'||p.type==='stream');
+        var imgWrap='<div class="p-prod-img"'+(hasDetails?' style="cursor:pointer" onclick="pProductDetails(\''+p.type+'\',\''+p.id+'\')"':'')+'>'+img+'</div>';
+        var detailsBtn=hasDetails?'<button class="btn btn-outline btn-sm" onclick="pProductDetails(\''+p.type+'\',\''+p.id+'\')">👁️ Ver Fotos e Detalhes</button> ':'';
+        return '<div class="p-prod">'+imgWrap+'<div class="p-prod-body"><span class="ptag">'+p.tag+'</span><h4>'+p.name+'</h4><div class="p-prod-price">'+fmt(p.price)+' <small>'+p.unit+'</small></div><div style="display:flex;gap:6px;flex-wrap:wrap">'+detailsBtn+'<button class="btn btn-primary btn-sm" onclick="pAddToCart(\''+p.type+'\',\''+p.id+'\')">🛒 Adicionar</button></div></div></div>';
     }).join('');
 }
 function pProductDetails(type,id){
@@ -1057,16 +1068,20 @@ function pCopyLink(url){
 async function renderPublicDownloads(){
     var grid=document.getElementById('pDownloadsGrid');
     if(!grid) return;
-    var apps=(pStoreData.stream||[]).filter(function(p){return p.android_url||p.ios_url||p.tv_url;});
+    var streamApps=(pStoreData.stream||[]).filter(function(p){return p.android_url||p.ios_url||p.tv_url;}).map(function(p){return {name:p.name,icon:p.image,category:'Streaming',price:p.price,unit:p.unit,android_url:p.android_url,ios_url:p.ios_url,tv_url:p.tv_url,website_url:p.website_url};});
+    var pureApps=[];
+    try{ pureApps=(await DB.get('apps')).filter(function(a){return a.status==='Publicado'&&(a.android_url||a.ios_url||a.tv_url||a.website_url);}).map(function(a){return {name:a.name,icon:a.icon,category:a.category||'Aplicativo',android_url:a.android_url,ios_url:a.ios_url,tv_url:a.tv_url,website_url:a.website_url};}); }catch(e){}
+    var apps=pureApps.concat(streamApps);
     if(!apps.length){grid.innerHTML='<p style="color:var(--text-muted)">Ainda sem aplicações disponíveis para download. Fala connosco no WhatsApp.</p>';return;}
     grid.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">'+apps.map(function(p){
-        var head=p.image?'<img src="'+p.image+'" alt="">':'<div class="p-dl-icon">📺</div>';
+        var head=p.icon?'<img src="'+p.icon+'" alt="">':'<div class="p-dl-icon">📲</div>';
         var btns='';
         if(p.android_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.android_url.replace(/'/g,"\\'")+'\',\'Android (telemóvel/tablet)\')">🤖 Android</button>';
         if(p.ios_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+p.ios_url.replace(/'/g,"\\'")+'\',\'iPhone/iPad\')">🍎 iPhone</button>';
         if(p.tv_url||p.android_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+p.name.replace(/'/g,"\\'")+'\',\''+(p.tv_url||p.android_url).replace(/'/g,"\\'")+'\',\'Smart TV\')">📺 Smart TV</button>';
         if(p.website_url) btns+='<a href="'+p.website_url+'" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🌐 Site</a>';
-        return '<div class="p-dl-card"><div class="p-dl-head">'+head+'<div><h4>'+p.name+'</h4><span>'+fmt(p.price)+' '+p.unit+'</span></div></div><div class="p-dl-btns">'+btns+'</div></div>';
+        var priceTag=p.price?('<span>'+fmt(p.price)+' '+p.unit+'</span>'):('<span>'+(p.category||'Aplicativo')+'</span>');
+        return '<div class="p-dl-card"><div class="p-dl-head">'+head+'<div><h4>'+p.name+'</h4>'+priceTag+'</div></div><div class="p-dl-btns">'+btns+'</div></div>';
     }).join('')+'</div>';
 }
 
@@ -1231,6 +1246,47 @@ function openMediaModal(){var b='<div class="form-group"><label>Título</label><
 function saveMedia(){var title=val('fMediaTitle'),url=val('fMediaUrl'),file=document.getElementById('fMediaFile');var done=function(u){if(!u)return showToast('Indica uma URL ou escolhe uma imagem.','danger');(async function(){await DB.insert('media_library',{id:'m'+Date.now(),title:title,url:u,date:todayISO()});closeModal();showToast('Imagem adicionada!');loadMedia();})();};if(file&&file.files&&file.files[0])readPortalImage(file,done);else done(url);}
 async function delMedia(id){if(!(await showConfirm('Eliminar Imagem','Eliminar esta imagem da biblioteca?','Eliminar','btn-danger')))return;await DB.del('media_library',id);loadMedia();}
 
+/* ==================== APLICATIVOS (DOWNLOADS) ==================== */
+async function loadApps(){
+    var data=(await DB.get('apps')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
+    var html='<div style="display:flex;justify-content:space-between;margin-bottom:5px;flex-wrap:wrap;gap:10px"><div><h2>📲 Aplicativos</h2><p style="color:var(--text-muted);font-size:.85rem">Cada app publicada aparece automaticamente na página de Downloads do site — qualquer visitante pode baixar, sem precisar de login.</p></div><button class="btn btn-danger btn-sm" onclick="openAppModal()">➕ Novo Aplicativo</button></div><div class="card" style="margin-top:15px"><table><thead><tr><th>Ícone</th><th>Nome</th><th>Categoria</th><th>Links</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';
+    if(!data.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhum aplicativo criado ainda.</td></tr>';
+    data.forEach(function(a){
+        var pub=a.status==='Publicado';
+        var links=[a.android_url?'🤖':'',a.ios_url?'🍎':'',a.tv_url?'📺':'',a.website_url?'🌐':''].filter(Boolean).join(' ')||'-';
+        html+='<tr><td>'+(a.icon?'<img src="'+a.icon+'" style="width:36px;height:36px;object-fit:cover;border-radius:8px">':'📲')+'</td><td><strong>'+a.name+'</strong></td><td>'+(a.category||'-')+'</td><td>'+links+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(a.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openAppModal(\''+a.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="toggleAppStatus(\''+a.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delApp(\''+a.id+'\')">🗑️</button></td></tr>';
+    });
+    html+='</tbody></table></div>';
+    document.getElementById('appContent').innerHTML=html;
+}
+function openAppModal(id){
+    var a=id?DB.cache.apps.find(function(x){return x.id===id;}):null;
+    var b='<div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="fAppName" value="'+(a?a.name.replace(/"/g,'&quot;'):'')+'" placeholder="Ex: Netflix, Unitv, App Câmaras..."></div>'+
+    '<div class="form-group"><label>Categoria</label><input type="text" id="fAppCat" value="'+(a?(a.category||''):'')+'" placeholder="Streaming, Câmaras, Utilitário..."></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Ícone (URL)</label><input type="text" id="fAppIcon" value="'+(a?(a.icon||''):'')+'" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="fAppFile" accept="image/*"></div></div>'+
+    '<div class="form-group"><label>Descrição</label><textarea id="fAppDesc" rows="2" placeholder="Breve descrição do aplicativo">'+(a?(a.description||''):'')+'</textarea></div>'+
+    '<div class="form-row"><div class="form-group"><label>Link direto Android (.apk)</label><input type="text" id="fAppAndroid" value="'+(a?(a.android_url||''):'')+'" placeholder="https://.../app.apk"></div><div class="form-group"><label>Link iOS</label><input type="text" id="fAppIos" value="'+(a?(a.ios_url||''):'')+'" placeholder="https://..."></div></div>'+
+    '<div class="form-row"><div class="form-group"><label>Link Smart TV (.apk direto)</label><input type="text" id="fAppTv" value="'+(a?(a.tv_url||''):'')+'" placeholder="https://.../app.apk"></div><div class="form-group"><label>Site Oficial</label><input type="text" id="fAppSite" value="'+(a?(a.website_url||''):'')+'" placeholder="https://..."></div></div>'+
+    '<div class="form-group"><label>Estado</label><select id="fAppStatus"><option value="Rascunho"'+(a&&a.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(a&&a.status==='Publicado'?' selected':'')+'>Publicado</option></select></div>'+
+    '<p style="color:var(--text-muted);font-size:.78rem;margin-top:6px">💡 Este campo guarda apenas o <strong>link</strong> do ficheiro (ex: alojado no teu Google Drive, site próprio, etc.) — o sistema não guarda o ficheiro .apk em si, apenas o endereço direto para o download.</p>';
+    modal(a?'Editar Aplicativo':'Novo Aplicativo', b, function(){saveApp(id);}, 'Salvar');
+}
+async function saveApp(id){
+    var name=document.getElementById('fAppName').value.trim();
+    if(!name) return showToast('Indica o nome do aplicativo.','danger');
+    var finish=async function(icon){
+        var rec={name:name,category:document.getElementById('fAppCat').value.trim(),icon:icon||document.getElementById('fAppIcon').value.trim(),description:document.getElementById('fAppDesc').value.trim(),android_url:document.getElementById('fAppAndroid').value.trim(),ios_url:document.getElementById('fAppIos').value.trim(),tv_url:document.getElementById('fAppTv').value.trim(),website_url:document.getElementById('fAppSite').value.trim(),status:document.getElementById('fAppStatus').value};
+        if(id){await DB.update('apps',id,rec);}else{rec.id='app'+Date.now();rec.date=todayISO();await DB.insert('apps',rec);}
+        closeModal();showToast('Aplicativo guardado!');loadApps();
+    };
+    var file=document.getElementById('fAppFile');
+    if(file&&file.files&&file.files[0]) return readPortalImage(file,finish);
+    return finish('');
+}
+async function toggleAppStatus(id){var a=DB.cache.apps.find(function(x){return x.id===id;});if(!a)return;await DB.update('apps',id,{status:a.status==='Publicado'?'Rascunho':'Publicado'});loadApps();}
+async function delApp(id){var ok=await showConfirm('Eliminar Aplicativo','Eliminar este aplicativo? Deixará de aparecer nos Downloads do site.','Eliminar','btn-danger');if(!ok)return;await DB.del('apps',id);showToast('Eliminado!');loadApps();}
+
+
 /* ==================== CONTEÚDO DO PORTAL (BANNERS + PORQUÊ ESCOLHER) ==================== */
 async function loadSiteContent(){
     var data=await DB.get('content_blocks');
@@ -1346,6 +1402,7 @@ function showClientApp(){
     document.getElementById('pageTitle').innerText='Meu Perfil';
     loadClientPortal().then(function(){
         if(pPendingClientTab){ renderClientTab(pPendingClientTab); pPendingClientTab=null; }
+        else { var unread=updateClientNewsBadge(); if(unread>0) showToast('🔔 Tens '+unread+' notícia(s) nova(s) da Conex Cass!','info'); }
     });
 }
 function clientLogout(){
@@ -1384,14 +1441,14 @@ async function loadClientPortal(){
     var txs=(await DB.get('transactions')).filter(function(t){return t.clientId===c.id;}).reverse();
     var docs=(await DB.get('documents')).filter(function(d){return d.clientId===c.id;}).reverse();
     var pendingTx = txs.find(function(t){return t.status==='pending_verification';});
-    var html='<div style="max-width:900px;margin:0 auto"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px"><h2>Olá, '+c.name+'</h2><button class="btn btn-danger btn-sm" onclick="clientLogout()">Sair</button></div>';
+    var html='<div style="max-width:900px;margin:0 auto"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px"><h2>Olá, '+c.name+'</h2><div style="display:flex;gap:8px"><button class="btn btn-outline btn-sm" onclick="pBackToSiteFromClient()">🏠 Voltar ao Site</button><button class="btn btn-danger btn-sm" onclick="clientLogout()">Sair</button></div></div>';
     if(pendingTx){
         var cartItems = pendingTx.cart_items ? JSON.parse(pendingTx.cart_items) : [{name: pendingTx.desc, price: pendingTx.val}];
         var itemsHtml = cartItems.map(function(it){return '<li>'+it.name+' - '+fmt(it.price)+' '+cu+'</li>';}).join('');
         html+='<div class="card" style="border:2px solid var(--warning); margin-bottom:20px;"><h3 style="color:var(--warning)">⏳ Pagamento a Aguardar Confirmação</h3><p>Recebemos o seu aviso de pagamento de <strong>'+fmt(pendingTx.val)+' '+cu+'</strong>.</p><ul style="font-size:0.85rem; color:var(--text-muted); margin-left:20px;">'+itemsHtml+'</ul><p>A sua fatura estará disponível assim que a administração confirmar.</p></div>';
     }
     html+='<div class="kpi-grid" style="margin-bottom:20px"><div class="kpi-card" style="background:rgba(0,180,216,.05);border-left-color:var(--primary)"><div class="kpi-label">O meu Plano</div><div class="kpi-value" style="color:var(--primary);font-size:1.1rem">'+(c.pkg||'N/A')+'</div></div><div class="kpi-card" style="background:rgba(0,255,136,.05);border-left-color:'+statusCor+'"><div class="kpi-label">Estado do Serviço</div><div class="kpi-value" style="color:'+statusCor+';font-size:1.1rem">'+statusTxt+'</div></div><div class="kpi-card" style="background:rgba(255,0,110,.05);border-left-color:'+(c.divida>0?'var(--danger)':'var(--success)')+'"><div class="kpi-label">Dívida em Aberto</div><div class="kpi-value" style="color:'+(c.divida>0?'var(--danger)':'var(--success)')+'">'+fmt(Math.max(0, c.divida||0))+' '+cu+'</div></div></div>';
-    html+='<div class="card"><div style="display:flex;gap:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:15px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="renderClientTab(\'home\')">Início</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'plans\')">Planos</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'streaming\')">Streaming</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'shop\')">Loja</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'support\')">Apoio Técnico</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'news\')">Notícias<span id="clientNewsBadge"></span></button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'history\')">Histórico</button></div><div id="clientTabContent"></div></div>';
+    html+='<div class="card"><div style="display:flex;gap:10px;border-bottom:1px solid rgba(255,255,255,.1);margin-bottom:15px;flex-wrap:wrap"><button class="btn btn-sm btn-primary" onclick="renderClientTab(\'home\')">Início</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'plans\')">Planos</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'streaming\')">Streaming</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'shop\')">Loja</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'downloads\')">📲 Downloads</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'support\')">Apoio Técnico</button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'news\')">Notícias<span id="clientNewsBadge"></span></button><button class="btn btn-sm btn-outline" onclick="renderClientTab(\'history\')">Histórico</button></div><div id="clientTabContent"></div></div>';
     html+='<div id="clientCartBar" style="position:fixed;bottom:0;left:0;right:0;background:var(--bg-panel);border-top:1px solid var(--primary);padding:10px 20px;display:none;justify-content:space-between;align-items:center;z-index:100;"><div><strong>Carrinho: <span id="cartTotal">0.00</span> '+cu+'</strong></div><button class="btn btn-success btn-sm" onclick="openCartCheckout()">💳 Finalizar Compra</button></div>';
     html+='<div class="card" style="margin-top:20px"><h3>As Minhas Faturas</h3>'+(docs.length?'<div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Doc</th><th>Valor</th><th>Estado</th><th>Ações</th></tr></thead><tbody>'+docs.map(function(d){return '<tr><td>'+d.date+'</td><td>'+d.docId+'</td><td>'+fmt(d.total)+'</td><td><span class="badge '+(d.status==='paid'?'bg-success':'bg-warning')+'">'+(d.status==='paid'?'PAGO':'PEND.')+'</span></td><td style="white-space:nowrap"><button class="btn btn-sm btn-outline" onclick="viewDoc(\''+d.id+'\')">👁️ Ver</button> <button class="btn btn-sm btn-primary" onclick="downloadClientInvoice(\''+d.id+'\')">📄 PDF</button></td></tr>';}).join('')+'</tbody></table></div>':'<p style="color:var(--text-muted);text-align:center;padding:20px">Nenhuma fatura encontrada.</p>')+'</div>';
     document.getElementById('appContent').innerHTML=html;
@@ -1403,6 +1460,7 @@ function updateClientNewsBadge(){
     var unread=(DB.cache.news||[]).filter(function(n){return n.status==='Publicado'&&(n.date||'')>lastSeen;}).length;
     var b=document.getElementById('clientNewsBadge');
     if(b) b.innerHTML=unread>0?' <span class="badge bg-danger" style="padding:1px 6px;font-size:.6rem">'+unread+'</span>':'';
+    return unread;
 }
 
 async function renderClientTab(tab){
@@ -1438,7 +1496,9 @@ async function renderClientTab(tab){
         inv.forEach(function(i){
             if(i.status==='Em Stock' && i.qty>0){
                 hasItems = true;
+                var imgHtml = i.image ? '<img src="'+i.image+'" alt="'+i.name+'" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:10px;cursor:pointer" onclick="pOpenLightbox(\''+i.image.replace(/'/g,"\\'")+'\')">' : '';
                 shopHtml += '<div class="plan-card" style="flex-direction:column;align-items:stretch;gap:10px;">';
+                shopHtml += imgHtml;
                 shopHtml += '<div style="display:flex;justify-content:space-between;align-items:center;"><div><strong>'+i.name+'</strong> ('+fmt(i.val)+' '+cu+')</div></div>';
                 shopHtml += '<div class="form-row" style="margin-bottom:0;"><div><label>Taxa de Serviço</label><select id="fee_'+i.id+'" onchange="updateShopPrice(\''+i.id+'\')"><option value="'+deliveryFee+'">Entrega/Montagem ('+fmt(deliveryFee)+' Kz)</option><option value="'+configFee+'">Config. Câmera/Equip. ('+fmt(configFee)+' Kz)</option></select></div><div style="text-align:right;"><label>Total a Pagar</label><strong id="price_'+i.id+'" style="font-size:1.1rem;">'+fmt(i.val + deliveryFee)+' Kz</strong></div></div>';
                 shopHtml += '<button class="btn btn-success btn-sm" onclick="addShopItem(\''+i.id+'\')">➕ Adicionar ao Carrinho</button>';
@@ -1448,6 +1508,25 @@ async function renderClientTab(tab){
         if(!hasItems) shopHtml += '<p style="color:var(--text-muted);text-align:center;padding:20px">Sem equipamentos disponíveis na loja neste momento.</p>';
         content.innerHTML = shopHtml;
     } 
+    else if(tab==='downloads'){
+        var pureApps=[]; try{ pureApps=(await DB.get('apps')).filter(function(a){return a.status==='Publicado'&&(a.android_url||a.ios_url||a.tv_url||a.website_url);}); }catch(e){}
+        var plansApps=(await DB.get('plans')).filter(function(p){return p.android_url||p.ios_url||p.tv_url;});
+        var allApps=pureApps.concat(plansApps.map(function(p){return {name:p.nome,icon:p.image,category:'Streaming',android_url:p.android_url,ios_url:p.ios_url,tv_url:p.tv_url,website_url:p.website_url};}));
+        var dlHtml='<h3>📲 Aplicativos Disponíveis</h3><p style="font-size:.85rem;color:var(--text-muted);margin-bottom:12px">Baixa diretamente para o teu telemóvel, iPhone ou Smart TV.</p>';
+        if(!allApps.length){ dlHtml+='<p style="color:var(--text-muted)">Sem aplicativos disponíveis no momento.</p>'; }
+        else{
+            allApps.forEach(function(a){
+                var img=a.icon?'<img src="'+a.icon+'" style="width:48px;height:48px;border-radius:10px;object-fit:cover">':'📲';
+                var btns='';
+                if(a.android_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+a.name.replace(/'/g,"\\'")+'\',\''+a.android_url.replace(/'/g,"\\'")+'\',\'Android\')">🤖 Android</button> ';
+                if(a.ios_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+a.name.replace(/'/g,"\\'")+'\',\''+a.ios_url.replace(/'/g,"\\'")+'\',\'iPhone\')">🍎 iPhone</button> ';
+                if(a.tv_url||a.android_url) btns+='<button class="btn btn-info btn-sm" onclick="pOpenAppDownload(\''+a.name.replace(/'/g,"\\'")+'\',\''+(a.tv_url||a.android_url).replace(/'/g,"\\'")+'\',\'Smart TV\')">📺 TV</button> ';
+                if(a.website_url) btns+='<a href="'+a.website_url+'" target="_blank" rel="noopener" class="btn btn-outline btn-sm">🌐 Site</a>';
+                dlHtml+='<div class="plan-card"><div style="display:flex;align-items:center;gap:10px"><div>'+img+'</div><div><strong>'+a.name+'</strong><br><small style="color:var(--text-muted)">'+(a.category||'Aplicativo')+'</small></div></div><div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">'+btns+'</div></div>';
+            });
+        }
+        content.innerHTML = dlHtml;
+    }
     else if(tab==='support'){
         var supportFee = 5000;
         content.innerHTML = '<h3>Agendar Apoio Técnico</h3><p style="font-size:.85rem;color:var(--warning);margin-bottom:10px">A taxa de apoio técnico é fixa de <strong>'+fmt(supportFee)+' '+cu+'</strong>. O técnico só é despachado após a confirmação do pagamento pela administração.</p><div class="form-group"><label>Descreva o problema</label><textarea id="supProblem" rows="3" placeholder="Ex: Sem internet, lentidão..."></textarea></div><button class="btn btn-warning" onclick="addCartSupport()"><strong>Agendar e Pagar '+fmt(supportFee)+' '+cu+'</strong></button>';
@@ -1456,7 +1535,7 @@ async function renderClientTab(tab){
         localStorage.setItem('cx_client_lastseen_'+c.id,todayISO());
         updateClientNewsBadge();
         var allNews=(await DB.get('news')).filter(function(n){return n.status==='Publicado';}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');}).slice(0,10);
-        content.innerHTML='<h3>📢 Notícias da Rede</h3>'+(allNews.length?allNews.map(function(n){return '<div style="border-bottom:1px solid rgba(255,255,255,.08);padding:10px 0"><span class="badge bg-info">'+(n.type||'Novidade')+'</span> <strong style="color:#fff">'+n.title+'</strong><p style="color:var(--text-muted);font-size:.82rem;margin-top:4px">'+fmtPT(n.date)+'</p></div>';}).join(''):'<p style="color:var(--text-muted)">Sem notícias no momento.</p>');
+        content.innerHTML='<h3>📢 Notícias da Rede</h3>'+(allNews.length?allNews.map(function(n){return '<div style="border-bottom:1px solid rgba(255,255,255,.08);padding:10px 0;cursor:pointer" onclick="pOpenNews(\''+n.id+'\')"><span class="badge bg-info">'+(n.type||'Novidade')+'</span> <strong style="color:#fff">'+n.title+'</strong><p style="color:var(--text-muted);font-size:.82rem;margin-top:4px">'+fmtPT(n.date)+' · <span style="color:var(--primary)">Ver detalhes →</span></p></div>';}).join(''):'<p style="color:var(--text-muted)">Sem notícias no momento.</p>');
     }
     else if(tab==='history'){
         var allTx=(await DB.get('transactions')).filter(function(t){return t.clientId===c.id;}).sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});
@@ -1608,8 +1687,8 @@ async function runDailyAutomations() {
     if(blocked > 0 || genInv > 0) showToast('Automação: '+genInv+' faturas geradas, '+blocked+' clientes bloqueados.', 'info');
 }
 
-var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config','blog','news','faq','comments','promotions','newsletter','stats','tutorials','feedback','media','sitecontent'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports','blog','news','faq','comments','promotions','newsletter','stats','tutorials','feedback','media','sitecontent'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
-async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'sitecontent',i:'🎨',t:'Conteúdo do Portal'},{id:'blog',i:'📰',t:'Blog'},{id:'news',i:'📢',t:'Notícias'},{id:'promotions',i:'🔥',t:'Promoções'},{id:'newsletter',i:'📧',t:'Newsletter'},{id:'faq',i:'❓',t:'FAQ'},{id:'comments',i:'💬',t:'Comentários'},{id:'stats',i:'📊',t:'Estatísticas Portal'},{id:'tutorials',i:'🎓',t:'Tutoriais'},{id:'feedback',i:'⭐',t:'Feedbacks'},{id:'media',i:'🖼️',t:'Imagens / Media'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
+var menuPermissions = {'admin': ['dashboard','clients','commercial','installments','finance','advances','tickets','suppliers','stock','plans','network','renewals','installations','cash','employees','reports','audit','config','blog','news','faq','comments','promotions','newsletter','stats','tutorials','feedback','media','sitecontent','apps'],'manager': ['dashboard','clients','commercial','installments','finance','tickets','stock','plans','network','renewals','installations','cash','reports','blog','news','faq','comments','promotions','newsletter','stats','tutorials','feedback','media','sitecontent','apps'],'caixa': ['dashboard','clients','commercial','installments','finance','cash','reports'],'tecnico': ['dashboard','clients','tickets','network','installations','renewals']};
+async function loadSidebar(){var nav=document.getElementById('menuNav');var allItems=[{id:'dashboard',i:'📊',t:'Dashboard'},{id:'clients',i:'👥',t:'Clientes'},{id:'commercial',i:'💼',t:'Faturação'},{id:'installments',i:'💳',t:'Prestações'},{id:'finance',i:'🏦',t:'Financeiro'},{id:'advances',i:'🤝',t:'Adiantamentos'},{id:'tickets',i:'🎧',t:'Suporte'},{id:'sitecontent',i:'🎨',t:'Conteúdo do Portal'},{id:'blog',i:'📰',t:'Blog'},{id:'news',i:'📢',t:'Notícias'},{id:'apps',i:'📲',t:'Aplicativos'},{id:'promotions',i:'🔥',t:'Promoções'},{id:'newsletter',i:'📧',t:'Newsletter'},{id:'faq',i:'❓',t:'FAQ'},{id:'comments',i:'💬',t:'Comentários'},{id:'stats',i:'📊',t:'Estatísticas Portal'},{id:'tutorials',i:'🎓',t:'Tutoriais'},{id:'feedback',i:'⭐',t:'Feedbacks'},{id:'media',i:'🖼️',t:'Imagens / Media'},{id:'suppliers',i:'🏭',t:'Fornecedores'},{id:'stock',i:'📦',t:'Ativos/Stock'},{id:'plans',i:'📡',t:'Planos'},{id:'network',i:'🌐',t:'Rede'},{id:'renewals',i:'🔄',t:'Renovações'},{id:'installations',i:'🔧',t:'Instalações'},{id:'cash',i:'💰',t:'Caixa'},{id:'employees',i:'👷',t:'RH'},{id:'reports',i:'📈',t:'Relatórios'},{id:'audit',i:'📋',t:'Auditoria'},{id:'config',i:'⚙️',t:'Config'}];var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];var items=allItems.filter(function(x){return allowed.includes(x.id);});nav.innerHTML=items.map(function(x){return'<a onclick="navigate(\''+x.id+'\')">'+x.i+' '+x.t+'</a>';}).join('');}
 function navigate(id){
     if(currentClient) { showToast('Acesso restrito ao portal do cliente.','warning'); return loadClientPortal(); }
     var role=currentUser.role||'tecnico';var allowed=menuPermissions[role]||menuPermissions['tecnico'];
@@ -1618,7 +1697,7 @@ function navigate(id){
     var a=document.querySelector('.sidebar nav a[onclick*="'+id+'"]');if(a)a.classList.add('active');
     document.getElementById('pageTitle').innerText=id.charAt(0).toUpperCase()+id.slice(1);
     currentPageId = id; 
-    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,sitecontent:loadSiteContent,blog:loadBlog,news:loadNews,faq:loadFaq,comments:loadComments,promotions:loadPromotions,newsletter:loadNewsletter,stats:loadStats,tutorials:loadTutorials,feedback:loadFeedback,media:loadMedia,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
+    var actions={dashboard:loadDashboard,clients:loadClients,commercial:loadCommercial,installments:loadInstallmentsPage,finance:loadFinance,advances:loadAdvances,tickets:loadTickets,sitecontent:loadSiteContent,blog:loadBlog,news:loadNews,apps:loadApps,faq:loadFaq,comments:loadComments,promotions:loadPromotions,newsletter:loadNewsletter,stats:loadStats,tutorials:loadTutorials,feedback:loadFeedback,media:loadMedia,suppliers:loadSuppliers,stock:loadStock,plans:loadPlans,network:loadNetwork,renewals:loadRenewals,installations:loadInstallations,cash:loadCash,employees:loadEmployees,reports:loadReports,audit:loadAudit,config:loadConfig};
     if(actions[id])actions[id]();
     document.getElementById('mainSidebar').classList.remove('open');
 }
@@ -1785,7 +1864,7 @@ async function rejectPayment(txId) {
 /* ==================== CLIENTES ==================== */
 async function loadClients(){
     var cl = await DB.get('clients');
-    var html = '<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>👥 Clientes</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><input type="text" class="search-box" placeholder="🔍 Pesquisar..." oninput="filterTable(this,\'tblClients\')" style="max-width:300px"><button class="btn btn-success btn-sm" onclick="exportTableToCSV(\'tblClients\',\'clientes\')">📊 Excel</button><button class="btn btn-primary btn-sm" onclick="openModalClient()">➕ Novo Cliente</button></div></div><div class="card"><table id="tblClients"><thead><tr><th>Nome</th><th>Tipo</th><th>Contacto</th><th>Plano</th><th>Dívida</th><th>Ações</th></tr></thead><tbody id="tblClientsBody"></tbody></table><div id="pag_tblClients"></div></div>';
+    var html = '<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>👥 Clientes</h2><div style="display:flex;gap:10px;flex-wrap:wrap"><input type="text" class="search-box" placeholder="🔍 Pesquisar..." oninput="filterTable(this,\'tblClients\')" style="max-width:300px"><button class="btn btn-success btn-sm" onclick="exportTableToCSV(\'tblClients\',\'clientes\')">📊 Excel</button><button class="btn" style="background:rgba(157,78,221,.2);color:#9d4edd;border:1px solid #9d4edd" onclick="openQuickAvulsoModal()">⚡ Utilizador Avulso</button><button class="btn btn-primary btn-sm" onclick="openModalClient()">➕ Novo Cliente</button></div></div><div class="card"><table id="tblClients"><thead><tr><th>Nome</th><th>Tipo</th><th>Contacto</th><th>Plano</th><th>Dívida</th><th>Ações</th></tr></thead><tbody id="tblClientsBody"></tbody></table><div id="pag_tblClients"></div></div>';
     document.getElementById('appContent').innerHTML = html;
     var renderFn = function(data) {
         var body = document.getElementById('tblClientsBody');
@@ -1832,6 +1911,26 @@ async function openModalClient(id){
     });
 }
 function toggleInternetBlock(){document.getElementById('internetBlock').style.display=val('cType')==='Avulso'?'none':'block';}
+function openQuickAvulsoModal(){
+    var b='<p style="color:var(--text-muted);font-size:.85rem;margin-bottom:14px">Cria rapidamente um acesso para alguém que só quer comprar equipamentos ou baixar aplicativos, sem plano de internet. Ele poderá entrar na Área do Cliente com o número e o código gerado.</p>'+
+    '<div class="form-row"><div class="form-group"><label>Nome *</label><input id="qaName" placeholder="Nome completo"></div><div class="form-group"><label>Contacto (telefone) *</label><input id="qaContact" placeholder="Ex: 923000000"></div></div>'+
+    '<div class="form-group"><label>Código de Acesso (opcional)</label><input id="qaCode" placeholder="Deixa vazio para gerar automático"></div>';
+    modal('⚡ Novo Utilizador Avulso', b, saveQuickAvulso, 'Criar Utilizador', 'btn-primary');
+}
+async function saveQuickAvulso(){
+    var name=val('qaName'),contact=val('qaContact');
+    if(!name||!contact) return showToast('Nome e contacto são obrigatórios.','danger');
+    var cls=await DB.get('clients');
+    var isDuplicate=cls.some(function(x){return (x.contact||'').replace(/\s/g,'')===contact.replace(/\s/g,'');});
+    if(isDuplicate) return showToast('Já existe um cliente com este contacto!','danger');
+    var accessCode=val('qaCode')||Math.floor(1000+Math.random()*9000).toString();
+    var data={id:'c'+Date.now(),name:name,contact:contact,address:'',nif:'',clientType:'Avulso',speedId:null,pkg:'',mens:0,validade:'',divida:0,streamings:'',equipments:'',accessCode:accessCode,createdAt:getTodayStr()};
+    await DB.insert('clients',data);
+    await logAction('Utilizador Avulso',name);
+    closeModal();
+    showToast('Utilizador criado! Código de acesso: '+accessCode);
+    loadClients();
+}
 
 /* ==================== FATURAÇÃO ==================== */
 async function loadCommercial(){
@@ -1951,9 +2050,29 @@ async function savePost(id){var title=document.getElementById('fPostTitle').valu
 async function togglePostStatus(id){var p=DB.cache.posts.find(function(x){return x.id===id;});if(!p)return;await DB.update('posts',id,{status:p.status==='Publicado'?'Rascunho':'Publicado'});loadBlog();}
 async function delPost(id){var ok=await showConfirm('Eliminar Artigo','Eliminar este artigo do blog?','Eliminar','btn-danger');if(!ok)return;await DB.del('posts',id);showToast('Eliminado!');loadBlog();}
 
-async function loadNews(){var data=(await DB.get('news')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📢 Notícias</h2><button class="btn btn-danger btn-sm" onclick="openNewsModal()">➕ Nova Notícia</button></div><div class="card"><table><thead><tr><th>Título</th><th>Tipo</th><th>Data</th><th>Notificar</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';if(!data.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhuma notícia criada ainda.</td></tr>';data.forEach(function(n){var pub=n.status==='Publicado';html+='<tr><td><strong>'+n.title+'</strong></td><td><span class="badge bg-info">'+(n.type||'Novidade')+'</span></td><td>'+fmtPT(n.date)+'</td><td>'+(n.notify?'🔔 Sim':'-')+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(n.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openNewsModal(\''+n.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="toggleNewsStatus(\''+n.id+'\')">'+(pub?'⏸️':'✅')+'</button> <button class="btn btn-danger btn-sm" onclick="delNews(\''+n.id+'\')">🗑️</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
+async function loadNews(){var data=(await DB.get('news')).slice().sort(function(a,b){return (b.date||'').localeCompare(a.date||'');});var html='<div style="display:flex;justify-content:space-between;margin-bottom:15px;flex-wrap:wrap;gap:10px"><h2>📢 Notícias</h2><button class="btn btn-danger btn-sm" onclick="openNewsModal()">➕ Nova Notícia</button></div><div class="card"><table><thead><tr><th>Título</th><th>Tipo</th><th>Data</th><th>Notificar</th><th>Estado</th><th>Ações</th></tr></thead><tbody>';if(!data.length) html+='<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Nenhuma notícia criada ainda.</td></tr>';data.forEach(function(n){var pub=n.status==='Publicado';html+='<tr><td><strong>'+n.title+'</strong></td><td><span class="badge bg-info">'+(n.type||'Novidade')+'</span></td><td>'+fmtPT(n.date)+'</td><td>'+(n.notify?'🔔 Sim':'-')+'</td><td><span class="badge '+(pub?'bg-success':'bg-warning')+'">'+(n.status||'Rascunho')+'</span></td><td style="white-space:nowrap"><button class="btn btn-outline btn-sm" onclick="openNewsModal(\''+n.id+'\')">✏️</button> <button class="btn '+(pub?'btn-warning':'btn-success')+' btn-sm" onclick="toggleNewsStatus(\''+n.id+'\')">'+(pub?'⏸️':'✅')+'</button> '+(pub?'<button class="btn btn-info btn-sm" onclick="notifyClientsWhatsApp(\''+n.id+'\')" title="Notificar clientes via WhatsApp">📨</button> ':'')+'<button class="btn btn-danger btn-sm" onclick="delNews(\''+n.id+'\')">🗑️</button></td></tr>';});html+='</tbody></table></div>';document.getElementById('appContent').innerHTML=html;}
 function openNewsModal(id){var n=id?DB.cache.news.find(function(x){return x.id===id;}):null;var types=['Novidade','Cobertura','Manutenção','Interrupção'];var b='<div class="form-group"><label>Título</label><input type="text" id="fNewsTitle" value="'+(n?n.title.replace(/"/g,'&quot;'):'')+'" placeholder="Título da notícia"></div><div class="form-row"><div class="form-group"><label>Tipo</label><select id="fNewsType">'+types.map(function(t){return '<option value="'+t+'"'+(n&&n.type===t?' selected':'')+'>'+t+'</option>';}).join('')+'</select></div><div class="form-group"><label>Estado</label><select id="fNewsStatus"><option value="Rascunho"'+(n&&n.status==='Rascunho'?' selected':'')+'>Rascunho</option><option value="Publicado"'+(n&&n.status==='Publicado'?' selected':'')+'>Publicado</option></select></div></div><div class="form-row"><div class="form-group"><label>Imagem (URL)</label><input type="text" id="fNewsImg" value="'+(n?(n.image||''):'')+'" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="fNewsFile" accept="image/*"></div></div><div class="form-group"><label>Conteúdo</label><textarea id="fNewsContent" rows="6" placeholder="Detalhes da notícia">'+(n?(n.content||''):'')+'</textarea></div><div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" id="fNewsNotify" style="width:auto" '+(n&&n.notify?'checked':'')+'> Notificar clientes ao publicar</label></div>';modal(n?'Editar Notícia':'Nova Notícia', b, function(){saveNews(id);}, 'Salvar');}
-async function saveNews(id){var title=document.getElementById('fNewsTitle').value.trim();if(!title) return showToast('Indica o título da notícia.','danger');var finish=async function(img){var rec={title:title,type:document.getElementById('fNewsType').value,status:document.getElementById('fNewsStatus').value,content:document.getElementById('fNewsContent').value.trim(),image:img||val('fNewsImg'),notify:document.getElementById('fNewsNotify').checked};if(id){await DB.update('news',id,rec);}else{rec.date=todayISO();await DB.insert('news',rec);}closeModal();showToast('Notícia guardada!');loadNews();};var file=document.getElementById('fNewsFile');if(file&&file.files&&file.files[0])return readPortalImage(file,function(img){finish(img);});return finish('');}
+async function saveNews(id){var title=document.getElementById('fNewsTitle').value.trim();if(!title) return showToast('Indica o título da notícia.','danger');var finish=async function(img){var rec={title:title,type:document.getElementById('fNewsType').value,status:document.getElementById('fNewsStatus').value,content:document.getElementById('fNewsContent').value.trim(),image:img||val('fNewsImg'),notify:document.getElementById('fNewsNotify').checked};var newsId=id;if(id){await DB.update('news',id,rec);}else{rec.date=todayISO();var created=await DB.insert('news',rec);newsId=created?created.id:null;}closeModal();showToast('Notícia guardada!');loadNews();if(rec.notify&&rec.status==='Publicado'&&newsId){var ok=await showConfirm('Notificar Clientes','A notícia está marcada para notificar. Queres avisar os clientes agora via WhatsApp?','Notificar Agora','btn-success');if(ok)notifyClientsWhatsApp(newsId);}};var file=document.getElementById('fNewsFile');if(file&&file.files&&file.files[0])return readPortalImage(file,function(img){finish(img);});return finish('');}
+async function notifyClientsWhatsApp(newsId){
+    var n=(DB.cache.news||[]).find(function(x){return x.id===newsId;});
+    if(!n) return showToast('Notícia não encontrada.','danger');
+    var cl=(await DB.get('clients',true)).filter(function(c){return c.contact;});
+    if(!cl.length) return showToast('Nenhum cliente com contacto registado.','danger');
+    var ok=await showConfirm('Notificar '+cl.length+' Clientes','Vai abrir uma janela do WhatsApp por cada cliente, com a mensagem já preenchida. Basta clicares em Enviar em cada uma. Continuar?','Começar','btn-success');
+    if(!ok) return;
+    showSpinner('A preparar notificações... Não feche a janela.');
+    var i=0;
+    var icons={'Cobertura':'📡','Manutenção':'🛠️','Interrupção':'⚠️','Novidade':'🗞️'};
+    var interval=setInterval(function(){
+        if(i>=cl.length){clearInterval(interval);hideSpinner();showToast(cl.length+' janelas de WhatsApp abertas!','success');return;}
+        var c=cl[i];
+        var phone=(c.contact||'').replace(/\s/g,'').replace('+','');
+        if(!phone.startsWith('244')) phone='244'+phone.replace(/^0/,'');
+        var msg='Olá '+c.name+'! '+(icons[n.type]||'🔔')+'\n\n*'+n.title+'*\n\n'+(n.content||'').slice(0,300)+'\n\n— Conex Cass';
+        window.open('https://api.whatsapp.com/send?phone='+phone+'&text='+encodeURIComponent(msg),'_blank');
+        i++;
+    },1500);
+}
 async function toggleNewsStatus(id){var n=DB.cache.news.find(function(x){return x.id===id;});if(!n)return;await DB.update('news',id,{status:n.status==='Publicado'?'Rascunho':'Publicado'});loadNews();}
 async function delNews(id){var ok=await showConfirm('Eliminar Notícia','Eliminar esta notícia?','Eliminar','btn-danger');if(!ok)return;await DB.del('news',id);showToast('Eliminado!');loadNews();}
 
@@ -1995,7 +2114,7 @@ async function delItem(id){var ok=await showConfirm('Eliminar Item','Eliminar es
 async function loadPlans(){var sp=await DB.get('speeds'),pl=await DB.get('plans'),cu=getCurrency();var semanal=sp.filter(function(s){return s.period==='Semanal';});var quinzenal=sp.filter(function(s){return s.period==='Quinzenal';});var mensal=sp.filter(function(s){return s.period==='Mensal'||!s.period;});function rl(arr,type){if(!arr.length)return'<p style="color:var(--text-muted)">Nenhum</p>';return arr.map(function(s){return'<div class="plan-card"><span>'+s.nome+'</span><div style="display:flex;align-items:center;gap:8px"><strong>'+fmt(s.preco)+' '+cu+'</strong><button class="btn btn-warning btn-sm" style="padding:2px 6px;font-size:.65rem" onclick="editSpeed(\''+s.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:.65rem" onclick="delSpeed(\''+s.id+'\')">🗑️</button></div></div>';}).join('');}document.getElementById('appContent').innerHTML='<h2>📡 Planos Internet</h2><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:15px;margin-bottom:20px"><div class="card" style="border-left:3px solid var(--warning)"><h3>📅 Semanal</h3>'+rl(semanal,'speed')+'</div><div class="card" style="border-left:3px solid var(--info)"><h3>📅 Quinzenal</h3>'+rl(quinzenal,'speed')+'</div><div class="card" style="border-left:3px solid var(--success)"><h3>📅 Mensal</h3>'+rl(mensal,'speed')+'</div></div><div class="card"><h3>Novo Plano Internet</h3><div class="form-row"><div><label>Nome</label><input id="nSN" placeholder="5 MB"></div><div><label>Preço</label><input type="number" id="nSPr"></div><div><label>Período</label><select id="nSPer"><option value="Semanal">Semanal</option><option value="Quinzenal">Quinzenal</option><option value="Mensal" selected>Mensal</option></select></div><div style="display:flex;align-items:flex-end"><button class="btn btn-primary" onclick="addSp()">➕</button></div></div></div><div class="card"><h3>Streamings / Serviços Adicionais</h3><div class="form-row"><div><label>Serviço</label><input id="nPN"></div><div><label>Preço</label><input type="number" id="nPP"></div><div style="display:flex;align-items:flex-end"><button class="btn btn-primary" onclick="addPl()">➕</button></div></div><div style="margin-top:10px">'+pl.map(function(p){return'<div class="plan-card"><span>'+p.nome+'</span><div style="display:flex;align-items:center;gap:8px"><strong>'+fmt(p.preco)+' '+cu+'</strong><button class="btn btn-warning btn-sm" style="padding:2px 6px;font-size:.65rem" onclick="editPlan(\''+p.id+'\')">✏️</button> <button class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:.65rem" onclick="delPlan(\''+p.id+'\')">🗑️</button></div></div>';}).join('')+'</div></div>';}
 async function addSp(){var n=val('nSN'),pr=parseFloat(val('nSPr')),per=val('nSPer');if(!n||!pr)return showToast('Nome e Preço obrigatórios!','danger');var days=per==='Semanal'?7:per==='Quinzenal'?15:30;await DB.insert('speeds',{id:'s'+Date.now(),nome:n,preco:pr,period:per,days:days});showToast('Criado!');loadPlans();}
 async function addPl(){var n=val('nPN'),pr=parseFloat(val('nPP'));if(!n||!pr)return showToast('Nome e Preço obrigatórios!','danger');await DB.insert('plans',{id:'p'+Date.now(),nome:n,preco:pr});showToast('Criado!');loadPlans();}
-async function editSpeed(id){var sp=(await DB.get('speeds')).find(function(s){return s.id===id;});if(!sp)return;modal('✏️ Editar Plano Internet','<div class="form-row"><div><label>Nome</label><input id="esName" value="'+sp.nome+'"></div><div><label>Preço</label><input type="number" id="esPrice" value="'+sp.preco+'"></div><div><label>Período</label><select id="esPeriod"><option value="Semanal" '+(sp.period==='Semanal'?'selected':'')+'>Semanal</option><option value="Quinzenal" '+(sp.period==='Quinzenal'?'selected':'')+'>Quinzenal</option><option value="Mensal" '+(sp.period==='Mensal'||!sp.period?'selected':'')+'>Mensal</option></select></div></div>',async function(){var per=val('esPeriod');var days=per==='Semanal'?7:per==='Quinzenal'?15:30;await DB.update('speeds',id,{nome:val('esName'),preco:parseFloat(val('esPrice'))||0,period:per,days:days});showToast('Plano actualizado!');closeModal();loadPlans();});}
+async function editSpeed(id){var sp=(await DB.get('speeds')).find(function(s){return s.id===id;});if(!sp)return;modal('✏️ Editar Plano Internet','<div class="form-row"><div><label>Nome</label><input id="esName" value="'+sp.nome+'"></div><div><label>Preço</label><input type="number" id="esPrice" value="'+sp.preco+'"></div><div><label>Período</label><select id="esPeriod"><option value="Semanal" '+(sp.period==='Semanal'?'selected':'')+'>Semanal</option><option value="Quinzenal" '+(sp.period==='Quinzenal'?'selected':'')+'>Quinzenal</option><option value="Mensal" '+(sp.period==='Mensal'||!sp.period?'selected':'')+'>Mensal</option></select></div></div><div class="form-row"><div class="form-group"><label>Imagem (URL)</label><input id="esImg" value="'+(sp.image||'')+'" placeholder="https://..."></div><div class="form-group"><label>Ou carregar imagem</label><input type="file" id="esImgFile" accept="image/*"></div></div>',async function(){var per=val('esPeriod');var days=per==='Semanal'?7:per==='Quinzenal'?15:30;var finish=async function(img){await DB.update('speeds',id,{nome:val('esName'),preco:parseFloat(val('esPrice'))||0,period:per,days:days,image:img||val('esImg')});showToast('Plano actualizado!');closeModal();loadPlans();};var file=document.getElementById('esImgFile');if(file&&file.files&&file.files[0])return readPortalImage(file,finish);return finish('');});}
 async function delSpeed(id){var ok=await showConfirm('Eliminar Plano','Eliminar este plano de internet?','Eliminar','btn-danger');if(!ok)return;await DB.del('speeds',id);showToast('Plano eliminado!');loadPlans();}
 async function editPlan(id){var pl=(await DB.get('plans')).find(function(p){return p.id===id;});if(!pl)return;modal('✏️ Editar Serviço','<div class="form-row"><div><label>Nome</label><input id="epName" value="'+pl.nome+'"></div><div><label>Preço</label><input type="number" id="epPrice" value="'+pl.preco+'"></div></div><div class="form-row"><div><label>Logo/Imagem (URL)</label><input id="epImg" value="'+(pl.image||'')+'" placeholder="https://..."></div><div><label>Ou carregar imagem</label><input type="file" id="epImgFile" accept="image/*"></div></div><div><label>Descrição</label><textarea id="epDesc" rows="2" placeholder="Descrição, compatibilidade...">'+(pl.description||'')+'</textarea></div><div class="form-row"><div><label>Link Android</label><input id="epAndroid" value="'+(pl.android_url||'')+'" placeholder="https://..."></div><div><label>Link iOS</label><input id="epIos" value="'+(pl.ios_url||'')+'" placeholder="https://..."></div></div><div class="form-row"><div><label>Link Smart TV</label><input id="epTv" value="'+(pl.tv_url||'')+'" placeholder="https://..."></div><div><label>Site Oficial</label><input id="epSite" value="'+(pl.website_url||'')+'" placeholder="https://..."></div></div>',async function(){var finish=async function(img){await DB.update('plans',id,{nome:val('epName'),preco:parseFloat(val('epPrice'))||0,image:img||val('epImg'),description:val('epDesc'),android_url:val('epAndroid'),ios_url:val('epIos'),tv_url:val('epTv'),website_url:val('epSite')});showToast('Serviço actualizado!');closeModal();loadPlans();};var file=document.getElementById('epImgFile');if(file&&file.files&&file.files[0])return readPortalImage(file,finish);return finish('');});}
 async function delPlan(id){var ok=await showConfirm('Eliminar Serviço','Eliminar este serviço/streaming?','Eliminar','btn-danger');if(!ok)return;await DB.del('plans',id);showToast('Serviço eliminado!');loadPlans();}
